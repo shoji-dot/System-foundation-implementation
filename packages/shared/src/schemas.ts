@@ -88,3 +88,47 @@ export const regulationListResponseSchema = z.object({
   nextCursor: z.string().nullable(),
 });
 export type RegulationListResponse = z.infer<typeof regulationListResponseSchema>;
+
+/**
+ * 条文セクション応答（設計書④ regulation_sections 準拠）。
+ */
+export const regulationSectionResponseSchema = z.object({
+  id: z.string().uuid(),
+  path: z.string(),
+  heading: z.string(),
+  body: z.string(),
+});
+export type RegulationSectionResponse = z.infer<typeof regulationSectionResponseSchema>;
+
+/**
+ * 法規文書バージョン応答（設計書④⑧ regulation_versions 準拠）。
+ */
+export const regulationVersionResponseSchema = z.object({
+  id: z.string().uuid(),
+  versionNo: z.number().int().positive(),
+  publishedAt: z.string().datetime(),
+  effectiveFrom: z.string().date(),
+  effectiveTo: z.string().date().nullable(),
+  summary: z.string().nullable(),
+  changeSummary: z.string().nullable(),
+  fullText: z.string(),
+  sections: z.array(regulationSectionResponseSchema),
+});
+export type RegulationVersionResponse = z.infer<typeof regulationVersionResponseSchema>;
+
+/**
+ * 法規文書パラメータ（設計書⑤ GET /api/v1/regulations/:id 等、UUID検証）。
+ */
+export const regulationIdParamSchema = z.object({
+  id: z.string().uuid(),
+});
+export type RegulationIdParam = z.infer<typeof regulationIdParamSchema>;
+
+/**
+ * 法規文書詳細応答（設計書⑤ GET /api/v1/regulations/:id、最新版）。
+ * 関連文書(regulation_relations)・タグは今回は対象外（別コミットで追加予定）。
+ */
+export const regulationDetailResponseSchema = regulationSummaryResponseSchema.extend({
+  latestVersion: regulationVersionResponseSchema.nullable(),
+});
+export type RegulationDetailResponse = z.infer<typeof regulationDetailResponseSchema>;

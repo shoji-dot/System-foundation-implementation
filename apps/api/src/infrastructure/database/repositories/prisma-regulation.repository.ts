@@ -3,9 +3,12 @@ import type {
   Jurisdiction as PrismaJurisdiction,
   Prisma,
   Regulation as PrismaRegulation,
+  RegulationSection as PrismaRegulationSection,
+  RegulationVersion as PrismaRegulationVersion,
 } from "@prisma/client";
 
-import type { Regulation } from "../../../core/domain/regulation.entity";
+import type { RegulationVersion } from "../../../core/domain/regulation-version.entity";
+import type { Regulation, RegulationDetail } from "../../../core/domain/regulation.entity";
 import type {
   RegulationListFilters,
   RegulationListResult,
@@ -14,6 +17,9 @@ import type {
 import { PrismaService } from "../prisma.service";
 
 type RegulationWithJurisdiction = PrismaRegulation & { jurisdiction: PrismaJurisdiction };
+type RegulationVersionWithSections = PrismaRegulationVersion & {
+  sections: PrismaRegulationSection[];
+};
 
 /**
  * RegulationRepository の Prisma 実装（設計書③ infrastructure/database、Repository Pattern）。
@@ -57,6 +63,31 @@ export class PrismaRegulationRepository implements RegulationRepository {
     };
   }
 
+  async findDetailById(id: string): Promise<RegulationDetail | null> {
+    const record = await this.prisma.regulation.findUnique({
+      where: { id },
+      include: {
+        jurisdiction: true,
+        versions: {
+          orderBy: { versionNo: "desc" },
+          take: 1,
+          include: { sections: { orderBy: { createdAt: "asc" } } },
+        },
+      },
+    });
+
+    if (!record) {
+      return null;
+    }
+
+    const latestVersionRecord = record.versions[0];
+
+    return {
+      ...this.toDomain(record),
+      latestVersion: latestVersionRecord ? this.toVersionDomain(latestVersionRecord) : null,
+    };
+  }
+
   private toDomain(record: RegulationWithJurisdiction): Regulation {
     return {
       id: record.id,
@@ -70,6 +101,25 @@ export class PrismaRegulationRepository implements RegulationRepository {
       sourceUrl: record.sourceUrl,
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
+    };
+  }
+
+  private toVersionDomain(record: RegulationVersionWithSections): RegulationVersion {
+    return {
+      id: record.id,
+      versionNo: record.versionNo,
+      publishedAt: record.publishedAt,
+      effectiveFrom: record.effectiveFrom,
+      effectiveTo: record.effectiveTo,
+      fullText: record.fullText,
+      summary: record.summary,
+      changeSummary: record.changeSummary,
+      sections: record.sections.map((section: PrismaRegulationSection) => ({
+        id: section.id,
+        path: section.path,
+        heading: section.heading,
+        body: section.body,
+      })),
     };
   }
 }
