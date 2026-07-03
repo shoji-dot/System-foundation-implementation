@@ -31,13 +31,15 @@
     "@prisma/client": "^6.1.0",
     "@nestjs/bullmq": "^10.2.3",
     "bullmq": "^5.34.0",
-    "ioredis": "^5.4.2"
+    "ioredis": "^5.4.2",
+    "bcrypt": "^5.1.1"
   },
   "devDependencies": {
     "@yakuji/config": "workspace:*",
     "@nestjs/cli": "^10.4.9",
     "@nestjs/schematics": "^10.2.3",
     "@nestjs/testing": "^10.4.15",
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.5",
