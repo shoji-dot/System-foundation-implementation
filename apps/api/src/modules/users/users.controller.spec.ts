@@ -2,6 +2,7 @@ import { Test } from "@nestjs/testing";
 import type { TestingModule } from "@nestjs/testing";
 
 import type { AuthenticatedRequest } from "../../common/guards/authenticated-request";
+import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { GetCurrentUserUsecase } from "../../core/usecases/get-current-user.usecase";
 
 import { UsersController } from "./users.controller";
@@ -15,7 +16,12 @@ describe("UsersController", () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [{ provide: GetCurrentUserUsecase, useValue: { execute } }],
-    }).compile();
+    })
+      // JwtAuthGuardはTOKEN_SERVICEに依存するため、コントローラ単体テストではガード自体の
+      // 振る舞い(jwt-auth.guard.spec.tsで別途検証済み)を検証せず、常に通過させる。
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get(UsersController);
   });
