@@ -25,6 +25,7 @@ module.exports = tseslint.config(
       "**/*.config.cjs",
       "**/*.config.js",
       "**/playwright-report/**",
+      "**/next-env.d.ts",
     ],
   },
   js.configs.recommended,
