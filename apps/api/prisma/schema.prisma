@@ -2,7 +2,9 @@
 // 設計書 ④ データベース構成 に準拠。
 // Phase 0: マイグレーション基盤の確立（拡張機能のみ）。
 // Phase 1: 認証基盤（⑦）として users / organizations / memberships を追加。
-// 他ドメインテーブル (regulations / classifications / ...) は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
+// Phase 1: JP法規制データ閲覧（S06/S07）として jurisdictions / regulations / regulation_versions /
+//          regulation_sections / regulation_relations を追加。
+// 他ドメインテーブル (classifications / tags / ...) は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
 
 generator client {
   provider        = "prisma-client-js"
@@ -90,4 +92,136 @@ model Membership {
 
   @@unique([userId, organizationId])
   @@map("memberships")
+}
+
+/// 法域コード（設計書 ④ jurisdictions 準拠）
+enum JurisdictionCode {
+  JP
+  US
+  EU
+  UK
+  CA
+  AU
+  CN
+  KR
+  TW
+  SG
+}
+
+/// 法規文書種別（設計書 ④ regulations 準拠）
+enum RegulationType {
+  LAW
+  ORDINANCE
+  NOTICE
+  GUIDANCE
+  STANDARD
+}
+
+/// 法規文書ステータス（設計書 ④ regulations 準拠）。論理削除のみで表現し、物理削除しない（設計書④ 設計原則）。
+enum RegulationStatus {
+  ACTIVE
+  AMENDED
+  REPEALED
+}
+
+/// 法規文書間の関係種別（設計書 ④ regulation_relations 準拠）
+enum RegulationRelationType {
+  AMENDS
+  IMPLEMENTS
+  REFERS
+  SUPERSEDES
+}
+
+/// 法域（設計書 ④ jurisdictions 準拠）: 国別スキームを分離するための基点テーブル。
+model Jurisdiction {
+  id        String           @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  code      JurisdictionCode @unique
+  name      String
+  authority String
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  regulations Regulation[]
+
+  @@map("jurisdictions")
+}
+
+/// 法規文書（設計書 ④⑧ regulations 準拠）。
+/// 正: RegulationVersion（原文・版・施行日は不変保持、編集は新版追加のみ）。本テーブルは文書の識別・現況のみを保持する。
+model Regulation {
+  id             String           @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  jurisdictionId String           @map("jurisdiction_id") @db.Uuid
+  type           RegulationType
+  /// 国別の文書タイプ差分吸収用（設計書⑧: 例 FDA Guidance, EU MDCG）。スキーマ変更なしで各国拡張するための列。
+  subtype        String?
+  title          String
+  docNumber      String?          @map("doc_number")
+  status         RegulationStatus @default(ACTIVE)
+  effectiveDate  DateTime?        @map("effective_date") @db.Date
+  sourceUrl      String?          @map("source_url")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+
+  jurisdiction  Jurisdiction         @relation(fields: [jurisdictionId], references: [id], onDelete: Restrict)
+  versions      RegulationVersion[]
+  relationsFrom RegulationRelation[] @relation("RegulationRelationFrom")
+  relationsTo   RegulationRelation[] @relation("RegulationRelationTo")
+
+  @@index([jurisdictionId, type, status])
+  @@map("regulations")
+}
+
+/// 法規文書バージョン（設計書 ④⑧ regulation_versions 準拠）: 法改正はバージョン行追加で表現し、履歴を不変保持する。
+model RegulationVersion {
+  id            String    @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  regulationId  String    @map("regulation_id") @db.Uuid
+  versionNo     Int       @map("version_no")
+  publishedAt   DateTime  @map("published_at")
+  effectiveFrom DateTime  @map("effective_from") @db.Date
+  effectiveTo   DateTime? @map("effective_to") @db.Date
+  fullText      String    @map("full_text")
+  summary       String?
+  changeSummary String?   @map("change_summary")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  regulation Regulation          @relation(fields: [regulationId], references: [id], onDelete: Cascade)
+  sections   RegulationSection[]
+
+  @@unique([regulationId, versionNo])
+  @@map("regulation_versions")
+}
+
+/// 条文セクション（設計書 ④ regulation_sections 準拠）: RAG・全文検索の単位。
+model RegulationSection {
+  id        String                      @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  versionId String                      @map("version_id") @db.Uuid
+  /// 条・項・号の階層パス（例: 第23条の2/第1項/第2号）
+  path      String
+  heading   String
+  body      String
+  /// 埋め込みベクトル（設計書⑥ RAG用）。Phase 3 のAI機能実装時にWorkerが生成するため、Phase 1時点ではnull。
+  embedding Unsupported("vector(1536)")?
+  createdAt DateTime                    @default(now()) @map("created_at")
+  updatedAt DateTime                    @updatedAt @map("updated_at")
+
+  version RegulationVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@unique([versionId, path])
+  @@map("regulation_sections")
+}
+
+/// 法規文書間の関係（設計書 ④⑧ regulation_relations 準拠）: 例「政令←法律」「通知→改正対象」「基準↔ISO/IEC」。
+model RegulationRelation {
+  id        String                 @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  fromId    String                 @map("from_id") @db.Uuid
+  toId      String                 @map("to_id") @db.Uuid
+  relation  RegulationRelationType
+  createdAt DateTime               @default(now()) @map("created_at")
+
+  from Regulation @relation("RegulationRelationFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to   Regulation @relation("RegulationRelationTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId, relation])
+  @@map("regulation_relations")
 }
