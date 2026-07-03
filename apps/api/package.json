@@ -9,7 +9,11 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "jest --config ./jest.config.js",
-    "test:e2e": "jest --config ./test/jest-e2e.config.js"
+    "test:e2e": "jest --config ./test/jest-e2e.config.js",
+    "db:generate": "prisma generate",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@yakuji/shared": "workspace:*",
@@ -21,7 +25,8 @@
     "helmet": "^8.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "zod": "^3.24.1"
+    "zod": "^3.24.1",
+    "@prisma/client": "^6.1.0"
   },
   "devDependencies": {
     "@yakuji/config": "workspace:*",
@@ -39,6 +44,7 @@
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "prisma": "^6.1.0"
   }
 }

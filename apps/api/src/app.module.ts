@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ThrottlerModule } from "@nestjs/throttler";
 
+import { PrismaModule } from "./infrastructure/database/prisma.module";
 import { HealthModule } from "./modules/health/health.module";
 
 @Module({
@@ -16,6 +17,7 @@ import { HealthModule } from "./modules/health/health.module";
         limit: 100,
       },
     ]),
+    PrismaModule,
     HealthModule,
   ],
 })

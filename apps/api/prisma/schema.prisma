@@ -1,0 +1,17 @@
+// 医療機器薬事承認支援アプリ Prisma Schema
+// 設計書 ④ データベース構成 に準拠。
+// Phase 0 時点では「マイグレーション基盤」の確立のみを対象とし、
+// ドメインテーブル (users / regulations / ...) は Phase 1 以降、
+// 各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  // pgcrypto: UUID生成補助 / pg_trgm: 日本語含むあいまい全文検索 / vector: pgvector（RAG用埋め込み, 設計書⑥⑩）
+  extensions = [pgcrypto, pg_trgm, vector]
+}
