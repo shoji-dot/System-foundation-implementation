@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { planSchema, systemRoleSchema } from "./roles";
+
 /**
  * サインアップ要求（設計書⑤ POST /api/v1/auth/signup 準拠）。
  * password の上限72文字は bcrypt の実効上限に合わせた実装上の制約。
@@ -19,8 +21,8 @@ export const userResponseSchema = z.object({
   email: z.string().email(),
   name: z.string(),
   locale: z.string(),
-  systemRole: z.enum(["ADMIN", "EDITOR", "USER"]),
-  plan: z.enum(["FREE", "PRO", "ENTERPRISE"]),
+  systemRole: systemRoleSchema,
+  plan: planSchema,
   createdAt: z.string().datetime(),
 });
 export type UserResponse = z.infer<typeof userResponseSchema>;
