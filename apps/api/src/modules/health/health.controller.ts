@@ -1,7 +1,6 @@
 import { Controller, Get, Inject } from "@nestjs/common";
-import type Redis from "ioredis";
-
 import { healthResponseSchema } from "@yakuji/shared";
+import type Redis from "ioredis";
 
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { REDIS_CLIENT } from "../../infrastructure/queue/redis.module";

@@ -1,6 +1,5 @@
-import { NextResponse } from "next/server";
-
 import { healthResponseSchema } from "@yakuji/shared";
+import { NextResponse } from "next/server";
 
 /**
  * Vercel 側 (BFF) 起動確認用ヘルスチェック。

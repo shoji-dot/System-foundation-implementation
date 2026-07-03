@@ -1,13 +1,13 @@
 import "reflect-metadata";
 
-import { NestFactory } from "@nestjs/core";
 import { Logger } from "@nestjs/common";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
+import { NestFactory } from "@nestjs/core";
 
+import { PrismaModule } from "../infrastructure/database/prisma.module";
 import { BullmqModule } from "../infrastructure/queue/bullmq.module";
 import { RedisModule } from "../infrastructure/queue/redis.module";
-import { PrismaModule } from "../infrastructure/database/prisma.module";
 
 /**
  * Worker プロセスのエントリポイント（Railway 2サービス目, 設計書①③⑨）。
