@@ -5,6 +5,7 @@ import helmet from "helmet";
 
 import { AppModule } from "./app.module";
 import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
+import { ZodValidationPipe } from "./common/pipes/zod-validation.pipe";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,10 +19,9 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // NOTE: 設計書⑤に基づき入力値検証は Zod を使用する（class-validator は導入しない）。
-  // Zodベースのグローバルバリデーションパイプは、最初にDTOを持つエンドポイントを
-  // 実装するタイミング（Phase 1）で追加する。
+  // 設計書⑤: 入力値検証は Zod を使用する（class-validator は導入しない）。
   app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalPipes(new ZodValidationPipe());
 
   const port = process.env.PORT ?? 3001;
   await app.listen(port);

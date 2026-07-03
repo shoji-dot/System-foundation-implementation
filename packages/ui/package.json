@@ -20,6 +20,11 @@
   "devDependencies": {
     "@yakuji/config": "workspace:*",
     "eslint": "^9.17.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "react": "19.0.0",
+    "@types/react": "^19.0.4"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
   }
 }

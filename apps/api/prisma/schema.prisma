@@ -1,8 +1,8 @@
 // 医療機器薬事承認支援アプリ Prisma Schema
 // 設計書 ④ データベース構成 に準拠。
-// Phase 0 時点では「マイグレーション基盤」の確立のみを対象とし、
-// ドメインテーブル (users / regulations / ...) は Phase 1 以降、
-// 各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
+// Phase 0: マイグレーション基盤の確立（拡張機能のみ）。
+// Phase 1: 認証基盤（⑦）として users / organizations / memberships を追加。
+// 他ドメインテーブル (regulations / classifications / ...) は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
 
 generator client {
   provider        = "prisma-client-js"
@@ -14,4 +14,80 @@ datasource db {
   url        = env("DATABASE_URL")
   // pgcrypto: UUID生成補助 / pg_trgm: 日本語含むあいまい全文検索 / vector: pgvector（RAG用埋め込み, 設計書⑥⑩）
   extensions = [pgcrypto, pg_trgm, vector]
+}
+
+/// システムロール（設計書 ⑦ 準拠）: 運営視点の権限。組織ロール(OrgRole)とは独立して保持する。
+enum SystemRole {
+  ADMIN
+  EDITOR
+  USER
+}
+
+/// 課金プラン（設計書 ⑦ 準拠）: エンタイトルメント層の判定に用いる。課金実装前でも判定層のみ先行させる。
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+/// 組織種別（設計書 ④ organizations 準拠）
+enum OrganizationType {
+  MAKER
+  MARKETING_HOLDER
+  IMPORTER
+  ACADEMIC
+}
+
+/// 組織内ロール（設計書 ⑦ 準拠）
+enum OrgRole {
+  ORG_ADMIN
+  MEMBER
+}
+
+/// ユーザー（設計書 ④ users 準拠）。
+/// passwordHash は OAuth のみでサインアップしたユーザーでは null となる
+/// （設計書⑦: 認証はメール+パスワード または Google/Microsoft OAuth の2方式のため）。
+model User {
+  id           String     @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  email        String     @unique
+  passwordHash String?    @map("password_hash")
+  name         String
+  locale       String     @default("ja")
+  systemRole   SystemRole @default(USER) @map("system_role")
+  plan         Plan       @default(FREE)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  memberships Membership[]
+
+  @@map("users")
+}
+
+/// 組織（設計書 ④ organizations 準拠）
+model Organization {
+  id        String           @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  name      String
+  type      OrganizationType
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  memberships Membership[]
+
+  @@map("organizations")
+}
+
+/// ユーザー所属（設計書 ④ memberships 準拠）: ユーザーと組織の中間テーブル（1ユーザーが複数組織に所属可）。
+model Membership {
+  id             String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  role           OrgRole
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@map("memberships")
 }
