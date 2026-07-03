@@ -2,6 +2,8 @@ import { Test } from "@nestjs/testing";
 import type { TestingModule } from "@nestjs/testing";
 
 import { LoginUserUsecase } from "../../core/usecases/login-user.usecase";
+import { LogoutUserUsecase } from "../../core/usecases/logout-user.usecase";
+import { RefreshTokenUsecase } from "../../core/usecases/refresh-token.usecase";
 import { SignupUserUsecase } from "../../core/usecases/signup-user.usecase";
 
 import { AuthController } from "./auth.controller";
@@ -10,15 +12,21 @@ describe("AuthController", () => {
   let controller: AuthController;
   const signupExecute = jest.fn();
   const loginExecute = jest.fn();
+  const refreshExecute = jest.fn();
+  const logoutExecute = jest.fn();
 
   beforeEach(async () => {
     signupExecute.mockReset();
     loginExecute.mockReset();
+    refreshExecute.mockReset();
+    logoutExecute.mockReset();
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
         { provide: SignupUserUsecase, useValue: { execute: signupExecute } },
         { provide: LoginUserUsecase, useValue: { execute: loginExecute } },
+        { provide: RefreshTokenUsecase, useValue: { execute: refreshExecute } },
+        { provide: LogoutUserUsecase, useValue: { execute: logoutExecute } },
       ],
     }).compile();
 
@@ -68,6 +76,31 @@ describe("AuthController", () => {
         tokenType: "Bearer",
         expiresIn: 900,
       });
+    });
+  });
+
+  describe("refresh", () => {
+    it("delegates to RefreshTokenUsecase and returns a new token pair", async () => {
+      refreshExecute.mockResolvedValue({
+        accessToken: "new-access-token",
+        refreshToken: "new-refresh-token",
+        accessTokenExpiresIn: 900,
+      });
+
+      const result = await controller.refresh({ refreshToken: "old-refresh-token" });
+
+      expect(refreshExecute).toHaveBeenCalledWith("old-refresh-token");
+      expect(result.accessToken).toBe("new-access-token");
+    });
+  });
+
+  describe("logout", () => {
+    it("delegates to LogoutUserUsecase", async () => {
+      logoutExecute.mockResolvedValue(undefined);
+
+      await controller.logout({ refreshToken: "some-refresh-token" });
+
+      expect(logoutExecute).toHaveBeenCalledWith("some-refresh-token");
     });
   });
 });

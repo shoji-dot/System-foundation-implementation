@@ -14,5 +14,7 @@ export interface NewUser {
 
 export interface UserRepository {
   findByEmail(email: string): Promise<User | null>;
+  /** refresh token の sub(userId) からユーザーを引く（設計書⑤ /auth/refresh）。 */
+  findById(id: string): Promise<User | null>;
   create(input: NewUser): Promise<User>;
 }

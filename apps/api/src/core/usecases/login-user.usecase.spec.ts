@@ -23,6 +23,7 @@ describe("LoginUserUsecase", () => {
   function setup() {
     const userRepository: jest.Mocked<UserRepository> = {
       findByEmail: jest.fn(),
+      findById: jest.fn(),
       create: jest.fn(),
     };
     const passwordHasher: jest.Mocked<PasswordHasher> = {

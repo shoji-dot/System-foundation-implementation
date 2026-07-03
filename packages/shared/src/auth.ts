@@ -45,3 +45,11 @@ export const tokenPairResponseSchema = z.object({
   expiresIn: z.number().int().positive(),
 });
 export type TokenPairResponse = z.infer<typeof tokenPairResponseSchema>;
+
+/**
+ * refresh / logout 要求（設計書⑤ POST /api/v1/auth/{refresh|logout} 準拠）。
+ */
+export const refreshTokenRequestSchema = z.object({
+  refreshToken: z.string().min(1),
+});
+export type RefreshTokenRequest = z.infer<typeof refreshTokenRequestSchema>;

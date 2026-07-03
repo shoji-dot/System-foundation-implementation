@@ -6,17 +6,26 @@ import { JwtService } from "@nestjs/jwt";
 
 import type {
   IssuedTokenPair,
+  RefreshTokenPayload,
   TokenPayload,
   TokenService,
 } from "../../core/domain/token-service";
+import { InvalidTokenError } from "../../core/domain/token-service";
 
 /**
  * 設計書⑦: セッションはJWT（短命 access 15分 + refresh 30日）。
  * access/refresh で別々の秘密鍵を用いる（片方の漏洩がもう片方に波及しないようにするため）。
- * refresh token には jti を付与する（将来のRedis失効リスト実装 [logout/refresh コミット] で使用）。
+ * refresh token には jti を付与し、Redis失効リスト（logout/refreshローテーション）で使用する。
  */
 const ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
 const REFRESH_TOKEN_TTL = "30d";
+
+interface RefreshTokenClaims {
+  sub: string;
+  jti: string;
+  type: string;
+  exp: number;
+}
 
 @Injectable()
 export class JwtTokenService implements TokenService {
@@ -47,6 +56,27 @@ export class JwtTokenService implements TokenService {
     );
 
     return { accessToken, refreshToken, accessTokenExpiresIn: ACCESS_TOKEN_TTL_SECONDS };
+  }
+
+  async verifyRefreshToken(token: string): Promise<RefreshTokenPayload> {
+    let claims: RefreshTokenClaims;
+    try {
+      claims = await this.jwtService.verifyAsync<RefreshTokenClaims>(token, {
+        secret: this.requireSecret("JWT_REFRESH_SECRET"),
+      });
+    } catch {
+      throw new InvalidTokenError("refresh token verification failed");
+    }
+
+    if (claims.type !== "refresh") {
+      throw new InvalidTokenError("token is not a refresh token");
+    }
+
+    return {
+      userId: claims.sub,
+      jti: claims.jti,
+      expiresAt: new Date(claims.exp * 1000),
+    };
   }
 
   private requireSecret(key: "JWT_ACCESS_SECRET" | "JWT_REFRESH_SECRET"): string {

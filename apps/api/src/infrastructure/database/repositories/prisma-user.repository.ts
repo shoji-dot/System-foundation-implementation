@@ -17,6 +17,11 @@ export class PrismaUserRepository implements UserRepository {
     return record ? this.toDomain(record) : null;
   }
 
+  async findById(id: string): Promise<User | null> {
+    const record = await this.prisma.user.findUnique({ where: { id } });
+    return record ? this.toDomain(record) : null;
+  }
+
   async create(input: NewUser): Promise<User> {
     const record = await this.prisma.user.create({
       data: {
