@@ -24,3 +24,24 @@ export const userResponseSchema = z.object({
   createdAt: z.string().datetime(),
 });
 export type UserResponse = z.infer<typeof userResponseSchema>;
+
+/**
+ * ログイン要求（設計書⑤ POST /api/v1/auth/login 準拠）。
+ * password はここでは既存パスワードの照合用のため長さ要件を課さない（signupRequestSchema側で制約済み）。
+ */
+export const loginRequestSchema = z.object({
+  email: z.string().trim().toLowerCase().email(),
+  password: z.string().min(1),
+});
+export type LoginRequest = z.infer<typeof loginRequestSchema>;
+
+/**
+ * JWTトークンペア応答（設計書⑦: access 15分 + refresh 30日）。
+ */
+export const tokenPairResponseSchema = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  tokenType: z.literal("Bearer"),
+  expiresIn: z.number().int().positive(),
+});
+export type TokenPairResponse = z.infer<typeof tokenPairResponseSchema>;

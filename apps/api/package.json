@@ -32,7 +32,8 @@
     "@nestjs/bullmq": "^10.2.3",
     "bullmq": "^5.34.0",
     "ioredis": "^5.4.2",
-    "bcrypt": "^5.1.1"
+    "bcrypt": "^5.1.1",
+    "@nestjs/jwt": "^10.2.0"
   },
   "devDependencies": {
     "@yakuji/config": "workspace:*",
