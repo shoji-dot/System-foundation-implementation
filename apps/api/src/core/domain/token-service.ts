@@ -20,6 +20,13 @@ export interface IssuedTokenPair {
   accessTokenExpiresIn: number;
 }
 
+export interface AccessTokenPayload {
+  userId: string;
+  email: string;
+  systemRole: SystemRole;
+  plan: Plan;
+}
+
 export interface RefreshTokenPayload {
   userId: string;
   /** 失効リスト（Redis）でのキーに使うトークン固有ID。 */
@@ -27,11 +34,13 @@ export interface RefreshTokenPayload {
   expiresAt: Date;
 }
 
-/** refresh token の署名検証失敗・期限切れ・型不一致をまとめて表す（HTTP例外への変換はusecase層で行う）。 */
+/** JWTの署名検証失敗・期限切れ・型不一致をまとめて表す（HTTP例外への変換はusecase/guard層で行う）。 */
 export class InvalidTokenError extends Error {}
 
 export interface TokenService {
   issueTokenPair(payload: TokenPayload): Promise<IssuedTokenPair>;
+  /** @throws {InvalidTokenError} 署名不正・期限切れ・access以外のtypeの場合（設計書⑦ Guard1段目: JWT検証） */
+  verifyAccessToken(token: string): Promise<AccessTokenPayload>;
   /** @throws {InvalidTokenError} 署名不正・期限切れ・refresh以外のtypeの場合 */
   verifyRefreshToken(token: string): Promise<RefreshTokenPayload>;
 }

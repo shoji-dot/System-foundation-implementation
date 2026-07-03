@@ -8,6 +8,7 @@ import { BullmqModule } from "./infrastructure/queue/bullmq.module";
 import { RedisModule } from "./infrastructure/queue/redis.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { HealthModule } from "./modules/health/health.module";
+import { UsersModule } from "./modules/users/users.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { HealthModule } from "./modules/health/health.module";
     BullmqModule,
     HealthModule,
     AuthModule,
+    UsersModule,
   ],
   providers: [
     // NOTE: ThrottlerModule.forRoot はデフォルト設定を宣言するのみで、

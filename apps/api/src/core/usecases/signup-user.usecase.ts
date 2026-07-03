@@ -2,7 +2,7 @@ import { ConflictException, Inject, Injectable } from "@nestjs/common";
 
 import type { PasswordHasher } from "../domain/password-hasher";
 import { PASSWORD_HASHER } from "../domain/password-hasher";
-import type { User } from "../domain/user.entity";
+import type { PublicUser } from "../domain/user.entity";
 import type { UserRepository } from "../domain/user.repository";
 import { USER_REPOSITORY } from "../domain/user.repository";
 
@@ -11,11 +11,6 @@ export interface SignupUserInput {
   password: string;
   name: string;
 }
-
-export type SignupUserResult = Pick<
-  User,
-  "id" | "email" | "name" | "locale" | "systemRole" | "plan" | "createdAt"
->;
 
 /**
  * サインアップ（アカウント作成）ユースケース（設計書⑤ POST /api/v1/auth/signup）。
@@ -28,7 +23,7 @@ export class SignupUserUsecase {
     @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher,
   ) {}
 
-  async execute(input: SignupUserInput): Promise<SignupUserResult> {
+  async execute(input: SignupUserInput): Promise<PublicUser> {
     const normalizedEmail = input.email.trim().toLowerCase();
 
     const existing = await this.userRepository.findByEmail(normalizedEmail);

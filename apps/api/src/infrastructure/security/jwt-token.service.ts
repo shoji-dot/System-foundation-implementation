@@ -5,12 +5,14 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 
 import type {
+  AccessTokenPayload,
   IssuedTokenPair,
   RefreshTokenPayload,
   TokenPayload,
   TokenService,
 } from "../../core/domain/token-service";
 import { InvalidTokenError } from "../../core/domain/token-service";
+import type { Plan, SystemRole } from "../../core/domain/user.entity";
 
 /**
  * 設計書⑦: セッションはJWT（短命 access 15分 + refresh 30日）。
@@ -19,6 +21,14 @@ import { InvalidTokenError } from "../../core/domain/token-service";
  */
 const ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
 const REFRESH_TOKEN_TTL = "30d";
+
+interface AccessTokenClaims {
+  sub: string;
+  email: string;
+  systemRole: SystemRole;
+  plan: Plan;
+  type: string;
+}
 
 interface RefreshTokenClaims {
   sub: string;
@@ -56,6 +66,28 @@ export class JwtTokenService implements TokenService {
     );
 
     return { accessToken, refreshToken, accessTokenExpiresIn: ACCESS_TOKEN_TTL_SECONDS };
+  }
+
+  async verifyAccessToken(token: string): Promise<AccessTokenPayload> {
+    let claims: AccessTokenClaims;
+    try {
+      claims = await this.jwtService.verifyAsync<AccessTokenClaims>(token, {
+        secret: this.requireSecret("JWT_ACCESS_SECRET"),
+      });
+    } catch {
+      throw new InvalidTokenError("access token verification failed");
+    }
+
+    if (claims.type !== "access") {
+      throw new InvalidTokenError("token is not an access token");
+    }
+
+    return {
+      userId: claims.sub,
+      email: claims.email,
+      systemRole: claims.systemRole,
+      plan: claims.plan,
+    };
   }
 
   async verifyRefreshToken(token: string): Promise<RefreshTokenPayload> {

@@ -17,3 +17,9 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
 }
+
+/** パスワードハッシュ等の非公開情報を除いた、応答・Guard間受け渡しに使う公開ユーザー像。 */
+export type PublicUser = Pick<
+  User,
+  "id" | "email" | "name" | "locale" | "systemRole" | "plan" | "createdAt"
+>;
