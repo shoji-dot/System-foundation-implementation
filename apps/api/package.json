@@ -13,7 +13,9 @@
     "db:generate": "prisma generate",
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "worker:dev": "nest start --watch --entryFile worker/main",
+    "worker:start": "node dist/worker/main.js"
   },
   "dependencies": {
     "@yakuji/shared": "workspace:*",
@@ -26,7 +28,10 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "zod": "^3.24.1",
-    "@prisma/client": "^6.1.0"
+    "@prisma/client": "^6.1.0",
+    "@nestjs/bullmq": "^10.2.3",
+    "bullmq": "^5.34.0",
+    "ioredis": "^5.4.2"
   },
   "devDependencies": {
     "@yakuji/config": "workspace:*",

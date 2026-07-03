@@ -3,6 +3,8 @@ import { ConfigModule } from "@nestjs/config";
 import { ThrottlerModule } from "@nestjs/throttler";
 
 import { PrismaModule } from "./infrastructure/database/prisma.module";
+import { BullmqModule } from "./infrastructure/queue/bullmq.module";
+import { RedisModule } from "./infrastructure/queue/redis.module";
 import { HealthModule } from "./modules/health/health.module";
 
 @Module({
@@ -18,6 +20,8 @@ import { HealthModule } from "./modules/health/health.module";
       },
     ]),
     PrismaModule,
+    RedisModule,
+    BullmqModule,
     HealthModule,
   ],
 })

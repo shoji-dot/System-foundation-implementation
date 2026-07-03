@@ -1,8 +1,10 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Inject } from "@nestjs/common";
+import type Redis from "ioredis";
 
 import { healthResponseSchema } from "@yakuji/shared";
 
 import { PrismaService } from "../../infrastructure/database/prisma.service";
+import { REDIS_CLIENT } from "../../infrastructure/queue/redis.module";
 
 /**
  * 起動確認用ヘルスチェック（Phase 0）。
@@ -10,7 +12,10 @@ import { PrismaService } from "../../infrastructure/database/prisma.service";
  */
 @Controller("health")
 export class HealthController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(REDIS_CLIENT) private readonly redis: Redis,
+  ) {}
 
   @Get()
   check() {
@@ -27,6 +32,16 @@ export class HealthController {
     return healthResponseSchema.parse({
       status: "ok" as const,
       service: "api-db",
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  @Get("redis")
+  async checkRedis() {
+    await this.redis.ping();
+    return healthResponseSchema.parse({
+      status: "ok" as const,
+      service: "api-redis",
       timestamp: new Date().toISOString(),
     });
   }
