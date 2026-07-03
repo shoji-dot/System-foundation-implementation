@@ -9,7 +9,9 @@ import { RolesGuard } from "./roles.guard";
 
 function createContext(systemRole?: SystemRole): ExecutionContext {
   const request = {
-    user: systemRole ? { userId: "u1", email: "user@example.com", systemRole, plan: "FREE" } : undefined,
+    user: systemRole
+      ? { userId: "u1", email: "user@example.com", systemRole, plan: "FREE" }
+      : undefined,
   } as unknown as AuthenticatedRequest;
 
   return {

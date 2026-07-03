@@ -65,9 +65,9 @@ describe("LoginUserUsecase", () => {
     userRepository.findByEmail.mockResolvedValue(null);
     passwordHasher.hash.mockResolvedValue("dummy");
 
-    await expect(usecase.execute({ email: "missing@example.com", password: "x" })).rejects.toBeInstanceOf(
-      UnauthorizedException,
-    );
+    await expect(
+      usecase.execute({ email: "missing@example.com", password: "x" }),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
     expect(tokenService.issueTokenPair).not.toHaveBeenCalled();
   });
 
@@ -87,9 +87,9 @@ describe("LoginUserUsecase", () => {
     userRepository.findByEmail.mockResolvedValue(baseUser);
     passwordHasher.compare.mockResolvedValue(false);
 
-    await expect(usecase.execute({ email: baseUser.email, password: "wrong" })).rejects.toBeInstanceOf(
-      UnauthorizedException,
-    );
+    await expect(
+      usecase.execute({ email: baseUser.email, password: "wrong" }),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
     expect(tokenService.issueTokenPair).not.toHaveBeenCalled();
   });
 });

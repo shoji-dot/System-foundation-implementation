@@ -9,7 +9,9 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3
  * NestJS /api/v1/auth/login を呼び出し、成功したらAuth.jsのUser形状に詰め替える。
  * 設計書⑦の方針: 認証ロジック・パスワード照合はNestJS側が正、Auth.jsはBFF層としてセッション(JWT httpOnly cookie)を管理する。
  */
-async function authorizeWithApi(credentials: Partial<Record<string, unknown>>): Promise<User | null> {
+async function authorizeWithApi(
+  credentials: Partial<Record<string, unknown>>,
+): Promise<User | null> {
   const parsed = loginRequestSchema.safeParse(credentials);
   if (!parsed.success) {
     return null;

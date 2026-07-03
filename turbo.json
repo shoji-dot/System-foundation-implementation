@@ -19,6 +19,9 @@
     },
     "test": {
       "dependsOn": ["^build"]
+    },
+    "@yakuji/web#typecheck": {
+      "dependsOn": ["^build", "build"]
     }
   }
 }

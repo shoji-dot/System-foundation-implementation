@@ -21,7 +21,9 @@
     "@tanstack/react-query": "^5.62.11",
     "zustand": "^5.0.2",
     "zod": "^3.24.1",
-    "next-auth": "5.0.0-beta.31"
+    "next-auth": "5.0.0-beta.31",
+    "react-hook-form": "^7.80.0",
+    "@hookform/resolvers": "^5.4.0"
   },
   "devDependencies": {
     "@yakuji/config": "workspace:*",
