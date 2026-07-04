@@ -1,11 +1,13 @@
 import { Controller, Get, Param, Query, UseGuards } from "@nestjs/common";
 import type {
   RegulationDetailResponse,
+  RegulationDiffResponse,
   RegulationListResponse,
   RegulationVersionListResponse,
 } from "@yakuji/shared";
 import {
   regulationDetailResponseSchema,
+  regulationDiffResponseSchema,
   regulationListResponseSchema,
   regulationVersionListResponseSchema,
 } from "@yakuji/shared";
@@ -13,15 +15,17 @@ import {
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { toDateOnlyString } from "../../common/utils/date-only";
 import { GetRegulationDetailUsecase } from "../../core/usecases/get-regulation-detail.usecase";
+import { GetRegulationDiffUsecase } from "../../core/usecases/get-regulation-diff.usecase";
 import { ListRegulationVersionsUsecase } from "../../core/usecases/list-regulation-versions.usecase";
 import { ListRegulationsUsecase } from "../../core/usecases/list-regulations.usecase";
 
 import { ListRegulationVersionsQueryDto } from "./dto/list-regulation-versions-query.dto";
 import { ListRegulationsQueryDto } from "./dto/list-regulations-query.dto";
+import { RegulationDiffQueryDto } from "./dto/regulation-diff-query.dto";
 import { RegulationIdParamDto } from "./dto/regulation-id-param.dto";
 
 /**
- * 設計書⑤ GET /api/v1/regulations、/regulations/:id、/regulations/:id/versions。
+ * 設計書⑤ GET /api/v1/regulations、/regulations/:id、/regulations/:id/versions、/regulations/:id/diff。
  * 設計書⑬画面遷移: S06/S07はS02ログイン後のみ到達するため、JwtAuthGuardで保護する。
  */
 @Controller("regulations")
@@ -31,6 +35,7 @@ export class RegulationsController {
     private readonly listRegulationsUsecase: ListRegulationsUsecase,
     private readonly getRegulationDetailUsecase: GetRegulationDetailUsecase,
     private readonly listRegulationVersionsUsecase: ListRegulationVersionsUsecase,
+    private readonly getRegulationDiffUsecase: GetRegulationDiffUsecase,
   ) {}
 
   @Get()
@@ -111,6 +116,41 @@ export class RegulationsController {
         changeSummary: version.changeSummary,
       })),
       nextCursor: result.nextCursor,
+    });
+  }
+
+  @Get(":id/diff")
+  async diff(
+    @Param() params: RegulationIdParamDto,
+    @Query() query: RegulationDiffQueryDto,
+  ): Promise<RegulationDiffResponse> {
+    const result = await this.getRegulationDiffUsecase.execute({
+      regulationId: params.id,
+      from: query.from,
+      to: query.to,
+    });
+
+    return regulationDiffResponseSchema.parse({
+      regulationId: result.regulationId,
+      from: {
+        id: result.from.id,
+        versionNo: result.from.versionNo,
+        publishedAt: result.from.publishedAt.toISOString(),
+        effectiveFrom: toDateOnlyString(result.from.effectiveFrom),
+        effectiveTo: toDateOnlyString(result.from.effectiveTo),
+        summary: result.from.summary,
+        changeSummary: result.from.changeSummary,
+      },
+      to: {
+        id: result.to.id,
+        versionNo: result.to.versionNo,
+        publishedAt: result.to.publishedAt.toISOString(),
+        effectiveFrom: toDateOnlyString(result.to.effectiveFrom),
+        effectiveTo: toDateOnlyString(result.to.effectiveTo),
+        summary: result.to.summary,
+        changeSummary: result.to.changeSummary,
+      },
+      sections: result.sections,
     });
   }
 }

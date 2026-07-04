@@ -21,6 +21,7 @@ describe("ListRegulationVersionsUsecase", () => {
       findMany: jest.fn(),
       findDetailById: jest.fn(),
       findVersions: jest.fn(),
+      findVersionsForDiff: jest.fn(),
     };
     const usecase = new ListRegulationVersionsUsecase(regulationRepository);
     return { usecase, regulationRepository };

@@ -162,3 +162,58 @@ export const regulationVersionListResponseSchema = z.object({
   nextCursor: z.string().nullable(),
 });
 export type RegulationVersionListResponse = z.infer<typeof regulationVersionListResponseSchema>;
+
+/**
+ * GET /api/v1/regulations/:id/diff クエリ（設計書⑤ ?from=&to=、版間差分）。
+ * from/to は versionNo（regulation内で一意な連番）。同一版同士の差分は無意味なため禁止する。
+ */
+export const regulationDiffQuerySchema = z
+  .object({
+    from: z.coerce.number().int().positive(),
+    to: z.coerce.number().int().positive(),
+  })
+  .refine((value) => value.from !== value.to, {
+    message: "fromとtoには異なる版番号を指定してください。",
+    path: ["to"],
+  });
+export type RegulationDiffQuery = z.infer<typeof regulationDiffQuerySchema>;
+
+/**
+ * 条文セクション差分ステータス。
+ * - added: to側にのみ存在（新設）
+ * - removed: from側にのみ存在（削除）
+ * - modified: 両側に存在するが本文が異なる（改正）
+ * - unchanged: 両側に存在し本文も同一
+ */
+export const regulationSectionDiffStatusSchema = z.enum([
+  "added",
+  "removed",
+  "modified",
+  "unchanged",
+]);
+export type RegulationSectionDiffStatus = z.infer<typeof regulationSectionDiffStatusSchema>;
+
+/**
+ * 条文セクション単位の差分応答。path（条・項・号の階層）でfrom/to両版のセクションを突合する
+ * （設計書④ regulation_sectionsのコメント「RAG・全文検索の単位」に準拠し、セクション単位を差分の粒度とする）。
+ */
+export const regulationSectionDiffResponseSchema = z.object({
+  path: z.string(),
+  heading: z.string(),
+  status: regulationSectionDiffStatusSchema,
+  fromBody: z.string().nullable(),
+  toBody: z.string().nullable(),
+});
+export type RegulationSectionDiffResponse = z.infer<typeof regulationSectionDiffResponseSchema>;
+
+/**
+ * 法規文書版間差分応答（設計書⑤ GET /api/v1/regulations/:id/diff?from=&to=）。
+ * from/toは軽量版（本文・セクション一覧を含まない）のメタ情報のみで、内容差分はsectionsで表現する。
+ */
+export const regulationDiffResponseSchema = z.object({
+  regulationId: z.string().uuid(),
+  from: regulationVersionSummaryResponseSchema,
+  to: regulationVersionSummaryResponseSchema,
+  sections: z.array(regulationSectionDiffResponseSchema),
+});
+export type RegulationDiffResponse = z.infer<typeof regulationDiffResponseSchema>;

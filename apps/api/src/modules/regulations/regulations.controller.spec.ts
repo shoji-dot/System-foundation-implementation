@@ -4,6 +4,7 @@ import type { TestingModule } from "@nestjs/testing";
 
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { GetRegulationDetailUsecase } from "../../core/usecases/get-regulation-detail.usecase";
+import { GetRegulationDiffUsecase } from "../../core/usecases/get-regulation-diff.usecase";
 import { ListRegulationVersionsUsecase } from "../../core/usecases/list-regulation-versions.usecase";
 import { ListRegulationsUsecase } from "../../core/usecases/list-regulations.usecase";
 
@@ -14,17 +15,20 @@ describe("RegulationsController", () => {
   const listExecute = jest.fn();
   const detailExecute = jest.fn();
   const versionsExecute = jest.fn();
+  const diffExecute = jest.fn();
 
   beforeEach(async () => {
     listExecute.mockReset();
     detailExecute.mockReset();
     versionsExecute.mockReset();
+    diffExecute.mockReset();
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RegulationsController],
       providers: [
         { provide: ListRegulationsUsecase, useValue: { execute: listExecute } },
         { provide: GetRegulationDetailUsecase, useValue: { execute: detailExecute } },
         { provide: ListRegulationVersionsUsecase, useValue: { execute: versionsExecute } },
+        { provide: GetRegulationDiffUsecase, useValue: { execute: diffExecute } },
       ],
     })
       .overrideGuard(JwtAuthGuard)
@@ -283,6 +287,92 @@ describe("RegulationsController", () => {
 
       await expect(
         controller.versions({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a" }, { limit: 20 }),
+      ).rejects.toBeInstanceOf(NotFoundException);
+    });
+  });
+
+  describe("diff", () => {
+    it("maps the usecase result to a diff response with from/to summaries and sections", async () => {
+      diffExecute.mockResolvedValue({
+        regulationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
+        from: {
+          id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c",
+          versionNo: 1,
+          publishedAt: new Date("2026-01-01T00:00:00.000Z"),
+          effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
+          effectiveTo: new Date("2026-01-31T00:00:00.000Z"),
+          summary: null,
+          changeSummary: null,
+        },
+        to: {
+          id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5d",
+          versionNo: 2,
+          publishedAt: new Date("2026-02-01T00:00:00.000Z"),
+          effectiveFrom: new Date("2026-02-01T00:00:00.000Z"),
+          effectiveTo: null,
+          summary: "改正概要",
+          changeSummary: "第一条を改正",
+        },
+        sections: [
+          {
+            path: "第一条",
+            heading: "目的",
+            status: "modified",
+            fromBody: "旧本文",
+            toBody: "新本文",
+          },
+        ],
+      });
+
+      const result = await controller.diff(
+        { id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a" },
+        { from: 1, to: 2 },
+      );
+
+      expect(diffExecute).toHaveBeenCalledWith({
+        regulationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
+        from: 1,
+        to: 2,
+      });
+      expect(result).toEqual({
+        regulationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
+        from: {
+          id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c",
+          versionNo: 1,
+          publishedAt: "2026-01-01T00:00:00.000Z",
+          effectiveFrom: "2026-01-01",
+          effectiveTo: "2026-01-31",
+          summary: null,
+          changeSummary: null,
+        },
+        to: {
+          id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5d",
+          versionNo: 2,
+          publishedAt: "2026-02-01T00:00:00.000Z",
+          effectiveFrom: "2026-02-01",
+          effectiveTo: null,
+          summary: "改正概要",
+          changeSummary: "第一条を改正",
+        },
+        sections: [
+          {
+            path: "第一条",
+            heading: "目的",
+            status: "modified",
+            fromBody: "旧本文",
+            toBody: "新本文",
+          },
+        ],
+      });
+    });
+
+    it("propagates NotFoundException from the usecase", async () => {
+      diffExecute.mockRejectedValue(
+        new NotFoundException("指定された法規文書または版が見つかりません。"),
+      );
+
+      await expect(
+        controller.diff({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a" }, { from: 1, to: 2 }),
       ).rejects.toBeInstanceOf(NotFoundException);
     });
   });
