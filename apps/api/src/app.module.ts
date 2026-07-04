@@ -9,9 +9,11 @@ import { RedisModule } from "./infrastructure/queue/redis.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { ClassificationsModule } from "./modules/classifications/classifications.module";
 import { HealthModule } from "./modules/health/health.module";
+import { LearningModule } from "./modules/learning/learning.module";
 import { RegulationsModule } from "./modules/regulations/regulations.module";
 import { SearchModule } from "./modules/search/search.module";
 import { UsersModule } from "./modules/users/users.module";
+import { WorkflowModule } from "./modules/workflow/workflow.module";
 
 @Module({
   imports: [
@@ -33,7 +35,9 @@ import { UsersModule } from "./modules/users/users.module";
     UsersModule,
     RegulationsModule,
     ClassificationsModule,
+    LearningModule,
     SearchModule,
+    WorkflowModule,
   ],
   providers: [
     // NOTE: ThrottlerModule.forRoot はデフォルト設定を宣言するのみで、
