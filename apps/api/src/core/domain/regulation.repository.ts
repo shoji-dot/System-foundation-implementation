@@ -1,4 +1,5 @@
 import type { JurisdictionCode } from "./jurisdiction.entity";
+import type { RegulationVersionSummary } from "./regulation-version.entity";
 import type { Regulation, RegulationDetail, RegulationType } from "./regulation.entity";
 
 /**
@@ -23,8 +24,24 @@ export interface RegulationListResult {
   nextCursor: string | null;
 }
 
+export interface RegulationVersionListFilters {
+  /** versionNoを文字列化したキーセットカーソル（前回応答の nextCursor をそのまま渡す）。 */
+  cursor?: string;
+  limit: number;
+}
+
+export interface RegulationVersionListResult {
+  items: RegulationVersionSummary[];
+  nextCursor: string | null;
+}
+
 export interface RegulationRepository {
   findMany(filters: RegulationListFilters): Promise<RegulationListResult>;
   /** 設計書⑤ GET /api/v1/regulations/:id（最新版込み）。存在しない場合は null。 */
   findDetailById(id: string): Promise<RegulationDetail | null>;
+  /** 設計書⑤ GET /api/v1/regulations/:id/versions（改正履歴）。対象regulationが存在しない場合は null。 */
+  findVersions(
+    regulationId: string,
+    filters: RegulationVersionListFilters,
+  ): Promise<RegulationVersionListResult | null>;
 }

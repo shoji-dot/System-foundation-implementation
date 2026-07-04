@@ -21,3 +21,14 @@ export interface RegulationVersion {
   changeSummary: string | null;
   sections: RegulationSection[];
 }
+
+/** バージョン一覧（改正履歴）表示用の軽量版。本文・条文セクションを含まない。 */
+export interface RegulationVersionSummary {
+  id: string;
+  versionNo: number;
+  publishedAt: Date;
+  effectiveFrom: Date;
+  effectiveTo: Date | null;
+  summary: string | null;
+  changeSummary: string | null;
+}
