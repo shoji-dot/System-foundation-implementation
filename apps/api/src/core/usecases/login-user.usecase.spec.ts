@@ -32,6 +32,8 @@ describe("LoginUserUsecase", () => {
     };
     const tokenService: jest.Mocked<TokenService> = {
       issueTokenPair: jest.fn(),
+      verifyAccessToken: jest.fn(),
+      verifyRefreshToken: jest.fn(),
     };
     const usecase = new LoginUserUsecase(userRepository, passwordHasher, tokenService);
     return { usecase, userRepository, passwordHasher, tokenService };

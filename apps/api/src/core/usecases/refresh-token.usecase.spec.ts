@@ -30,6 +30,7 @@ describe("RefreshTokenUsecase", () => {
   function setup() {
     const tokenService: jest.Mocked<TokenService> = {
       issueTokenPair: jest.fn(),
+      verifyAccessToken: jest.fn(),
       verifyRefreshToken: jest.fn(),
     };
     const revocationStore: jest.Mocked<TokenRevocationStore> = {
