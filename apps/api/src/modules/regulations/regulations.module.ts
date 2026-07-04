@@ -5,6 +5,7 @@ import { JURISDICTION_REPOSITORY } from "../../core/domain/jurisdiction.reposito
 import { REGULATION_REPOSITORY } from "../../core/domain/regulation.repository";
 import { TOKEN_SERVICE } from "../../core/domain/token-service";
 import { GetRegulationDetailUsecase } from "../../core/usecases/get-regulation-detail.usecase";
+import { GetRegulationDiffUsecase } from "../../core/usecases/get-regulation-diff.usecase";
 import { ListJurisdictionsUsecase } from "../../core/usecases/list-jurisdictions.usecase";
 import { ListRegulationVersionsUsecase } from "../../core/usecases/list-regulation-versions.usecase";
 import { ListRegulationsUsecase } from "../../core/usecases/list-regulations.usecase";
@@ -28,6 +29,7 @@ import { RegulationsController } from "./regulations.controller";
     ListRegulationsUsecase,
     GetRegulationDetailUsecase,
     ListRegulationVersionsUsecase,
+    GetRegulationDiffUsecase,
     { provide: JURISDICTION_REPOSITORY, useClass: PrismaJurisdictionRepository },
     { provide: REGULATION_REPOSITORY, useClass: PrismaRegulationRepository },
     { provide: TOKEN_SERVICE, useClass: JwtTokenService },

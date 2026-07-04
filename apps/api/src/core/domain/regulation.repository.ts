@@ -1,5 +1,5 @@
 import type { JurisdictionCode } from "./jurisdiction.entity";
-import type { RegulationVersionSummary } from "./regulation-version.entity";
+import type { RegulationVersion, RegulationVersionSummary } from "./regulation-version.entity";
 import type { Regulation, RegulationDetail, RegulationType } from "./regulation.entity";
 
 /**
@@ -35,6 +35,12 @@ export interface RegulationVersionListResult {
   nextCursor: string | null;
 }
 
+/** 版間差分用に取得する from/to 両版（本文・セクション込み）のペア。 */
+export interface RegulationVersionDiffPair {
+  from: RegulationVersion;
+  to: RegulationVersion;
+}
+
 export interface RegulationRepository {
   findMany(filters: RegulationListFilters): Promise<RegulationListResult>;
   /** 設計書⑤ GET /api/v1/regulations/:id（最新版込み）。存在しない場合は null。 */
@@ -44,4 +50,13 @@ export interface RegulationRepository {
     regulationId: string,
     filters: RegulationVersionListFilters,
   ): Promise<RegulationVersionListResult | null>;
+  /**
+   * 設計書⑤ GET /api/v1/regulations/:id/diff?from=&to=（版間差分）。
+   * regulationが存在しない、または指定versionNoのいずれかが存在しない場合は null。
+   */
+  findVersionsForDiff(
+    regulationId: string,
+    fromVersionNo: number,
+    toVersionNo: number,
+  ): Promise<RegulationVersionDiffPair | null>;
 }

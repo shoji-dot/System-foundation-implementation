@@ -16,6 +16,7 @@ import type {
   RegulationListFilters,
   RegulationListResult,
   RegulationRepository,
+  RegulationVersionDiffPair,
   RegulationVersionListFilters,
   RegulationVersionListResult,
 } from "../../../core/domain/regulation.repository";
@@ -125,6 +126,31 @@ export class PrismaRegulationRepository implements RegulationRepository {
     return {
       items: page.map((record: PrismaRegulationVersion) => this.toVersionSummaryDomain(record)),
       nextCursor,
+    };
+  }
+
+  async findVersionsForDiff(
+    regulationId: string,
+    fromVersionNo: number,
+    toVersionNo: number,
+  ): Promise<RegulationVersionDiffPair | null> {
+    const records = await this.prisma.regulationVersion.findMany({
+      where: {
+        regulationId,
+        versionNo: { in: [fromVersionNo, toVersionNo] },
+      },
+      include: { sections: { orderBy: { createdAt: "asc" } } },
+    });
+
+    const fromRecord = records.find((record) => record.versionNo === fromVersionNo);
+    const toRecord = records.find((record) => record.versionNo === toVersionNo);
+    if (!fromRecord || !toRecord) {
+      return null;
+    }
+
+    return {
+      from: this.toVersionDomain(fromRecord),
+      to: this.toVersionDomain(toRecord),
     };
   }
 
