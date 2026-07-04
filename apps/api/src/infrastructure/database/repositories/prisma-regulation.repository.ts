@@ -7,12 +7,17 @@ import type {
   RegulationVersion as PrismaRegulationVersion,
 } from "@prisma/client";
 
-import type { RegulationVersion } from "../../../core/domain/regulation-version.entity";
+import type {
+  RegulationVersion,
+  RegulationVersionSummary,
+} from "../../../core/domain/regulation-version.entity";
 import type { Regulation, RegulationDetail } from "../../../core/domain/regulation.entity";
 import type {
   RegulationListFilters,
   RegulationListResult,
   RegulationRepository,
+  RegulationVersionListFilters,
+  RegulationVersionListResult,
 } from "../../../core/domain/regulation.repository";
 import { PrismaService } from "../prisma.service";
 
@@ -23,7 +28,8 @@ type RegulationVersionWithSections = PrismaRegulationVersion & {
 
 /**
  * RegulationRepository の Prisma 実装（設計書③ infrastructure/database、Repository Pattern）。
- * カーソルページネーションは id（UUIDv7、生成順に単調増加）を使ったキーセット方式。
+ * 法規文書一覧のカーソルページネーションは id（UUIDv7、生成順に単調増加）を使ったキーセット方式。
+ * バージョン一覧のカーソルページネーションは versionNo（regulation内で一意な連番）を使ったキーセット方式。
  */
 @Injectable()
 export class PrismaRegulationRepository implements RegulationRepository {
@@ -88,6 +94,40 @@ export class PrismaRegulationRepository implements RegulationRepository {
     };
   }
 
+  async findVersions(
+    regulationId: string,
+    filters: RegulationVersionListFilters,
+  ): Promise<RegulationVersionListResult | null> {
+    const regulationExists = await this.prisma.regulation.findUnique({
+      where: { id: regulationId },
+      select: { id: true },
+    });
+    if (!regulationExists) {
+      return null;
+    }
+
+    // cursor はクエリDTO側(listRegulationVersionsQuerySchema)で数値文字列であることを検証済み。
+    const cursorVersionNo = filters.cursor ? Number.parseInt(filters.cursor, 10) : undefined;
+
+    const records = await this.prisma.regulationVersion.findMany({
+      where: {
+        regulationId,
+        ...(cursorVersionNo !== undefined ? { versionNo: { lt: cursorVersionNo } } : {}),
+      },
+      orderBy: { versionNo: "desc" },
+      take: filters.limit + 1,
+    });
+
+    const hasMore = records.length > filters.limit;
+    const page = hasMore ? records.slice(0, filters.limit) : records;
+    const nextCursor = hasMore ? (page[page.length - 1]?.versionNo.toString() ?? null) : null;
+
+    return {
+      items: page.map((record: PrismaRegulationVersion) => this.toVersionSummaryDomain(record)),
+      nextCursor,
+    };
+  }
+
   private toDomain(record: RegulationWithJurisdiction): Regulation {
     return {
       id: record.id,
@@ -120,6 +160,18 @@ export class PrismaRegulationRepository implements RegulationRepository {
         heading: section.heading,
         body: section.body,
       })),
+    };
+  }
+
+  private toVersionSummaryDomain(record: PrismaRegulationVersion): RegulationVersionSummary {
+    return {
+      id: record.id,
+      versionNo: record.versionNo,
+      publishedAt: record.publishedAt,
+      effectiveFrom: record.effectiveFrom,
+      effectiveTo: record.effectiveTo,
+      summary: record.summary,
+      changeSummary: record.changeSummary,
     };
   }
 }

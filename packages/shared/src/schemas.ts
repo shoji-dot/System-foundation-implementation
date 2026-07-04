@@ -132,3 +132,33 @@ export const regulationDetailResponseSchema = regulationSummaryResponseSchema.ex
   latestVersion: regulationVersionResponseSchema.nullable(),
 });
 export type RegulationDetailResponse = z.infer<typeof regulationDetailResponseSchema>;
+
+/**
+ * GET /api/v1/regulations/:id/versions クエリ（設計書⑤ 改正履歴）。
+ * cursor は versionNo をそのまま文字列化した値（このサブリソースはバージョン番号によるキーセット方式）。
+ */
+export const listRegulationVersionsQuerySchema = z.object({
+  cursor: z.string().regex(/^\d+$/, "cursorは数値文字列である必要があります。").optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+export type ListRegulationVersionsQuery = z.infer<typeof listRegulationVersionsQuerySchema>;
+
+/**
+ * 法規文書バージョン一覧項目応答（本文・条文セクションを含まない軽量版、版切替UI用）。
+ */
+export const regulationVersionSummaryResponseSchema = regulationVersionResponseSchema.omit({
+  fullText: true,
+  sections: true,
+});
+export type RegulationVersionSummaryResponse = z.infer<
+  typeof regulationVersionSummaryResponseSchema
+>;
+
+/**
+ * カーソルページネーション応答（法規文書バージョン一覧、設計書⑤ GET /api/v1/regulations/:id/versions）。
+ */
+export const regulationVersionListResponseSchema = z.object({
+  items: z.array(regulationVersionSummaryResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type RegulationVersionListResponse = z.infer<typeof regulationVersionListResponseSchema>;

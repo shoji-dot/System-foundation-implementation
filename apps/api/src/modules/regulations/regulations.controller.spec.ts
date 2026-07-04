@@ -4,6 +4,7 @@ import type { TestingModule } from "@nestjs/testing";
 
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { GetRegulationDetailUsecase } from "../../core/usecases/get-regulation-detail.usecase";
+import { ListRegulationVersionsUsecase } from "../../core/usecases/list-regulation-versions.usecase";
 import { ListRegulationsUsecase } from "../../core/usecases/list-regulations.usecase";
 
 import { RegulationsController } from "./regulations.controller";
@@ -12,15 +13,18 @@ describe("RegulationsController", () => {
   let controller: RegulationsController;
   const listExecute = jest.fn();
   const detailExecute = jest.fn();
+  const versionsExecute = jest.fn();
 
   beforeEach(async () => {
     listExecute.mockReset();
     detailExecute.mockReset();
+    versionsExecute.mockReset();
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RegulationsController],
       providers: [
         { provide: ListRegulationsUsecase, useValue: { execute: listExecute } },
         { provide: GetRegulationDetailUsecase, useValue: { execute: detailExecute } },
+        { provide: ListRegulationVersionsUsecase, useValue: { execute: versionsExecute } },
       ],
     })
       .overrideGuard(JwtAuthGuard)
@@ -207,6 +211,78 @@ describe("RegulationsController", () => {
 
       await expect(
         controller.detail({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a" }),
+      ).rejects.toBeInstanceOf(NotFoundException);
+    });
+  });
+
+  describe("versions", () => {
+    it("maps the usecase result to a version list response (no fullText/sections)", async () => {
+      versionsExecute.mockResolvedValue({
+        items: [
+          {
+            id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c",
+            versionNo: 2,
+            publishedAt: new Date("2026-02-01T00:00:00.000Z"),
+            effectiveFrom: new Date("2026-02-01T00:00:00.000Z"),
+            effectiveTo: null,
+            summary: "改正概要",
+            changeSummary: "第三条を改正",
+          },
+          {
+            id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5e",
+            versionNo: 1,
+            publishedAt: new Date("2026-01-01T00:00:00.000Z"),
+            effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
+            effectiveTo: new Date("2026-01-31T00:00:00.000Z"),
+            summary: null,
+            changeSummary: null,
+          },
+        ],
+        nextCursor: "1",
+      });
+
+      const result = await controller.versions(
+        { id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a" },
+        { cursor: undefined, limit: 20 },
+      );
+
+      expect(versionsExecute).toHaveBeenCalledWith({
+        regulationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
+        cursor: undefined,
+        limit: 20,
+      });
+      expect(result).toEqual({
+        items: [
+          {
+            id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c",
+            versionNo: 2,
+            publishedAt: "2026-02-01T00:00:00.000Z",
+            effectiveFrom: "2026-02-01",
+            effectiveTo: null,
+            summary: "改正概要",
+            changeSummary: "第三条を改正",
+          },
+          {
+            id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5e",
+            versionNo: 1,
+            publishedAt: "2026-01-01T00:00:00.000Z",
+            effectiveFrom: "2026-01-01",
+            effectiveTo: "2026-01-31",
+            summary: null,
+            changeSummary: null,
+          },
+        ],
+        nextCursor: "1",
+      });
+    });
+
+    it("propagates NotFoundException from the usecase", async () => {
+      versionsExecute.mockRejectedValue(
+        new NotFoundException("指定された法規文書が見つかりません。"),
+      );
+
+      await expect(
+        controller.versions({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a" }, { limit: 20 }),
       ).rejects.toBeInstanceOf(NotFoundException);
     });
   });
