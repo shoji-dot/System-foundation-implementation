@@ -7,6 +7,7 @@ import { PrismaModule } from "./infrastructure/database/prisma.module";
 import { BullmqModule } from "./infrastructure/queue/bullmq.module";
 import { RedisModule } from "./infrastructure/queue/redis.module";
 import { AuthModule } from "./modules/auth/auth.module";
+import { ClassificationsModule } from "./modules/classifications/classifications.module";
 import { HealthModule } from "./modules/health/health.module";
 import { RegulationsModule } from "./modules/regulations/regulations.module";
 import { UsersModule } from "./modules/users/users.module";
@@ -30,6 +31,7 @@ import { UsersModule } from "./modules/users/users.module";
     AuthModule,
     UsersModule,
     RegulationsModule,
+    ClassificationsModule,
   ],
   providers: [
     // NOTE: ThrottlerModule.forRoot はデフォルト設定を宣言するのみで、

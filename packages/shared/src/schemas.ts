@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { CLASSIFICATION_SCHEMES } from "./classifications";
 import { JURISDICTION_CODES } from "./jurisdictions";
 import { REGULATION_STATUSES, REGULATION_TYPES } from "./regulations";
 
@@ -57,9 +58,9 @@ export const listRegulationsQuerySchema = cursorPaginationQuerySchema.extend({
 export type ListRegulationsQuery = z.infer<typeof listRegulationsQuerySchema>;
 
 /**
- * 法規文書一覧項目に埋め込む法域情報（一覧表示用の最小情報のみ）。
+ * 法域の最小情報（一覧表示用、regulations/classifications 共通で使用）。
  */
-export const regulationJurisdictionSummaryResponseSchema = z.object({
+export const jurisdictionSummaryResponseSchema = z.object({
   code: jurisdictionCodeSchema,
   name: z.string(),
 });
@@ -69,7 +70,7 @@ export const regulationJurisdictionSummaryResponseSchema = z.object({
  */
 export const regulationSummaryResponseSchema = z.object({
   id: z.string().uuid(),
-  jurisdiction: regulationJurisdictionSummaryResponseSchema,
+  jurisdiction: jurisdictionSummaryResponseSchema,
   type: regulationTypeSchema,
   subtype: z.string().nullable(),
   title: z.string(),
@@ -217,3 +218,73 @@ export const regulationDiffResponseSchema = z.object({
   sections: z.array(regulationSectionDiffResponseSchema),
 });
 export type RegulationDiffResponse = z.infer<typeof regulationDiffResponseSchema>;
+
+/**
+ * 機器分類スキーム Zod スキーマ（設計書④ device_classifications 準拠）。
+ */
+export const classificationSchemeSchema = z.enum(CLASSIFICATION_SCHEMES);
+
+/**
+ * GET /api/v1/classifications クエリ（設計書⑤ ?scheme=JMDN&q= 準拠）。
+ * jurisdictionは明記が無いが、device_classifications.jurisdiction_idによる絞り込みも実用上必要なため追加
+ * （schemeがJP限定でないケース、例えばFDA_PRODUCT_CODEとJMDNを混在させないための任意フィルタ）。
+ */
+export const listClassificationsQuerySchema = cursorPaginationQuerySchema.extend({
+  scheme: classificationSchemeSchema.optional(),
+  jurisdiction: jurisdictionCodeSchema.optional(),
+  q: z.string().trim().min(1).optional(),
+});
+export type ListClassificationsQuery = z.infer<typeof listClassificationsQuerySchema>;
+
+/**
+ * 機器分類応答（設計書④ device_classifications 準拠、GET /api/v1/classifications）。
+ */
+export const classificationResponseSchema = z.object({
+  id: z.string().uuid(),
+  jurisdiction: jurisdictionSummaryResponseSchema,
+  scheme: classificationSchemeSchema,
+  code: z.string(),
+  name: z.string(),
+  class: z.string().nullable(),
+  definition: z.string().nullable(),
+});
+export type ClassificationResponse = z.infer<typeof classificationResponseSchema>;
+
+/**
+ * カーソルページネーション応答（機器分類一覧、設計書⑤ GET /api/v1/classifications）。
+ */
+export const classificationListResponseSchema = z.object({
+  items: z.array(classificationResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type ClassificationListResponse = z.infer<typeof classificationListResponseSchema>;
+
+/**
+ * 機器分類パラメータ（設計書⑤ GET /api/v1/classifications/:id/mappings 等、UUID検証）。
+ */
+export const classificationIdParamSchema = z.object({
+  id: z.string().uuid(),
+});
+export type ClassificationIdParam = z.infer<typeof classificationIdParamSchema>;
+
+/**
+ * 機器分類マッピング応答（設計書④ classification_mappings 準拠、GET /api/v1/classifications/:id/mappings）。
+ * classificationは相手側（自分以外）の分類情報。
+ */
+export const classificationMappingResponseSchema = z.object({
+  id: z.string().uuid(),
+  confidence: z.number(),
+  classification: classificationResponseSchema,
+});
+export type ClassificationMappingResponse = z.infer<typeof classificationMappingResponseSchema>;
+
+/**
+ * 機器分類マッピング一覧応答。件数が少ないためページネーションは行わない
+ * （jurisdictions一覧と同様の判断）。
+ */
+export const classificationMappingListResponseSchema = z.object({
+  items: z.array(classificationMappingResponseSchema),
+});
+export type ClassificationMappingListResponse = z.infer<
+  typeof classificationMappingListResponseSchema
+>;
