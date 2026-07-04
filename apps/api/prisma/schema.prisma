@@ -4,7 +4,8 @@
 // Phase 1: 認証基盤（⑦）として users / organizations / memberships を追加。
 // Phase 1: JP法規制データ閲覧（S06/S07）として jurisdictions / regulations / regulation_versions /
 //          regulation_sections / regulation_relations を追加。
-// 他ドメインテーブル (classifications / tags / ...) は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
+// Phase 1: JMDN検索（S08/S09）として device_classifications / classification_mappings を追加。
+// 他ドメインテーブル (tags / ...) は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
 
 generator client {
   provider        = "prisma-client-js"
@@ -141,7 +142,8 @@ model Jurisdiction {
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime         @updatedAt @map("updated_at")
 
-  regulations Regulation[]
+  regulations           Regulation[]
+  deviceClassifications DeviceClassification[]
 
   @@map("jurisdictions")
 }
@@ -224,4 +226,52 @@ model RegulationRelation {
 
   @@unique([fromId, toId, relation])
   @@map("regulation_relations")
+}
+
+/// 分類スキーム（設計書 ④ device_classifications 準拠）: 国別の機器分類体系を同一テーブルで抽象化する。
+enum ClassificationScheme {
+  JMDN
+  FDA_PRODUCT_CODE
+  EMDN
+  GMDN
+}
+
+/// 機器分類（設計書 ④ device_classifications 準拠、S08/S09）: 国別スキーム(JMDN/FDA_ProductCode/EMDN/GMDN)を
+/// 同一テーブルで抽象化する。jurisdictionId は当該コードを所管する法域（例: JMDNはJP）。
+model DeviceClassification {
+  id             String               @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  jurisdictionId String               @map("jurisdiction_id") @db.Uuid
+  scheme         ClassificationScheme
+  code           String
+  name           String
+  /// リスク分類（例: JPクラスI-IV、FDA Class I-III）。国・スキームごとに表記が異なるため自由記述とする。
+  class          String?
+  definition     String?
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @updatedAt @map("updated_at")
+
+  jurisdiction Jurisdiction            @relation(fields: [jurisdictionId], references: [id], onDelete: Restrict)
+  mappingsFrom ClassificationMapping[] @relation("ClassificationMappingFrom")
+  mappingsTo   ClassificationMapping[] @relation("ClassificationMappingTo")
+
+  @@unique([jurisdictionId, scheme, code])
+  @@index([scheme, code])
+  @@map("device_classifications")
+}
+
+/// 分類間マッピング（設計書 ④ classification_mappings 準拠）: JMDN↔FDA ProductCode 等の相互参照。
+/// 方向性は保持しないため（設計書④「相互参照」）、アプリケーション層では from/to 両方向で検索する。
+model ClassificationMapping {
+  id         String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  fromId     String   @map("from_id") @db.Uuid
+  toId       String   @map("to_id") @db.Uuid
+  /// マッチング信頼度（0.0〜1.0）。手動キュレーションの場合は1.0を設定する運用を想定。
+  confidence Float
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  from DeviceClassification @relation("ClassificationMappingFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to   DeviceClassification @relation("ClassificationMappingTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId])
+  @@map("classification_mappings")
 }
