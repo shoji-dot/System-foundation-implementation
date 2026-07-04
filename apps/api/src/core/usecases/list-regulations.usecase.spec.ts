@@ -21,6 +21,9 @@ describe("ListRegulationsUsecase", () => {
   function setup() {
     const regulationRepository: jest.Mocked<RegulationRepository> = {
       findMany: jest.fn(),
+      findDetailById: jest.fn(),
+      findVersions: jest.fn(),
+      findVersionsForDiff: jest.fn(),
     };
     const usecase = new ListRegulationsUsecase(regulationRepository);
     return { usecase, regulationRepository };
