@@ -1,3 +1,4 @@
+export * from "./classifications";
 export * from "./jurisdictions";
 export * from "./regulations";
 export * from "./schemas";
