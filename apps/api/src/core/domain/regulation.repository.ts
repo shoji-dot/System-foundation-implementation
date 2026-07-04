@@ -1,5 +1,5 @@
 import type { JurisdictionCode } from "./jurisdiction.entity";
-import type { Regulation, RegulationType } from "./regulation.entity";
+import type { Regulation, RegulationDetail, RegulationType } from "./regulation.entity";
 
 /**
  * リポジトリはインターフェースを domain 側に定義する（設計書③、Repository Pattern）。
@@ -25,4 +25,6 @@ export interface RegulationListResult {
 
 export interface RegulationRepository {
   findMany(filters: RegulationListFilters): Promise<RegulationListResult>;
+  /** 設計書⑤ GET /api/v1/regulations/:id（最新版込み）。存在しない場合は null。 */
+  findDetailById(id: string): Promise<RegulationDetail | null>;
 }

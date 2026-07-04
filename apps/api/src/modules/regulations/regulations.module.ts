@@ -4,6 +4,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { JURISDICTION_REPOSITORY } from "../../core/domain/jurisdiction.repository";
 import { REGULATION_REPOSITORY } from "../../core/domain/regulation.repository";
 import { TOKEN_SERVICE } from "../../core/domain/token-service";
+import { GetRegulationDetailUsecase } from "../../core/usecases/get-regulation-detail.usecase";
 import { ListJurisdictionsUsecase } from "../../core/usecases/list-jurisdictions.usecase";
 import { ListRegulationsUsecase } from "../../core/usecases/list-regulations.usecase";
 import { PrismaModule } from "../../infrastructure/database/prisma.module";
@@ -24,6 +25,7 @@ import { RegulationsController } from "./regulations.controller";
   providers: [
     ListJurisdictionsUsecase,
     ListRegulationsUsecase,
+    GetRegulationDetailUsecase,
     { provide: JURISDICTION_REPOSITORY, useClass: PrismaJurisdictionRepository },
     { provide: REGULATION_REPOSITORY, useClass: PrismaRegulationRepository },
     { provide: TOKEN_SERVICE, useClass: JwtTokenService },

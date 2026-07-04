@@ -1,4 +1,5 @@
 import type { JurisdictionCode } from "./jurisdiction.entity";
+import type { RegulationVersion } from "./regulation-version.entity";
 
 /**
  * 法規文書ドメインエンティティ（設計書④ regulations 準拠）。
@@ -26,4 +27,13 @@ export interface Regulation {
   sourceUrl: string | null;
   createdAt: Date;
   updatedAt: Date;
+}
+
+/**
+ * 法規文書詳細（設計書⑤ GET /api/v1/regulations/:id、最新版）。
+ * 関連文書(regulation_relations)・タグは今回は対象外（別コミットで追加予定）。
+ */
+export interface RegulationDetail extends Regulation {
+  /** 最新版（versionNo最大）。データ不整合でバージョンが1件も無い場合のみ null。 */
+  latestVersion: RegulationVersion | null;
 }
