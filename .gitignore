@@ -37,3 +37,7 @@ apps/api/prisma/dev.db
 # misc
 coverage/
 *.tsbuildinfo
+
+# Serwist (PWA) generated service worker, source is apps/web/src/app/sw.ts
+apps/web/public/sw*
+apps/web/public/swe-worker*
