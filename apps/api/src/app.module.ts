@@ -10,6 +10,7 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { ClassificationsModule } from "./modules/classifications/classifications.module";
 import { HealthModule } from "./modules/health/health.module";
 import { RegulationsModule } from "./modules/regulations/regulations.module";
+import { SearchModule } from "./modules/search/search.module";
 import { UsersModule } from "./modules/users/users.module";
 
 @Module({
@@ -32,6 +33,7 @@ import { UsersModule } from "./modules/users/users.module";
     UsersModule,
     RegulationsModule,
     ClassificationsModule,
+    SearchModule,
   ],
   providers: [
     // NOTE: ThrottlerModule.forRoot はデフォルト設定を宣言するのみで、

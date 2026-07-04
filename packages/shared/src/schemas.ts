@@ -288,3 +288,61 @@ export const classificationMappingListResponseSchema = z.object({
 export type ClassificationMappingListResponse = z.infer<
   typeof classificationMappingListResponseSchema
 >;
+
+/**
+ * GET /api/v1/search スコープ（設計書⑤ ?scope=all|regulation|jmdn|generic-name|learning 準拠）。
+ * jmdn/generic-nameはどちらもdevice_classificationsが対象だが、検索フィールド(code優先 / name・definition優先)が異なる。
+ * learning(courses/lessons)は当該テーブル未実装のため、指定時は常に空配列を返す（設計書⑤のスコープ列挙自体は維持）。
+ */
+export const searchScopeSchema = z.enum(["all", "regulation", "jmdn", "generic-name", "learning"]);
+export type SearchScope = z.infer<typeof searchScopeSchema>;
+
+/**
+ * GET /api/v1/search クエリ（設計書⑤ ?q=&scope=&tag= 準拠）。
+ * tagはtags/taggings未実装のため今回は対象外（regulations一覧と同様の判断）。
+ */
+export const searchQuerySchema = cursorPaginationQuerySchema.extend({
+  q: z.string().trim().min(1).optional(),
+  scope: searchScopeSchema.default("all"),
+  tag: z.string().optional(),
+});
+export type SearchQuery = z.infer<typeof searchQuerySchema>;
+
+/**
+ * 統合検索結果項目応答（設計書⑤⑩準拠）。regulations/classificationsを横断するdiscriminated union。
+ */
+export const regulationSearchResultResponseSchema = z.object({
+  type: z.literal("regulation"),
+  id: z.string().uuid(),
+  jurisdiction: jurisdictionSummaryResponseSchema,
+  regulationType: regulationTypeSchema,
+  title: z.string(),
+  docNumber: z.string().nullable(),
+  status: regulationStatusSchema,
+  effectiveDate: z.string().date().nullable(),
+});
+
+export const classificationSearchResultResponseSchema = z.object({
+  type: z.literal("classification"),
+  id: z.string().uuid(),
+  jurisdiction: jurisdictionSummaryResponseSchema,
+  scheme: classificationSchemeSchema,
+  code: z.string(),
+  name: z.string(),
+  class: z.string().nullable(),
+});
+
+export const searchResultItemResponseSchema = z.discriminatedUnion("type", [
+  regulationSearchResultResponseSchema,
+  classificationSearchResultResponseSchema,
+]);
+export type SearchResultItemResponse = z.infer<typeof searchResultItemResponseSchema>;
+
+/**
+ * 統合検索応答。scope=all の場合 nextCursor は常に null（複数ソース横断の統一カーソル未実装、設計書⑩の高度化時に対応）。
+ */
+export const searchResponseSchema = z.object({
+  items: z.array(searchResultItemResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type SearchResponse = z.infer<typeof searchResponseSchema>;
