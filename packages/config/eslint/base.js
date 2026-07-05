@@ -26,6 +26,10 @@ module.exports = tseslint.config(
       "**/*.config.js",
       "**/playwright-report/**",
       "**/next-env.d.ts",
+      // Serwist(PWA)がビルド時に生成するservice worker本体（.gitignore対象、手書きコードではない）。
+      "**/public/sw.js",
+      "**/public/sw*.js",
+      "**/public/swe-worker*.js",
     ],
   },
   js.configs.recommended,

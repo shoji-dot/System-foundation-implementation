@@ -8,11 +8,11 @@ import { NestFactory } from "@nestjs/core";
 import { PrismaModule } from "../infrastructure/database/prisma.module";
 import { BullmqModule } from "../infrastructure/queue/bullmq.module";
 import { RedisModule } from "../infrastructure/queue/redis.module";
+import { IngestionModule } from "../modules/ingestion/ingestion.module";
 
 /**
  * Worker プロセスのエントリポイント（Railway 2サービス目, 設計書①③⑨）。
- * Phase 0 では Redis/DB 接続のみ確認する。実際のジョブプロセッサ（法規制情報クローラ等）は
- * Phase 4「更新基盤」で ingestion モジュールとともに追加する。
+ * IngestionModule（薬事情報更新パイプライン、設計書⑨）の日次cron登録・ジョブ実行を行う。
  */
 @Module({
   imports: [
@@ -20,6 +20,7 @@ import { RedisModule } from "../infrastructure/queue/redis.module";
     PrismaModule,
     RedisModule,
     BullmqModule,
+    IngestionModule,
   ],
 })
 class WorkerModule {}

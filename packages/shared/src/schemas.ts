@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { CLASSIFICATION_SCHEMES } from "./classifications";
 import { JURISDICTION_CODES } from "./jurisdictions";
+import { PROGRESS_STATUSES } from "./learning";
 import { REGULATION_STATUSES, REGULATION_TYPES } from "./regulations";
 
 /**
@@ -288,6 +289,160 @@ export const classificationMappingListResponseSchema = z.object({
 export type ClassificationMappingListResponse = z.infer<
   typeof classificationMappingListResponseSchema
 >;
+
+/**
+ * 学習コース一覧項目応答（設計書④ courses 準拠、GET /api/v1/courses、S10）。
+ */
+export const courseSummaryResponseSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  description: z.string().nullable(),
+  order: z.number().int(),
+});
+export type CourseSummaryResponse = z.infer<typeof courseSummaryResponseSchema>;
+
+/**
+ * GET /api/v1/courses クエリ（設計書⑤ カーソルページネーション準拠、S10）。
+ * コースは体系カリキュラムのため order 順に固定表示し、絞り込み条件は現時点では持たない。
+ */
+export const listCoursesQuerySchema = cursorPaginationQuerySchema;
+export type ListCoursesQuery = z.infer<typeof listCoursesQuerySchema>;
+
+/**
+ * カーソルページネーション応答（学習コース一覧、設計書⑤ GET /api/v1/courses）。
+ */
+export const courseListResponseSchema = z.object({
+  items: z.array(courseSummaryResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type CourseListResponse = z.infer<typeof courseListResponseSchema>;
+
+/**
+ * レッスン一覧項目応答（設計書④ lessons 準拠、GET /api/v1/lessons、S11）。
+ * 本文(body)は一覧では返さず、詳細取得時に返す（regulation_versions一覧のfullText扱いに準拠）。
+ */
+export const lessonSummaryResponseSchema = z.object({
+  id: z.string().uuid(),
+  courseId: z.string().uuid(),
+  title: z.string(),
+  order: z.number().int(),
+});
+export type LessonSummaryResponse = z.infer<typeof lessonSummaryResponseSchema>;
+
+/**
+ * GET /api/v1/lessons クエリ（設計書⑤、S11）。courseIdでコース内のレッスン一覧に絞り込む
+ * （regulations一覧の?jurisdiction=と同様、フィルタとして扱いcourseId存在チェックは行わない）。
+ */
+export const listLessonsQuerySchema = cursorPaginationQuerySchema.extend({
+  courseId: z.string().uuid().optional(),
+});
+export type ListLessonsQuery = z.infer<typeof listLessonsQuerySchema>;
+
+/**
+ * カーソルページネーション応答（レッスン一覧、設計書⑤ GET /api/v1/lessons）。
+ */
+export const lessonListResponseSchema = z.object({
+  items: z.array(lessonSummaryResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type LessonListResponse = z.infer<typeof lessonListResponseSchema>;
+
+/**
+ * レッスンパラメータ（設計書⑤ GET /api/v1/lessons/:id、UUID検証）。
+ */
+export const lessonIdParamSchema = z.object({
+  id: z.string().uuid(),
+});
+export type LessonIdParam = z.infer<typeof lessonIdParamSchema>;
+
+/**
+ * レッスン詳細応答（設計書④ lessons 準拠、GET /api/v1/lessons/:id、S11本文表示）。
+ * 関連法令リンクは共通のtags/taggings（polymorphic: regulation/lesson/classification）実装時に対応する。
+ */
+export const lessonDetailResponseSchema = lessonSummaryResponseSchema.extend({
+  body: z.string(),
+});
+export type LessonDetailResponse = z.infer<typeof lessonDetailResponseSchema>;
+
+/**
+ * クイズ選択肢（設計書④ quiz_questions.choices jsonb 準拠）。
+ */
+export const quizChoiceResponseSchema = z.object({
+  id: z.string(),
+  text: z.string(),
+});
+export type QuizChoiceResponse = z.infer<typeof quizChoiceResponseSchema>;
+
+/**
+ * クイズ設問応答（設計書④ quiz_questions 準拠、GET /api/v1/quizzes、S12）。
+ * correctChoiceIdも含めて返す（採点はクライアント側で行い、結果をPOST /api/v1/progressで送信する運用のため）。
+ */
+export const quizQuestionResponseSchema = z.object({
+  id: z.string().uuid(),
+  question: z.string(),
+  choices: z.array(quizChoiceResponseSchema),
+  correctChoiceId: z.string(),
+  explanation: z.string().nullable(),
+  order: z.number().int(),
+});
+export type QuizQuestionResponse = z.infer<typeof quizQuestionResponseSchema>;
+
+/**
+ * クイズ応答（設計書④ quizzes 準拠、GET /api/v1/quizzes、S12）。
+ */
+export const quizResponseSchema = z.object({
+  id: z.string().uuid(),
+  lessonId: z.string().uuid(),
+  title: z.string(),
+  questions: z.array(quizQuestionResponseSchema),
+});
+export type QuizResponse = z.infer<typeof quizResponseSchema>;
+
+/**
+ * GET /api/v1/quizzes クエリ（設計書⑤、S12）。lessonIdでレッスンに紐づくクイズに絞り込む。
+ * レッスンあたりのクイズ件数は少ないため、classification_mappings一覧と同様ページネーションは行わない。
+ */
+export const listQuizzesQuerySchema = z.object({
+  lessonId: z.string().uuid().optional(),
+});
+export type ListQuizzesQuery = z.infer<typeof listQuizzesQuerySchema>;
+
+/**
+ * クイズ一覧応答（設計書⑤ GET /api/v1/quizzes）。
+ */
+export const quizListResponseSchema = z.object({
+  items: z.array(quizResponseSchema),
+});
+export type QuizListResponse = z.infer<typeof quizListResponseSchema>;
+
+/**
+ * 学習進捗ステータス Zod スキーマ（設計書④ user_progress 準拠）。
+ */
+export const progressStatusSchema = z.enum(PROGRESS_STATUSES);
+
+/**
+ * POST /api/v1/progress リクエスト（設計書⑤ 進捗POST、S13）。
+ * ログイン中のユーザー自身の進捗としてupsertするため、userIdはbodyに含めずアクセストークンから取得する。
+ * completedAtはクライアントから受け取らず、status===COMPLETEDの場合にサーバー側で設定する。
+ */
+export const recordProgressRequestSchema = z.object({
+  lessonId: z.string().uuid(),
+  status: progressStatusSchema,
+  score: z.number().int().min(0).max(100).optional(),
+});
+export type RecordProgressRequest = z.infer<typeof recordProgressRequestSchema>;
+
+/**
+ * 学習進捗応答（設計書④ user_progress 準拠、POST /api/v1/progress、S13）。
+ */
+export const progressResponseSchema = z.object({
+  id: z.string().uuid(),
+  lessonId: z.string().uuid(),
+  status: progressStatusSchema,
+  score: z.number().int().nullable(),
+  completedAt: z.string().datetime().nullable(),
+});
+export type ProgressResponse = z.infer<typeof progressResponseSchema>;
 
 /**
  * GET /api/v1/search スコープ（設計書⑤ ?scope=all|regulation|jmdn|generic-name|learning 準拠）。

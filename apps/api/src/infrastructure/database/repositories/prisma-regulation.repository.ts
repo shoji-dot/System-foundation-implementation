@@ -75,7 +75,9 @@ export class PrismaRegulationRepository implements RegulationRepository {
       where: { id },
       include: {
         jurisdiction: true,
+        // 最新版はPUBLISHEDのみを対象とする（設計書⑧、draft/review中の版は一般公開しない）。
         versions: {
+          where: { status: "PUBLISHED" },
           orderBy: { versionNo: "desc" },
           take: 1,
           include: { sections: { orderBy: { createdAt: "asc" } } },
@@ -113,6 +115,8 @@ export class PrismaRegulationRepository implements RegulationRepository {
     const records = await this.prisma.regulationVersion.findMany({
       where: {
         regulationId,
+        // 改正履歴はPUBLISHEDのみを対象とする（設計書⑧、draft/review中の版は一般公開しない）。
+        status: "PUBLISHED",
         ...(cursorVersionNo !== undefined ? { versionNo: { lt: cursorVersionNo } } : {}),
       },
       orderBy: { versionNo: "desc" },
@@ -137,6 +141,8 @@ export class PrismaRegulationRepository implements RegulationRepository {
     const records = await this.prisma.regulationVersion.findMany({
       where: {
         regulationId,
+        // 差分対象もPUBLISHEDのみとする（設計書⑧、draft/review中の版は一般公開しない）。
+        status: "PUBLISHED",
         versionNo: { in: [fromVersionNo, toVersionNo] },
       },
       include: { sections: { orderBy: { createdAt: "asc" } } },
