@@ -1,0 +1,5 @@
+import { listCoursesQuerySchema } from "@yakuji/shared";
+
+import { createZodDto } from "../../../common/dto/create-zod-dto";
+
+export class ListCoursesQueryDto extends createZodDto(listCoursesQuerySchema) {}
