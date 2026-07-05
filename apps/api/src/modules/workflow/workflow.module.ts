@@ -5,6 +5,7 @@ import { REGULATION_INGESTION_REPOSITORY } from "../../core/domain/regulation-in
 import { TOKEN_SERVICE } from "../../core/domain/token-service";
 import { GetPendingReviewVersionDetailUsecase } from "../../core/usecases/get-pending-review-version-detail.usecase";
 import { ListPendingReviewVersionsUsecase } from "../../core/usecases/list-pending-review-versions.usecase";
+import { PublishRegulationVersionUsecase } from "../../core/usecases/publish-regulation-version.usecase";
 import { PrismaModule } from "../../infrastructure/database/prisma.module";
 import { PrismaRegulationIngestionRepository } from "../../infrastructure/database/repositories/prisma-regulation-ingestion.repository";
 import { JwtTokenService } from "../../infrastructure/security/jwt-token.service";
@@ -22,6 +23,7 @@ import { IngestionReviewController } from "./ingestion-review.controller";
   providers: [
     ListPendingReviewVersionsUsecase,
     GetPendingReviewVersionDetailUsecase,
+    PublishRegulationVersionUsecase,
     { provide: REGULATION_INGESTION_REPOSITORY, useClass: PrismaRegulationIngestionRepository },
     { provide: TOKEN_SERVICE, useClass: JwtTokenService },
   ],

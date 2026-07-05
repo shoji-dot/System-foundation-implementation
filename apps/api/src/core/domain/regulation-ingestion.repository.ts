@@ -1,6 +1,10 @@
 import type { JurisdictionCode } from "./jurisdiction.entity";
 import type { RegulationVersionStatus } from "./regulation-version.entity";
-import type { RegulationJurisdictionSummary, RegulationType } from "./regulation.entity";
+import type {
+  RegulationJurisdictionSummary,
+  RegulationStatus,
+  RegulationType,
+} from "./regulation.entity";
 
 /**
  * 取込パイプライン（設計書⑨）専用の書き込みポート。
@@ -76,6 +80,21 @@ export interface PendingReviewVersionDetail extends PendingReviewVersionSummary 
   } | null;
 }
 
+/**
+ * 公開(publish)実行結果（設計書⑫ S20、⑧編集ワークフロー準拠）。
+ * 旧公開版が存在した場合はeffectiveToをクローズし、closedPreviousVersionに詳細を返す。
+ * 存在しない場合（初版公開）はRegulation.statusはACTIVEのまま変化しない。
+ */
+export interface PublishVersionResult {
+  regulationId: string;
+  versionId: string;
+  versionNo: number;
+  publishedAt: Date;
+  effectiveFrom: Date;
+  regulationStatus: RegulationStatus;
+  closedPreviousVersion: { versionId: string; effectiveTo: Date } | null;
+}
+
 export interface RegulationIngestionRepository {
   /** 法域+docNumberで既存regulationを検索する（全ステータス対象）。無ければnull（新規として扱う）。 */
   findLatestByDocNumber(
@@ -99,4 +118,10 @@ export interface RegulationIngestionRepository {
   ): Promise<PendingReviewVersionListResult>;
   /** 設計書⑫ S20向け: 校閲対象の版1件の詳細＋現行公開版（比較用）。存在しない、またはPUBLISHED済みの場合はnull。 */
   findPendingReviewDetail(versionId: string): Promise<PendingReviewVersionDetail | null>;
+  /**
+   * 設計書⑫ S20向け: 校閲対象の版を公開する（DRAFT/REVIEW→PUBLISHED）。
+   * 旧公開版が存在すればeffectiveToを新版のeffectiveFromでクローズし、Regulation.statusをAMENDEDにする
+   * （無ければACTIVEのまま）。対象版が存在しない、またはPUBLISHED済みの場合はnull。
+   */
+  publishVersion(versionId: string): Promise<PublishVersionResult | null>;
 }

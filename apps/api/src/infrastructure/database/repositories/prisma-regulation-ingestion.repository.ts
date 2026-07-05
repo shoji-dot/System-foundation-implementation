@@ -15,6 +15,7 @@ import type {
   PendingReviewVersionListFilters,
   PendingReviewVersionListResult,
   PendingReviewVersionSummary,
+  PublishVersionResult,
   RegulationIngestionRepository,
 } from "../../../core/domain/regulation-ingestion.repository";
 import { PrismaService } from "../prisma.service";
@@ -180,6 +181,49 @@ export class PrismaRegulationIngestionRepository implements RegulationIngestionR
           }
         : null,
     };
+  }
+
+  async publishVersion(versionId: string): Promise<PublishVersionResult | null> {
+    return this.prisma.$transaction(async (tx) => {
+      const target = await tx.regulationVersion.findUnique({ where: { id: versionId } });
+      if (!target || target.status === "PUBLISHED") {
+        return null;
+      }
+
+      const previousPublished = await tx.regulationVersion.findFirst({
+        where: { regulationId: target.regulationId, status: "PUBLISHED" },
+        orderBy: { versionNo: "desc" },
+      });
+
+      if (previousPublished) {
+        await tx.regulationVersion.update({
+          where: { id: previousPublished.id },
+          data: { effectiveTo: target.effectiveFrom },
+        });
+      }
+
+      await tx.regulation.update({
+        where: { id: target.regulationId },
+        data: { status: previousPublished ? "AMENDED" : "ACTIVE" },
+      });
+
+      const publishedVersion = await tx.regulationVersion.update({
+        where: { id: versionId },
+        data: { status: "PUBLISHED", publishedAt: new Date() },
+      });
+
+      return {
+        regulationId: target.regulationId,
+        versionId: publishedVersion.id,
+        versionNo: publishedVersion.versionNo,
+        publishedAt: publishedVersion.publishedAt,
+        effectiveFrom: publishedVersion.effectiveFrom,
+        regulationStatus: previousPublished ? "AMENDED" : "ACTIVE",
+        closedPreviousVersion: previousPublished
+          ? { versionId: previousPublished.id, effectiveTo: target.effectiveFrom }
+          : null,
+      };
+    });
   }
 
   private toPendingSummary(record: PendingReviewRecord): PendingReviewVersionSummary {
