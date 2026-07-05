@@ -1,4 +1,4 @@
-import { NotFoundException } from "@nestjs/common";
+﻿import { NotFoundException } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import type { TestingModule } from "@nestjs/testing";
 
@@ -6,6 +6,7 @@ import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { GetPendingReviewVersionDetailUsecase } from "../../core/usecases/get-pending-review-version-detail.usecase";
 import { ListPendingReviewVersionsUsecase } from "../../core/usecases/list-pending-review-versions.usecase";
+import { PublishRegulationVersionUsecase } from "../../core/usecases/publish-regulation-version.usecase";
 
 import { IngestionReviewController } from "./ingestion-review.controller";
 
@@ -13,15 +14,18 @@ describe("IngestionReviewController", () => {
   let controller: IngestionReviewController;
   const listExecute = jest.fn();
   const detailExecute = jest.fn();
+  const publishExecute = jest.fn();
 
   beforeEach(async () => {
     listExecute.mockReset();
     detailExecute.mockReset();
+    publishExecute.mockReset();
     const module: TestingModule = await Test.createTestingModule({
       controllers: [IngestionReviewController],
       providers: [
         { provide: ListPendingReviewVersionsUsecase, useValue: { execute: listExecute } },
         { provide: GetPendingReviewVersionDetailUsecase, useValue: { execute: detailExecute } },
+        { provide: PublishRegulationVersionUsecase, useValue: { execute: publishExecute } },
       ],
     })
       .overrideGuard(JwtAuthGuard)
@@ -150,6 +154,59 @@ describe("IngestionReviewController", () => {
 
       await expect(
         controller.detail({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c" }),
+      ).rejects.toBeInstanceOf(NotFoundException);
+    });
+  });
+
+  describe("publish", () => {
+    it("delegates to the usecase and maps the result to the publish response", async () => {
+      publishExecute.mockResolvedValue({
+        regulationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
+        versionId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c",
+        versionNo: 2,
+        publishedAt: new Date("2026-07-05T01:00:00.000Z"),
+        effectiveFrom: new Date("2026-07-01T00:00:00.000Z"),
+        regulationStatus: "AMENDED",
+        closedPreviousVersion: {
+          versionId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b",
+          effectiveTo: new Date("2026-06-30T00:00:00.000Z"),
+        },
+      });
+      const result = await controller.publish({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c" });
+      expect(publishExecute).toHaveBeenCalledWith("018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c");
+      expect(result).toEqual({
+        regulationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
+        versionId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c",
+        versionNo: 2,
+        status: "PUBLISHED",
+        publishedAt: "2026-07-05T01:00:00.000Z",
+        effectiveFrom: "2026-07-01",
+        regulationStatus: "AMENDED",
+        closedPreviousVersion: {
+          versionId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b",
+          effectiveTo: "2026-06-30",
+        },
+      });
+    });
+
+    it("returns closedPreviousVersion as null when publishing the first version", async () => {
+      publishExecute.mockResolvedValue({
+        regulationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
+        versionId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c",
+        versionNo: 1,
+        publishedAt: new Date("2026-07-05T01:00:00.000Z"),
+        effectiveFrom: new Date("2026-07-01T00:00:00.000Z"),
+        regulationStatus: "ACTIVE",
+        closedPreviousVersion: null,
+      });
+      const result = await controller.publish({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c" });
+      expect(result.closedPreviousVersion).toBeNull();
+    });
+
+    it("propagates NotFoundException from the usecase", async () => {
+      publishExecute.mockRejectedValue(new NotFoundException("not found"));
+      await expect(
+        controller.publish({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c" }),
       ).rejects.toBeInstanceOf(NotFoundException);
     });
   });
