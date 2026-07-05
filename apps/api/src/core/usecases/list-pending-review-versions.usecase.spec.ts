@@ -26,6 +26,7 @@ describe("ListPendingReviewVersionsUsecase", () => {
       appendDraftVersion: jest.fn(),
       listPendingReview: jest.fn(),
       findPendingReviewDetail: jest.fn(),
+      publishVersion: jest.fn(),
     };
     const usecase = new ListPendingReviewVersionsUsecase(regulationIngestionRepository);
     return { usecase, regulationIngestionRepository };
