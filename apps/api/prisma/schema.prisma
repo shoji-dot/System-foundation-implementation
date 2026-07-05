@@ -5,6 +5,10 @@
 // Phase 1: JP法規制データ閲覧（S06/S07）として jurisdictions / regulations / regulation_versions /
 //          regulation_sections / regulation_relations を追加。
 // Phase 1: JMDN検索（S08/S09）として device_classifications / classification_mappings を追加。
+// Phase 2: 学習系（S10-S13）として courses / lessons / quizzes / quiz_questions / user_progress を追加。
+// Phase 4: 更新基盤（⑨）として ingestion_jobs を追加。
+// Phase 4: 編集ワークフロー（⑧ draft→review→published）として regulation_versions.status を追加。
+// Phase 4: 更新通知（S17/S18）として update_subscriptions を追加（設計書④に列定義が無いためユーザー承認済み）。
 // 他ドメインテーブル (tags / ...) は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
 
 generator client {
@@ -61,7 +65,9 @@ model User {
   createdAt    DateTime   @default(now()) @map("created_at")
   updatedAt    DateTime   @updatedAt @map("updated_at")
 
-  memberships Membership[]
+  memberships   Membership[]
+  progresses    UserProgress[]
+  subscriptions UpdateSubscription[]
 
   @@map("users")
 }
@@ -144,6 +150,7 @@ model Jurisdiction {
 
   regulations           Regulation[]
   deviceClassifications DeviceClassification[]
+  updateSubscriptions   UpdateSubscription[]
 
   @@map("jurisdictions")
 }
@@ -173,39 +180,51 @@ model Regulation {
   @@map("regulations")
 }
 
+/// 編集ワークフロー状態（設計書⑧「編集ワークフロー: draft → review → published」準拠）。
+/// Phase1時点(取込パイプライン未実装)ではこの列が存在せず全版が公開扱いだったため、
+/// 既存行との後方互換のためデフォルトをPUBLISHEDとする（Phase4で取込パイプライン導入に伴い追加）。
+enum RegulationVersionStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+}
+
 /// 法規文書バージョン（設計書 ④⑧ regulation_versions 準拠）: 法改正はバージョン行追加で表現し、履歴を不変保持する。
 model RegulationVersion {
-  id            String    @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  regulationId  String    @map("regulation_id") @db.Uuid
-  versionNo     Int       @map("version_no")
-  publishedAt   DateTime  @map("published_at")
-  effectiveFrom DateTime  @map("effective_from") @db.Date
-  effectiveTo   DateTime? @map("effective_to") @db.Date
-  fullText      String    @map("full_text")
+  id            String                  @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  regulationId  String                  @map("regulation_id") @db.Uuid
+  versionNo     Int                     @map("version_no")
+  publishedAt   DateTime                @map("published_at")
+  effectiveFrom DateTime                @map("effective_from") @db.Date
+  effectiveTo   DateTime?               @map("effective_to") @db.Date
+  fullText      String                  @map("full_text")
   summary       String?
-  changeSummary String?   @map("change_summary")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  changeSummary String?                 @map("change_summary")
+  /// 編集ワークフロー状態（設計書⑧）。取込パイプライン(⑨)が新版をDRAFTで作成し、editorのレビューを経てPUBLISHEDになる。
+  status        RegulationVersionStatus @default(PUBLISHED)
+  createdAt     DateTime                @default(now()) @map("created_at")
+  updatedAt     DateTime                @updatedAt @map("updated_at")
 
   regulation Regulation          @relation(fields: [regulationId], references: [id], onDelete: Cascade)
   sections   RegulationSection[]
 
   @@unique([regulationId, versionNo])
+  @@index([regulationId, status])
   @@map("regulation_versions")
 }
 
 /// 条文セクション（設計書 ④ regulation_sections 準拠）: RAG・全文検索の単位。
 model RegulationSection {
-  id        String                      @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  versionId String                      @map("version_id") @db.Uuid
+  id        String                       @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  versionId String                       @map("version_id") @db.Uuid
   /// 条・項・号の階層パス（例: 第23条の2/第1項/第2号）
   path      String
   heading   String
   body      String
   /// 埋め込みベクトル（設計書⑥ RAG用）。Phase 3 のAI機能実装時にWorkerが生成するため、Phase 1時点ではnull。
   embedding Unsupported("vector(1536)")?
-  createdAt DateTime                    @default(now()) @map("created_at")
-  updatedAt DateTime                    @updatedAt @map("updated_at")
+  createdAt DateTime                     @default(now()) @map("created_at")
+  updatedAt DateTime                     @updatedAt @map("updated_at")
 
   version RegulationVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
 
@@ -274,4 +293,155 @@ model ClassificationMapping {
 
   @@unique([fromId, toId])
   @@map("classification_mappings")
+}
+
+/// 学習進捗ステータス（設計書 ④ user_progress 準拠）
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+/// 学習コース（設計書 ④ courses / ⑫ S10 準拠）: 企画〜市販後・リコールまでの体系カリキュラムの単位。
+model Course {
+  id          String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  title       String
+  description String?
+  /// カリキュラム内の表示順（設計書⑫ S10: 体系カリキュラム）。
+  order       Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  lessons Lesson[]
+
+  @@map("courses")
+}
+
+/// レッスン（設計書 ④ lessons / ⑫ S11 準拠）: 本文・図解・関連法令リンクを保持する単位。
+/// 関連法令リンクは共通の tags/taggings（設計書④共通、polymorphic: regulation/lesson/classification）実装時に対応する。
+model Lesson {
+  id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  courseId  String   @map("course_id") @db.Uuid
+  title     String
+  body      String
+  /// コース内の表示順。
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  course       Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  quizzes      Quiz[]
+  userProgress UserProgress[]
+
+  @@unique([courseId, order])
+  @@map("lessons")
+}
+
+/// クイズ（設計書 ④ quizzes / ⑫ S12 準拠）: レッスンに紐づく理解度確認の単位。
+model Quiz {
+  id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  lessonId  String   @map("lesson_id") @db.Uuid
+  title     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  lesson    Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions QuizQuestion[]
+
+  @@map("quizzes")
+}
+
+/// クイズ設問（設計書 ④ quiz_questions 準拠）。
+model QuizQuestion {
+  id              String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  quizId          String   @map("quiz_id") @db.Uuid
+  question        String
+  /// 選択肢配列（例: [{"id":"a","text":"..."}]）。設計書④ checklists.items と同様、設問形式の多様化に備えjsonbで保持する。
+  choices         Json
+  correctChoiceId String   @map("correct_choice_id")
+  explanation     String?
+  /// クイズ内の表示順。
+  order           Int      @default(0)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@unique([quizId, order])
+  @@map("quiz_questions")
+}
+
+/// ユーザー学習進捗（設計書 ④ user_progress 準拠、⑫ S13）: user_id, lesson_id, status, score, completed_at。
+model UserProgress {
+  id          String         @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  userId      String         @map("user_id") @db.Uuid
+  lessonId    String         @map("lesson_id") @db.Uuid
+  status      ProgressStatus @default(NOT_STARTED)
+  score       Int?
+  completedAt DateTime?      @map("completed_at")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@map("user_progress")
+}
+
+/// 取込ジョブ実行ステータス（設計書④ ingestion_jobs 準拠）。
+enum IngestionJobStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+/// 薬事情報更新パイプライン実行履歴（設計書④ ingestion_jobs 準拠、⑨の実行履歴）。
+/// source はAdapter識別子の自由記述（例: "PMDA_NOTICES"）とし、各国Adapter追加時にスキーマ変更を
+/// 不要にする（設計書④「各国拡張」の方針、device_classifications.schemeと同様の判断）。
+/// diffSummary は現時点ではAI要約ではなく、非AIの単純な自動要約（差分行数等）を保持する運用とする
+/// （AI機能はPhase3として保留中のため、要ユーザー確認済み）。
+model IngestionJob {
+  id           String             @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  source       String
+  status       IngestionJobStatus @default(PENDING)
+  /// 差分要約（非AI、簡易生成）。ジョブ失敗時や差分なしの場合はnull。
+  diffSummary  String?            @map("diff_summary")
+  /// 失敗時の原因（設計書⑨「失敗時リトライ・ingestion_jobsに監査記録」）。
+  errorMessage String?            @map("error_message")
+  runAt        DateTime           @map("run_at")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+
+  @@index([source, runAt])
+  @@map("ingestion_jobs")
+}
+
+/// 更新通知の配信頻度（設計書⑤ POST /api/v1/subscriptions、S18「購読国・タイプ・頻度」準拠）。
+enum UpdateFrequency {
+  REALTIME
+  DAILY
+  WEEKLY
+}
+
+/// 更新通知購読（設計書⑤ POST /api/v1/subscriptions、S17/S18 準拠）。設計書④に本テーブルの列定義は
+/// 無いため、S18の画面説明「購読国・タイプ・頻度」に基づきユーザー承認済みで追加する。
+/// jurisdictionId/regulationType が null の場合はそれぞれ「全国」「全タイプ」を意味する。
+/// 同一ユーザー・同一組み合わせの重複防止は、Postgresの複合UNIQUEがNULLを別値として扱い重複を
+/// 検知できないため、DB制約ではなくアプリ層（UpdateSubscriptionRepository.existsForUser）で行う。
+model UpdateSubscription {
+  id             String          @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  userId         String          @map("user_id") @db.Uuid
+  jurisdictionId String?         @map("jurisdiction_id") @db.Uuid
+  regulationType RegulationType? @map("regulation_type")
+  frequency      UpdateFrequency
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jurisdiction Jurisdiction? @relation(fields: [jurisdictionId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@map("update_subscriptions")
 }
