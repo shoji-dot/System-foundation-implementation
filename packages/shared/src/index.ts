@@ -7,3 +7,4 @@ export * from "./roles";
 export * from "./auth";
 export * from "./workflow";
 export * from "./updates";
+export * from "./notifications";
