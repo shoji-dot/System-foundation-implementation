@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { jurisdictionSummaryResponseSchema, regulationTypeSchema } from "./schemas";
+import {
+  jurisdictionSummaryResponseSchema,
+  regulationStatusSchema,
+  regulationTypeSchema,
+} from "./schemas";
 
 /**
  * 編集ワークフロー状態のうち、校閲待ちキュー（S20）の対象となるもの。
@@ -75,4 +79,30 @@ export const pendingReviewVersionDetailResponseSchema = pendingReviewVersionResp
 });
 export type PendingReviewVersionDetailResponse = z.infer<
   typeof pendingReviewVersionDetailResponseSchema
+>;
+
+/**
+ * 公開実行時にクローズされた旧公開版の情報。旧公開版が無かった場合（初版公開）はnull。
+ */
+export const closedPreviousVersionResponseSchema = z.object({
+  versionId: z.string().uuid(),
+  effectiveTo: z.string().date(),
+});
+
+/**
+ * 公開(publish)応答（設計書⑫ S20、POST /api/v1/admin/ingestion/versions/:id/publish）。
+ * regulationStatusは公開実行後のRegulation.status（旧公開版があればAMENDED、無ければACTIVE）。
+ */
+export const publishPendingReviewVersionResponseSchema = z.object({
+  regulationId: z.string().uuid(),
+  versionId: z.string().uuid(),
+  versionNo: z.number().int().positive(),
+  status: z.literal("PUBLISHED"),
+  publishedAt: z.string().datetime(),
+  effectiveFrom: z.string().date(),
+  regulationStatus: regulationStatusSchema,
+  closedPreviousVersion: closedPreviousVersionResponseSchema.nullable(),
+});
+export type PublishPendingReviewVersionResponse = z.infer<
+  typeof publishPendingReviewVersionResponseSchema
 >;
