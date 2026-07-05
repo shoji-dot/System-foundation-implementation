@@ -7,6 +7,7 @@ import type {
 import type { UpdateSubscription } from "../../../core/domain/update-subscription.entity";
 import type {
   CreateUpdateSubscriptionInput,
+  FindMatchingSubscriptionUserIdsInput,
   UpdateSubscriptionRepository,
 } from "../../../core/domain/update-subscription.repository";
 import { PrismaService } from "../prisma.service";
@@ -55,6 +56,21 @@ export class PrismaUpdateSubscriptionRepository implements UpdateSubscriptionRep
     });
 
     return this.toDomain(record);
+  }
+
+  async findMatchingUserIds(input: FindMatchingSubscriptionUserIdsInput): Promise<string[]> {
+    const subscriptions = await this.prisma.updateSubscription.findMany({
+      where: {
+        AND: [
+          { OR: [{ jurisdictionId: null }, { jurisdiction: { code: input.jurisdictionCode } }] },
+          { OR: [{ regulationType: null }, { regulationType: input.regulationType }] },
+        ],
+      },
+      select: { userId: true },
+      distinct: ["userId"],
+    });
+
+    return subscriptions.map((subscription) => subscription.userId);
   }
 
   private toDomain(record: UpdateSubscriptionWithJurisdiction): UpdateSubscription {

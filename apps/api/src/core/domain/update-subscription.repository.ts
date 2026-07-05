@@ -15,6 +15,11 @@ export interface CreateUpdateSubscriptionInput {
   frequency: UpdateFrequency;
 }
 
+export interface FindMatchingSubscriptionUserIdsInput {
+  jurisdictionCode: JurisdictionCode;
+  regulationType: RegulationType;
+}
+
 export interface UpdateSubscriptionRepository {
   /**
    * 同一ユーザー・同一jurisdiction・同一regulationTypeの組み合わせが既に存在するか確認する
@@ -23,4 +28,9 @@ export interface UpdateSubscriptionRepository {
    */
   existsForUser(input: CreateUpdateSubscriptionInput): Promise<boolean>;
   create(input: CreateUpdateSubscriptionInput): Promise<UpdateSubscription>;
+  /**
+   * 公開された法規文書のjurisdiction/typeに一致する購読者のuserIdを重複無しで返す
+   * （jurisdictionId/regulationTypeがnullは「全国」「全タイプ」を意味し一致扱い、設計書⑨通知生成用）。
+   */
+  findMatchingUserIds(input: FindMatchingSubscriptionUserIdsInput): Promise<string[]>;
 }

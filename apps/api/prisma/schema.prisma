@@ -9,6 +9,7 @@
 // Phase 4: 更新基盤（⑨）として ingestion_jobs を追加。
 // Phase 4: 編集ワークフロー（⑧ draft→review→published）として regulation_versions.status を追加。
 // Phase 4: 更新通知（S17/S18）として update_subscriptions を追加（設計書④に列定義が無いためユーザー承認済み）。
+// Phase 4: 公開時のアプリ内通知生成として notifications を追加（設計書④に列定義が無いためユーザー承認済み）。
 // 他ドメインテーブル (tags / ...) は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
 
 generator client {
@@ -68,6 +69,7 @@ model User {
   memberships   Membership[]
   progresses    UserProgress[]
   subscriptions UpdateSubscription[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -205,8 +207,9 @@ model RegulationVersion {
   createdAt     DateTime                @default(now()) @map("created_at")
   updatedAt     DateTime                @updatedAt @map("updated_at")
 
-  regulation Regulation          @relation(fields: [regulationId], references: [id], onDelete: Cascade)
-  sections   RegulationSection[]
+  regulation    Regulation          @relation(fields: [regulationId], references: [id], onDelete: Cascade)
+  sections      RegulationSection[]
+  notifications Notification[]
 
   @@unique([regulationId, versionNo])
   @@index([regulationId, status])
@@ -444,4 +447,25 @@ model UpdateSubscription {
 
   @@index([userId])
   @@map("update_subscriptions")
+}
+
+/// アプリ内通知（設計書⑨「published時: 購読ユーザーへ通知（アプリ内+メール）」準拠、S17）。
+/// 設計書④に本テーブルの列定義は無いため、update_subscriptionsと同様にユーザー承認済みで追加する。
+/// メール配信は保留中のためアプリ内通知のみを対象とし、既読切替APIは今回のスコープ外（次回検討）。
+/// 購読のfrequency(REALTIME/DAILY/WEEKLY)は現時点では無視し、一致する購読者全員に公開時点で即時生成する
+/// （メール配信実装時にfrequencyへ応じた配信頻度制御を行う想定、要ユーザー確認済み）。
+model Notification {
+  id                  String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  userId              String   @map("user_id") @db.Uuid
+  regulationVersionId String   @map("regulation_version_id") @db.Uuid
+  title               String
+  body                String?
+  isRead              Boolean  @default(false) @map("is_read")
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  regulationVersion RegulationVersion @relation(fields: [regulationVersionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("notifications")
 }

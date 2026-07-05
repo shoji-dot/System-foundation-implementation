@@ -1,10 +1,12 @@
 import { NotFoundException } from "@nestjs/common";
 
+import type { NotificationRepository } from "../domain/notification.repository";
 import type {
   PendingReviewVersionDetail,
   PublishVersionResult,
   RegulationIngestionRepository,
 } from "../domain/regulation-ingestion.repository";
+import type { UpdateSubscriptionRepository } from "../domain/update-subscription.repository";
 
 import { PublishRegulationVersionUsecase } from "./publish-regulation-version.usecase";
 
@@ -53,8 +55,26 @@ describe("PublishRegulationVersionUsecase", () => {
       findPendingReviewDetail: jest.fn(),
       publishVersion: jest.fn(),
     };
-    const usecase = new PublishRegulationVersionUsecase(regulationIngestionRepository);
-    return { usecase, regulationIngestionRepository };
+    const updateSubscriptionRepository: jest.Mocked<UpdateSubscriptionRepository> = {
+      existsForUser: jest.fn(),
+      create: jest.fn(),
+      findMatchingUserIds: jest.fn().mockResolvedValue([]),
+    };
+    const notificationRepository: jest.Mocked<NotificationRepository> = {
+      createMany: jest.fn(),
+      findManyForUser: jest.fn(),
+    };
+    const usecase = new PublishRegulationVersionUsecase(
+      regulationIngestionRepository,
+      updateSubscriptionRepository,
+      notificationRepository,
+    );
+    return {
+      usecase,
+      regulationIngestionRepository,
+      updateSubscriptionRepository,
+      notificationRepository,
+    };
   }
 
   it("publishes the version and returns the result", async () => {
@@ -83,5 +103,46 @@ describe("PublishRegulationVersionUsecase", () => {
     regulationIngestionRepository.publishVersion.mockResolvedValue(null);
 
     await expect(usecase.execute(versionId)).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it("creates notifications for users whose subscription matches the published jurisdiction/type", async () => {
+    const { usecase, regulationIngestionRepository, updateSubscriptionRepository, notificationRepository } =
+      setup();
+    regulationIngestionRepository.findPendingReviewDetail.mockResolvedValue(pendingDetail);
+    regulationIngestionRepository.publishVersion.mockResolvedValue(publishResult);
+    updateSubscriptionRepository.findMatchingUserIds.mockResolvedValue(["user-1", "user-2"]);
+
+    await usecase.execute(versionId);
+
+    expect(updateSubscriptionRepository.findMatchingUserIds).toHaveBeenCalledWith({
+      jurisdictionCode: pendingDetail.jurisdiction.code,
+      regulationType: pendingDetail.type,
+    });
+    expect(notificationRepository.createMany).toHaveBeenCalledWith([
+      {
+        userId: "user-1",
+        regulationVersionId: publishResult.versionId,
+        title: `${pendingDetail.regulationTitle}が更新されました`,
+        body: pendingDetail.changeSummary,
+      },
+      {
+        userId: "user-2",
+        regulationVersionId: publishResult.versionId,
+        title: `${pendingDetail.regulationTitle}が更新されました`,
+        body: pendingDetail.changeSummary,
+      },
+    ]);
+  });
+
+  it("does not call createMany when no subscription matches", async () => {
+    const { usecase, regulationIngestionRepository, updateSubscriptionRepository, notificationRepository } =
+      setup();
+    regulationIngestionRepository.findPendingReviewDetail.mockResolvedValue(pendingDetail);
+    regulationIngestionRepository.publishVersion.mockResolvedValue(publishResult);
+    updateSubscriptionRepository.findMatchingUserIds.mockResolvedValue([]);
+
+    await usecase.execute(versionId);
+
+    expect(notificationRepository.createMany).not.toHaveBeenCalled();
   });
 });
