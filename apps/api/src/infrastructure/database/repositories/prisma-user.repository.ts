@@ -3,6 +3,7 @@ import type { User as PrismaUser } from "@prisma/client";
 
 import type { Plan, SystemRole, User } from "../../../core/domain/user.entity";
 import type {
+  CompleteOnboardingInput,
   ListUsersFilters,
   NewUser,
   UserListResult,
@@ -73,6 +74,18 @@ export class PrismaUserRepository implements UserRepository {
     return this.toDomain(record);
   }
 
+  async completeOnboarding(id: string, input: CompleteOnboardingInput): Promise<User> {
+    const record = await this.prisma.user.update({
+      where: { id },
+      data: {
+        profession: input.profession,
+        interestedJurisdictions: input.interestedJurisdictions,
+        onboardingCompletedAt: new Date(),
+      },
+    });
+    return this.toDomain(record);
+  }
+
   private toDomain(record: PrismaUser): User {
     return {
       id: record.id,
@@ -82,6 +95,9 @@ export class PrismaUserRepository implements UserRepository {
       locale: record.locale,
       systemRole: record.systemRole,
       plan: record.plan,
+      profession: record.profession,
+      interestedJurisdictions: record.interestedJurisdictions,
+      onboardingCompletedAt: record.onboardingCompletedAt,
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
     };

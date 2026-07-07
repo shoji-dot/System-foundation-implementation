@@ -12,6 +12,9 @@ describe("ListUsersUsecase", () => {
     locale: "ja",
     systemRole: "USER",
     plan: "FREE",
+    profession: null,
+    interestedJurisdictions: [],
+    onboardingCompletedAt: null,
     createdAt: new Date("2026-07-01T00:00:00.000Z"),
     updatedAt: new Date("2026-07-01T00:00:00.000Z"),
   };
@@ -24,6 +27,7 @@ describe("ListUsersUsecase", () => {
       list: jest.fn(),
       updateRole: jest.fn(),
       updatePlan: jest.fn(),
+      completeOnboarding: jest.fn(),
     };
     const usecase = new ListUsersUsecase(userRepository);
     return { usecase, userRepository };

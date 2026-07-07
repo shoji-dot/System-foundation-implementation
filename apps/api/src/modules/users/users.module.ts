@@ -3,6 +3,7 @@ import { JwtModule } from "@nestjs/jwt";
 
 import { TOKEN_SERVICE } from "../../core/domain/token-service";
 import { USER_REPOSITORY } from "../../core/domain/user.repository";
+import { CompleteOnboardingUsecase } from "../../core/usecases/complete-onboarding.usecase";
 import { GetCurrentUserUsecase } from "../../core/usecases/get-current-user.usecase";
 import { ListUsersUsecase } from "../../core/usecases/list-users.usecase";
 import { UpdateUserPlanUsecase } from "../../core/usecases/update-user-plan.usecase";
@@ -26,6 +27,7 @@ import { UsersController } from "./users.controller";
   controllers: [UsersController, AdminUsersController],
   providers: [
     GetCurrentUserUsecase,
+    CompleteOnboardingUsecase,
     ListUsersUsecase,
     UpdateUserRoleUsecase,
     UpdateUserPlanUsecase,
