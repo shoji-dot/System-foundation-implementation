@@ -1,11 +1,11 @@
-import { UnauthorizedException } from "@nestjs/common";
+import { NotFoundException } from "@nestjs/common";
 
 import type { User } from "../domain/user.entity";
 import type { UserRepository } from "../domain/user.repository";
 
-import { GetCurrentUserUsecase } from "./get-current-user.usecase";
+import { UpdateUserRoleUsecase } from "./update-user-role.usecase";
 
-describe("GetCurrentUserUsecase", () => {
+describe("UpdateUserRoleUsecase", () => {
   const user: User = {
     id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e4f",
     email: "user@example.com",
@@ -27,24 +27,28 @@ describe("GetCurrentUserUsecase", () => {
       updateRole: jest.fn(),
       updatePlan: jest.fn(),
     };
-    const usecase = new GetCurrentUserUsecase(userRepository);
+    const usecase = new UpdateUserRoleUsecase(userRepository);
     return { usecase, userRepository };
   }
 
-  it("returns the public user profile without the password hash", async () => {
+  it("updates the user's system role", async () => {
     const { usecase, userRepository } = setup();
     userRepository.findById.mockResolvedValue(user);
+    userRepository.updateRole.mockResolvedValue({ ...user, systemRole: "EDITOR" });
 
-    const result = await usecase.execute(user.id);
+    const result = await usecase.execute({ id: user.id, systemRole: "EDITOR" });
 
-    expect(result).not.toHaveProperty("passwordHash");
-    expect(result.email).toBe(user.email);
+    expect(userRepository.updateRole).toHaveBeenCalledWith(user.id, "EDITOR");
+    expect(result.systemRole).toBe("EDITOR");
   });
 
-  it("rejects when the user no longer exists", async () => {
+  it("rejects when the user does not exist", async () => {
     const { usecase, userRepository } = setup();
     userRepository.findById.mockResolvedValue(null);
 
-    await expect(usecase.execute("missing-id")).rejects.toBeInstanceOf(UnauthorizedException);
+    await expect(
+      usecase.execute({ id: "missing", systemRole: "ADMIN" }),
+    ).rejects.toBeInstanceOf(NotFoundException);
+    expect(userRepository.updateRole).not.toHaveBeenCalled();
   });
 });
