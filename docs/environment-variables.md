@@ -12,15 +12,16 @@
 
 ## apps/api (NestJS) — `apps/api/.env.example`
 
-| 変数             | 用途                                                                                                     | ローカル既定値                              | 本番 (Railway)                                                       |
-| ---------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------- |
-| `NODE_ENV`       | 実行環境                                                                                                 | `development`                               | `production`                                                         |
-| `PORT`           | APIサーバ待受ポート                                                                                      | `3001`                                      | Railway が自動注入する `PORT` を使用                                 |
-| `API_PREFIX`     | APIルートプレフィックス                                                                                  | `api/v1`                                    | 同左                                                                 |
-| `CORS_ORIGIN`    | 許可オリジン（カンマ区切り）                                                                             | `http://localhost:3000`                     | VercelのProduction/Previewドメイン                                   |
-| `DATABASE_URL`   | PostgreSQL接続文字列                                                                                     | docker-compose の postgres                  | Railway Postgres プラグインの参照変数 `${{Postgres.DATABASE_URL}}`   |
-| `REDIS_URL`      | Redis接続文字列                                                                                          | docker-compose の redis                     | Railway Redis プラグインの参照変数 `${{Redis.REDIS_URL}}`            |
-| `OPENAI_API_KEY` | AIチャット(S14)埋め込み・生成用（infrastructure/external/llm、ユーザー承認済みでOpenAI一本の構成を採用） | OpenAIダッシュボードで発行した個人/組織キー | Railway Variablesに設定（Secretsとして扱う、コミット・ログ出力禁止） |
+| 変数                      | 用途                                                                                                     | ローカル既定値                              | 本番 (Railway)                                                       |
+| ------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------- |
+| `NODE_ENV`                | 実行環境                                                                                                 | `development`                               | `production`                                                         |
+| `PORT`                    | APIサーバ待受ポート                                                                                      | `3001`                                      | Railway が自動注入する `PORT` を使用                                 |
+| `API_PREFIX`              | APIルートプレフィックス                                                                                  | `api/v1`                                    | 同左                                                                 |
+| `CORS_ORIGIN`             | 許可オリジン（カンマ区切り）                                                                             | `http://localhost:3000`                     | VercelのProduction/Previewドメイン                                   |
+| `DATABASE_URL`            | PostgreSQL接続文字列                                                                                     | docker-compose の postgres                  | Railway Postgres プラグインの参照変数 `${{Postgres.DATABASE_URL}}`   |
+| `REDIS_URL`               | Redis接続文字列                                                                                          | docker-compose の redis                     | Railway Redis プラグインの参照変数 `${{Redis.REDIS_URL}}`            |
+| `OPENAI_API_KEY`          | AIチャット(S14)埋め込み・生成用（infrastructure/external/llm、ユーザー承認済みでOpenAI一本の構成を採用） | OpenAIダッシュボードで発行した個人/組織キー | Railway Variablesに設定（Secretsとして扱う、コミット・ログ出力禁止） |
+| `EMBEDDING_BACKFILL_CRON` | regulation_sections埋め込みバックフィル（Worker）の定期実行cron式（任意、未設定時は5分毎）               | 未設定（既定値を使用）                      | 未設定（既定値を使用、必要になれば個別設定）                         |
 
 ## 管理方針
 
