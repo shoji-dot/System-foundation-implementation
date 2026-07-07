@@ -29,6 +29,12 @@
 //          「共通」区分に列挙されたタグ機能で、polymorphic（regulation/lesson/classification）設計だが、
 //          管理画面から編集可能な対象がlessonのみのため、TaggableTypeは今回LESSONのみを実装する
 //          （ユーザー承認済み。regulation/classificationは将来の編集画面実装時に追加）。
+// S03（オンボーディング: 職能・関心国選択）として users に profession / interested_jurisdictions /
+//          onboarding_completed_at を追加。設計書④の users 列挙（id, email, name, locale, plan,
+//          created_at …）に明記は無いが、設計書⑦「職能属性」と設計書⑬の画面遷移（S01-S02-S03-S04、
+//          オンボーディング未完了ユーザーはS04等へ進めない）を実現するために必須のためユーザー承認済み
+//          で追加。interested_jurisdictions は user_projects.target_jurisdictions と同様、配列カラムで
+//          直接保持する（jurisdictions とのjoinテーブルを設けない）。
 // 他ドメインテーブル は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
 
 generator client {
@@ -57,6 +63,18 @@ enum Plan {
   ENTERPRISE
 }
 
+/// 職能属性（設計書 ⑦「権限ではなく表示パーソナライズに使用（権限モデルを汚さない）」準拠、
+/// S03オンボーディングで選択）。
+enum Profession {
+  REGULATORY
+  QA
+  SAFETY
+  SALES
+  DESIGN
+  MEDICAL
+  ACADEMIC
+}
+
 /// 組織種別（設計書 ④ organizations 準拠）
 enum OrganizationType {
   MAKER
@@ -75,15 +93,20 @@ enum OrgRole {
 /// passwordHash は OAuth のみでサインアップしたユーザーでは null となる
 /// （設計書⑦: 認証はメール+パスワード または Google/Microsoft OAuth の2方式のため）。
 model User {
-  id           String     @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  email        String     @unique
-  passwordHash String?    @map("password_hash")
-  name         String
-  locale       String     @default("ja")
-  systemRole   SystemRole @default(USER) @map("system_role")
-  plan         Plan       @default(FREE)
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
+  id                     String             @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  email                  String             @unique
+  passwordHash           String?            @map("password_hash")
+  name                   String
+  locale                 String             @default("ja")
+  systemRole             SystemRole         @default(USER) @map("system_role")
+  plan                   Plan               @default(FREE)
+  /// S03オンボーディング未完了の間は null。
+  profession             Profession?
+  interestedJurisdictions JurisdictionCode[] @default([]) @map("interested_jurisdictions")
+  /// S03オンボーディング完了時刻。未完了ユーザーの判定・S04等へのリダイレクトゲートに使用。
+  onboardingCompletedAt DateTime?  @map("onboarding_completed_at")
+  createdAt              DateTime           @default(now()) @map("created_at")
+  updatedAt              DateTime           @updatedAt @map("updated_at")
 
   memberships    Membership[]
   progresses     UserProgress[]

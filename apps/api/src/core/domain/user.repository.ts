@@ -1,4 +1,5 @@
-import type { Plan, SystemRole, User } from "./user.entity";
+import type { JurisdictionCode } from "./jurisdiction.entity";
+import type { Plan, Profession, SystemRole, User } from "./user.entity";
 
 /**
  * リポジトリはインターフェースを domain 側に定義する（設計書③、Repository Pattern）。
@@ -23,6 +24,12 @@ export interface UserListResult {
   nextCursor: string | null;
 }
 
+/** 設計書⑫ S03「オンボーディング」完了入力（職能・関心国）。 */
+export interface CompleteOnboardingInput {
+  profession: Profession;
+  interestedJurisdictions: JurisdictionCode[];
+}
+
 export interface UserRepository {
   findByEmail(email: string): Promise<User | null>;
   /** refresh token の sub(userId) からユーザーを引く（設計書⑤ /auth/refresh）。 */
@@ -34,4 +41,6 @@ export interface UserRepository {
   updateRole(id: string, systemRole: SystemRole): Promise<User>;
   /** 設計書⑫ S21「ユーザー管理」プラン変更（ADMIN限定）。 */
   updatePlan(id: string, plan: Plan): Promise<User>;
+  /** 設計書⑫ S03「オンボーディング」完了（職能・関心国を保存し、onboardingCompletedAtを設定）。 */
+  completeOnboarding(id: string, input: CompleteOnboardingInput): Promise<User>;
 }

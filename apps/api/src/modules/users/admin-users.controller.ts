@@ -78,6 +78,9 @@ function toResponse(user: User) {
     locale: user.locale,
     systemRole: user.systemRole,
     plan: user.plan,
+    profession: user.profession,
+    interestedJurisdictions: user.interestedJurisdictions,
+    onboardingCompletedAt: user.onboardingCompletedAt?.toISOString() ?? null,
     createdAt: user.createdAt.toISOString(),
   };
 }

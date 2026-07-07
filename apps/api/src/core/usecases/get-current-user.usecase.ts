@@ -25,6 +25,9 @@ export class GetCurrentUserUsecase {
       locale: user.locale,
       systemRole: user.systemRole,
       plan: user.plan,
+      profession: user.profession,
+      interestedJurisdictions: user.interestedJurisdictions,
+      onboardingCompletedAt: user.onboardingCompletedAt,
       createdAt: user.createdAt,
     };
   }

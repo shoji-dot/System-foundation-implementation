@@ -1,0 +1,73 @@
+import { NotFoundException } from "@nestjs/common";
+
+import type { User } from "../domain/user.entity";
+import type { UserRepository } from "../domain/user.repository";
+
+import { CompleteOnboardingUsecase } from "./complete-onboarding.usecase";
+
+describe("CompleteOnboardingUsecase", () => {
+  const user: User = {
+    id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e4f",
+    email: "user@example.com",
+    passwordHash: "hashed",
+    name: "User",
+    locale: "ja",
+    systemRole: "USER",
+    plan: "FREE",
+    profession: null,
+    interestedJurisdictions: [],
+    onboardingCompletedAt: null,
+    createdAt: new Date("2026-07-01T00:00:00.000Z"),
+    updatedAt: new Date("2026-07-01T00:00:00.000Z"),
+  };
+
+  function setup() {
+    const userRepository: jest.Mocked<UserRepository> = {
+      findByEmail: jest.fn(),
+      findById: jest.fn(),
+      create: jest.fn(),
+      list: jest.fn(),
+      updateRole: jest.fn(),
+      updatePlan: jest.fn(),
+      completeOnboarding: jest.fn(),
+    };
+    const usecase = new CompleteOnboardingUsecase(userRepository);
+    return { usecase, userRepository };
+  }
+
+  it("saves the profession and interested jurisdictions and marks onboarding complete", async () => {
+    const { usecase, userRepository } = setup();
+    userRepository.findById.mockResolvedValue(user);
+    userRepository.completeOnboarding.mockResolvedValue({
+      ...user,
+      profession: "REGULATORY",
+      interestedJurisdictions: ["JP", "US"],
+      onboardingCompletedAt: new Date("2026-07-07T00:00:00.000Z"),
+    });
+
+    const result = await usecase.execute({
+      id: user.id,
+      profession: "REGULATORY",
+      interestedJurisdictions: ["JP", "US"],
+    });
+
+    expect(userRepository.completeOnboarding).toHaveBeenCalledWith(user.id, {
+      profession: "REGULATORY",
+      interestedJurisdictions: ["JP", "US"],
+    });
+    expect(result.profession).toBe("REGULATORY");
+    expect(result.interestedJurisdictions).toEqual(["JP", "US"]);
+    expect(result.onboardingCompletedAt).not.toBeNull();
+    expect(result).not.toHaveProperty("passwordHash");
+  });
+
+  it("rejects when the user does not exist", async () => {
+    const { usecase, userRepository } = setup();
+    userRepository.findById.mockResolvedValue(null);
+
+    await expect(
+      usecase.execute({ id: "missing", profession: "QA", interestedJurisdictions: ["JP"] }),
+    ).rejects.toBeInstanceOf(NotFoundException);
+    expect(userRepository.completeOnboarding).not.toHaveBeenCalled();
+  });
+});
