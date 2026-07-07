@@ -9,9 +9,11 @@ import type {
 import type { UpdateSubscriptionRepository } from "../domain/update-subscription.repository";
 
 import { PublishRegulationVersionUsecase } from "./publish-regulation-version.usecase";
+import { RecordAuditLogUsecase } from "./record-audit-log.usecase";
 
 describe("PublishRegulationVersionUsecase", () => {
   const versionId = "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c";
+  const actorId = "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5f";
 
   const pendingDetail: PendingReviewVersionDetail = {
     id: versionId,
@@ -67,16 +69,21 @@ describe("PublishRegulationVersionUsecase", () => {
       createMany: jest.fn(),
       findManyForUser: jest.fn(),
     };
+    const recordAuditLogUsecase = {
+      execute: jest.fn(),
+    } as unknown as jest.Mocked<RecordAuditLogUsecase>;
     const usecase = new PublishRegulationVersionUsecase(
       regulationIngestionRepository,
       updateSubscriptionRepository,
       notificationRepository,
+      recordAuditLogUsecase,
     );
     return {
       usecase,
       regulationIngestionRepository,
       updateSubscriptionRepository,
       notificationRepository,
+      recordAuditLogUsecase,
     };
   }
 
@@ -85,7 +92,7 @@ describe("PublishRegulationVersionUsecase", () => {
     regulationIngestionRepository.findPendingReviewDetail.mockResolvedValue(pendingDetail);
     regulationIngestionRepository.publishVersion.mockResolvedValue(publishResult);
 
-    const result = await usecase.execute(versionId);
+    const result = await usecase.execute(versionId, actorId);
 
     expect(regulationIngestionRepository.findPendingReviewDetail).toHaveBeenCalledWith(versionId);
     expect(regulationIngestionRepository.publishVersion).toHaveBeenCalledWith(versionId);
@@ -96,7 +103,7 @@ describe("PublishRegulationVersionUsecase", () => {
     const { usecase, regulationIngestionRepository } = setup();
     regulationIngestionRepository.findPendingReviewDetail.mockResolvedValue(null);
 
-    await expect(usecase.execute(versionId)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(usecase.execute(versionId, actorId)).rejects.toBeInstanceOf(NotFoundException);
     expect(regulationIngestionRepository.publishVersion).not.toHaveBeenCalled();
   });
 
@@ -105,7 +112,29 @@ describe("PublishRegulationVersionUsecase", () => {
     regulationIngestionRepository.findPendingReviewDetail.mockResolvedValue(pendingDetail);
     regulationIngestionRepository.publishVersion.mockResolvedValue(null);
 
-    await expect(usecase.execute(versionId)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(usecase.execute(versionId, actorId)).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it("records an audit log entry for the publish action", async () => {
+    const { usecase, regulationIngestionRepository, recordAuditLogUsecase } = setup();
+    regulationIngestionRepository.findPendingReviewDetail.mockResolvedValue(pendingDetail);
+    regulationIngestionRepository.publishVersion.mockResolvedValue(publishResult);
+
+    await usecase.execute(versionId, actorId);
+
+    expect(recordAuditLogUsecase.execute).toHaveBeenCalledWith({
+      actorId,
+      action: "regulation_version.publish",
+      target: `regulation_version:${publishResult.versionId}`,
+    });
+  });
+
+  it("does not record an audit log entry when the version is not pending review", async () => {
+    const { usecase, regulationIngestionRepository, recordAuditLogUsecase } = setup();
+    regulationIngestionRepository.findPendingReviewDetail.mockResolvedValue(null);
+
+    await expect(usecase.execute(versionId, actorId)).rejects.toBeInstanceOf(NotFoundException);
+    expect(recordAuditLogUsecase.execute).not.toHaveBeenCalled();
   });
 
   it("creates notifications for users whose subscription matches the published jurisdiction/type", async () => {
@@ -119,7 +148,7 @@ describe("PublishRegulationVersionUsecase", () => {
     regulationIngestionRepository.publishVersion.mockResolvedValue(publishResult);
     updateSubscriptionRepository.findMatchingUserIds.mockResolvedValue(["user-1", "user-2"]);
 
-    await usecase.execute(versionId);
+    await usecase.execute(versionId, actorId);
 
     expect(updateSubscriptionRepository.findMatchingUserIds).toHaveBeenCalledWith({
       jurisdictionCode: pendingDetail.jurisdiction.code,
@@ -152,7 +181,7 @@ describe("PublishRegulationVersionUsecase", () => {
     regulationIngestionRepository.publishVersion.mockResolvedValue(publishResult);
     updateSubscriptionRepository.findMatchingUserIds.mockResolvedValue([]);
 
-    await usecase.execute(versionId);
+    await usecase.execute(versionId, actorId);
 
     expect(notificationRepository.createMany).not.toHaveBeenCalled();
   });

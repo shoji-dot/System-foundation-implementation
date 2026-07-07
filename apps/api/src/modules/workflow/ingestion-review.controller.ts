@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Query,
+  Req,
   UseGuards,
 } from "@nestjs/common";
 import type {
@@ -20,6 +21,7 @@ import {
 } from "@yakuji/shared";
 
 import { Roles } from "../../common/decorators/roles.decorator";
+import type { AuthenticatedRequest } from "../../common/guards/authenticated-request";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { toDateOnlyString } from "../../common/utils/date-only";
@@ -85,8 +87,12 @@ export class IngestionReviewController {
   @HttpCode(HttpStatus.OK)
   async publish(
     @Param() params: PendingReviewVersionIdParamDto,
+    @Req() request: AuthenticatedRequest,
   ): Promise<PublishPendingReviewVersionResponse> {
-    const result = await this.publishRegulationVersionUsecase.execute(params.id);
+    const result = await this.publishRegulationVersionUsecase.execute(
+      params.id,
+      request.user.userId,
+    );
 
     return publishPendingReviewVersionResponseSchema.parse({
       regulationId: result.regulationId,
