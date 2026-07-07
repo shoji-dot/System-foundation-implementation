@@ -22,6 +22,9 @@
 // Phase 3: AIチャット基盤（S14「履歴」表示）として ai_chat_sessions / ai_chat_messages を追加。
 //          設計書④の主要テーブル一覧に該当テーブルが無いためユーザー承認済みで追加（update_subscriptions等と
 //          同方針）。出典(citations)は次コミットのchat API実装時に構造を確定するためjsonbとする。
+// Phase 6: 商用化（監査ログ）として audit_logs を追加。設計書④の列定義（actor, action, target, at）を
+//          そのまま採用し、種別・IDへの分割等の独自追加は行わない。actor_id は取込パイプライン(⑨)等
+//          システム起因の操作を許容するため nullable UUID FK とする。
 // 他ドメインテーブル (tags / ...) は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
 
 generator client {
@@ -84,6 +87,7 @@ model User {
   notifications  Notification[]
   projects       Project[]
   aiChatSessions AiChatSession[]
+  auditLogs      AuditLog[]
 
   @@map("users")
 }
@@ -578,4 +582,24 @@ model AiChatMessage {
 
   @@index([sessionId, createdAt])
   @@map("ai_chat_messages")
+}
+
+/// 監査ログ（設計書④ audit_logs 準拠、Phase6 商用化）: actor, action, target, at の4項目を保持する。
+/// 追記のみで更新・削除は行わない不変のイベント記録のため updated_at は持たない
+/// （regulation_relations / classification_mappings 等と同様の方針）。
+/// actorId は取込パイプライン(⑨)等システム起因の操作ではnull（操作主体がユーザーでないため）。
+/// target は「対象種別:対象ID」形式の自由記述とする（例: "regulation:0198f2c3-..."）。設計書④は
+/// target を単一列として定義しているため、種別・IDを分割した列への変更は行わない。
+model AuditLog {
+  id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  actorId   String?  @map("actor_id") @db.Uuid
+  action    String
+  target    String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
 }

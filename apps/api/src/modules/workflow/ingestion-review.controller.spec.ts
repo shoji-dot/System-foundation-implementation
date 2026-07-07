@@ -2,6 +2,7 @@
 import { Test } from "@nestjs/testing";
 import type { TestingModule } from "@nestjs/testing";
 
+import type { AuthenticatedRequest } from "../../common/guards/authenticated-request";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { GetPendingReviewVersionDetailUsecase } from "../../core/usecases/get-pending-review-version-detail.usecase";
@@ -15,6 +16,10 @@ describe("IngestionReviewController", () => {
   const listExecute = jest.fn();
   const detailExecute = jest.fn();
   const publishExecute = jest.fn();
+  const actorId = "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5f";
+  const authenticatedRequest = {
+    user: { userId: actorId, email: "editor@example.com", systemRole: "EDITOR", plan: "FREE" },
+  } as AuthenticatedRequest;
 
   beforeEach(async () => {
     listExecute.mockReset();
@@ -172,8 +177,11 @@ describe("IngestionReviewController", () => {
           effectiveTo: new Date("2026-06-30T00:00:00.000Z"),
         },
       });
-      const result = await controller.publish({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c" });
-      expect(publishExecute).toHaveBeenCalledWith("018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c");
+      const result = await controller.publish(
+        { id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c" },
+        authenticatedRequest,
+      );
+      expect(publishExecute).toHaveBeenCalledWith("018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c", actorId);
       expect(result).toEqual({
         regulationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
         versionId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c",
@@ -199,14 +207,17 @@ describe("IngestionReviewController", () => {
         regulationStatus: "ACTIVE",
         closedPreviousVersion: null,
       });
-      const result = await controller.publish({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c" });
+      const result = await controller.publish(
+        { id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c" },
+        authenticatedRequest,
+      );
       expect(result.closedPreviousVersion).toBeNull();
     });
 
     it("propagates NotFoundException from the usecase", async () => {
       publishExecute.mockRejectedValue(new NotFoundException("not found"));
       await expect(
-        controller.publish({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c" }),
+        controller.publish({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c" }, authenticatedRequest),
       ).rejects.toBeInstanceOf(NotFoundException);
     });
   });
