@@ -42,6 +42,7 @@ async function authorizeWithApi(
     locale: user.locale,
     systemRole: user.systemRole,
     plan: user.plan,
+    onboardingCompletedAt: user.onboardingCompletedAt,
     accessToken: tokens.accessToken,
     refreshToken: tokens.refreshToken,
     accessTokenExpiresAt: Date.now() + tokens.expiresIn * 1000,
@@ -99,7 +100,7 @@ export const authConfig = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         return {
           ...token,
@@ -107,10 +108,17 @@ export const authConfig = {
           systemRole: user.systemRole,
           plan: user.plan,
           locale: user.locale,
+          onboardingCompletedAt: user.onboardingCompletedAt,
           accessToken: user.accessToken,
           refreshToken: user.refreshToken,
           accessTokenExpiresAt: user.accessTokenExpiresAt,
         };
+      }
+
+      // S03オンボーディング完了直後、再ログインせずにセッションへ反映するための更新トリガー
+      // （client側 `update({ onboardingCompletedAt })` 呼び出しに対応。設計書⑬ S03→S04遷移に必要）。
+      if (trigger === "update" && session?.onboardingCompletedAt !== undefined) {
+        return { ...token, onboardingCompletedAt: session.onboardingCompletedAt };
       }
 
       if (Date.now() < token.accessTokenExpiresAt - ACCESS_TOKEN_REFRESH_MARGIN_MS) {
@@ -124,6 +132,7 @@ export const authConfig = {
       session.user.systemRole = token.systemRole;
       session.user.plan = token.plan;
       session.user.locale = token.locale;
+      session.user.onboardingCompletedAt = token.onboardingCompletedAt;
       session.accessToken = token.accessToken;
       session.error = token.error;
       return session;
