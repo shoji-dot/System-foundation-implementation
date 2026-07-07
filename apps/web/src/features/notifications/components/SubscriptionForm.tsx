@@ -1,50 +1,30 @@
 "use client";
 
 import type { JurisdictionCode, RegulationType, UpdateFrequency } from "@yakuji/shared";
-import { JURISDICTION_CODES, REGULATION_TYPES } from "@yakuji/shared";
+import {
+  JURISDICTION_CODES,
+  JURISDICTION_LABELS,
+  REGULATION_TYPE_LABELS,
+  REGULATION_TYPES,
+  UPDATE_FREQUENCY_LABELS,
+} from "@yakuji/shared";
 import { Button } from "@yakuji/ui";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import type { FormEvent } from "react";
 
 import { createSubscription } from "../api/subscriptions";
 
-/** 法域コードの日本語表示名（MVPはJPのみ稼働、設計書⑨。他国はスキーマ・UIとして先行対応）。 */
-const JURISDICTION_LABELS: Record<JurisdictionCode, string> = {
-  JP: "日本",
-  US: "米国",
-  EU: "EU",
-  UK: "英国",
-  CA: "カナダ",
-  AU: "オーストラリア",
-  CN: "中国",
-  KR: "韓国",
-  TW: "台湾",
-  SG: "シンガポール",
-};
-
-const REGULATION_TYPE_LABELS: Record<RegulationType, string> = {
-  LAW: "法律",
-  ORDINANCE: "政令・省令",
-  NOTICE: "通知",
-  GUIDANCE: "ガイダンス",
-  STANDARD: "基準",
-};
-
-const FREQUENCY_LABELS: Record<UpdateFrequency, string> = {
-  REALTIME: "即時",
-  DAILY: "日次まとめ",
-  WEEKLY: "週次まとめ",
-};
-
 const ALL_VALUE = "ALL";
 
 /**
  * S18（通知設定、設計書⑫「購読国・タイプ・頻度」）の購読登録フォーム。
- * 既存購読の一覧・削除は設計書⑤にAPIが定義されていないため今回のスコープ外（新規登録のみ）。
+ * 既存購読の一覧・解除はSubscriptionList（同画面に併置）が担当する。
  */
 export function SubscriptionForm() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [jurisdiction, setJurisdiction] = useState<string>(ALL_VALUE);
   const [regulationType, setRegulationType] = useState<string>(ALL_VALUE);
   const [frequency, setFrequency] = useState<UpdateFrequency>("DAILY");
@@ -72,6 +52,7 @@ export function SubscriptionForm() {
         frequency,
       });
       setSuccessMessage("購読を登録しました。");
+      router.refresh();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "購読設定の保存に失敗しました。");
     } finally {
@@ -129,9 +110,9 @@ export function SubscriptionForm() {
           onChange={(event) => setFrequency(event.target.value as UpdateFrequency)}
           className="min-h-[44px] rounded-sm border border-border bg-bg px-3 text-[16px] text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
-          {(Object.keys(FREQUENCY_LABELS) as UpdateFrequency[]).map((value) => (
+          {(Object.keys(UPDATE_FREQUENCY_LABELS) as UpdateFrequency[]).map((value) => (
             <option key={value} value={value}>
-              {FREQUENCY_LABELS[value]}
+              {UPDATE_FREQUENCY_LABELS[value]}
             </option>
           ))}
         </select>

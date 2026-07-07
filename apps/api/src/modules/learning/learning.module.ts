@@ -6,8 +6,11 @@ import { LESSON_REPOSITORY } from "../../core/domain/lesson.repository";
 import { PROGRESS_REPOSITORY } from "../../core/domain/progress.repository";
 import { QUIZ_REPOSITORY } from "../../core/domain/quiz.repository";
 import { TOKEN_SERVICE } from "../../core/domain/token-service";
+import { GetCourseDetailUsecase } from "../../core/usecases/get-course-detail.usecase";
+import { GetLearningProgressSummaryUsecase } from "../../core/usecases/get-learning-progress-summary.usecase";
 import { GetLessonDetailUsecase } from "../../core/usecases/get-lesson-detail.usecase";
 import { ListCoursesUsecase } from "../../core/usecases/list-courses.usecase";
+import { ListLearningProgressUsecase } from "../../core/usecases/list-learning-progress.usecase";
 import { ListLessonsUsecase } from "../../core/usecases/list-lessons.usecase";
 import { ListQuizzesUsecase } from "../../core/usecases/list-quizzes.usecase";
 import { RecordProgressUsecase } from "../../core/usecases/record-progress.usecase";
@@ -25,7 +28,7 @@ import { QuizzesController } from "./quizzes.controller";
 
 /**
  * 学習系モジュール（設計書③ modules/learning、⑤ courses/lessons/quizzes系API＋進捗POST、S10-S13）。
- * これでcourses一覧・lessons一覧/詳細・quizzes一覧・progress記録まで、Phase 2の学習系APIが揃った。
+ * courses一覧/詳細・lessons一覧/詳細・quizzes一覧・progress記録/サマリ/一覧まで、Phase 2の学習系APIが揃った。
  */
 @Module({
   // JwtAuthGuardが要求するTOKEN_SERVICEのため、他モジュール同様にJwtModuleを自己完結でimportする。
@@ -33,10 +36,13 @@ import { QuizzesController } from "./quizzes.controller";
   controllers: [CoursesController, LessonsController, QuizzesController, ProgressController],
   providers: [
     ListCoursesUsecase,
+    GetCourseDetailUsecase,
     ListLessonsUsecase,
     GetLessonDetailUsecase,
     ListQuizzesUsecase,
     RecordProgressUsecase,
+    GetLearningProgressSummaryUsecase,
+    ListLearningProgressUsecase,
     { provide: COURSE_REPOSITORY, useClass: PrismaCourseRepository },
     { provide: LESSON_REPOSITORY, useClass: PrismaLessonRepository },
     { provide: QUIZ_REPOSITORY, useClass: PrismaQuizRepository },

@@ -1,5 +1,9 @@
-import type { CreateSubscriptionRequest, SubscriptionResponse } from "@yakuji/shared";
-import { subscriptionResponseSchema } from "@yakuji/shared";
+import type {
+  CreateSubscriptionRequest,
+  SubscriptionListResponse,
+  SubscriptionResponse,
+} from "@yakuji/shared";
+import { subscriptionListResponseSchema, subscriptionResponseSchema } from "@yakuji/shared";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001/api/v1";
 
@@ -44,4 +48,35 @@ export async function createSubscription(
   }
 
   return subscriptionResponseSchema.parse(await response.json());
+}
+
+/** GET /api/v1/subscriptions（S18「既存購読の一覧」）。 */
+export async function listSubscriptions(accessToken: string): Promise<SubscriptionListResponse> {
+  const response = await fetch(`${API_BASE_URL}/subscriptions`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const problem = (await response.json().catch(() => null)) as ProblemDetails | null;
+    throw new SubscriptionApiError(
+      problem?.detail ?? "購読一覧の取得に失敗しました。",
+      response.status,
+    );
+  }
+
+  return subscriptionListResponseSchema.parse(await response.json());
+}
+
+/** DELETE /api/v1/subscriptions/:id（S18「既存購読の解除」）。 */
+export async function deleteSubscription(accessToken: string, id: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/subscriptions/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!response.ok) {
+    const problem = (await response.json().catch(() => null)) as ProblemDetails | null;
+    throw new SubscriptionApiError(problem?.detail ?? "購読の解除に失敗しました。", response.status);
+  }
 }

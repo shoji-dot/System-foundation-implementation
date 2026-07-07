@@ -10,6 +10,15 @@
 // Phase 4: 編集ワークフロー（⑧ draft→review→published）として regulation_versions.status を追加。
 // Phase 4: 更新通知（S17/S18）として update_subscriptions を追加（設計書④に列定義が無いためユーザー承認済み）。
 // Phase 4: 公開時のアプリ内通知生成として notifications を追加（設計書④に列定義が無いためユーザー承認済み）。
+// Phase 5: 実務支援（S15/S16、S04プロジェクト概況）として user_projects を追加。
+//          設計書のorg_idは必須だが、signup時に組織が自動作成されないため、
+//          user_id(所有者)を追加しorganization_idはnullableとする（ユーザー承認済み）。
+// Phase 5: 実務支援（S16 チェックリスト・タスク・期限）として project_tasks を追加。
+//          設計書は checklist_item_ref で checklists マスタ（届出/認証/承認等の審査項目内容）を参照する
+//          構造だが、チェックリストの実内容は薬事の専門知識を要し、AIによる推測実装は誤った規制情報を
+//          生むリスクがあるため、checklists マスタは作らずユーザー自由入力のタスク管理とする
+//          （ユーザー承認済み）。title を表示用ラベルとして追加し、checklist_item_ref は将来 checklists
+//          マスタと連携する際の参照用に nullable で予約する。
 // 他ドメインテーブル (tags / ...) は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
 
 generator client {
@@ -70,6 +79,7 @@ model User {
   progresses    UserProgress[]
   subscriptions UpdateSubscription[]
   notifications Notification[]
+  projects      Project[]
 
   @@map("users")
 }
@@ -83,6 +93,7 @@ model Organization {
   updatedAt DateTime         @updatedAt @map("updated_at")
 
   memberships Membership[]
+  projects    Project[]
 
   @@map("organizations")
 }
@@ -468,4 +479,58 @@ model Notification {
 
   @@index([userId, createdAt])
   @@map("notifications")
+}
+
+/// 実務支援プロジェクト（設計書④ user_projects 準拠、⑫ S15/S16、S04「プロジェクト概況」）。
+/// 設計書のorg_idは必須列だが、signup時にOrganizationが自動作成されないため、
+/// 所有者を表すuserIdを追加しorganizationIdはnullableとする（組織未所属ユーザーは個人プロジェクトとして
+/// organizationId=nullで作成する。ユーザー承認済み）。
+model Project {
+  id                  String             @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  userId              String             @map("user_id") @db.Uuid
+  organizationId      String?            @map("organization_id") @db.Uuid
+  name                String
+  /// 対象機器のクラス分類（例: クラスII）。設計書④ device_classifications.classと同様、国により表記が
+  /// 異なる自由記述とする。
+  deviceClass         String?            @map("device_class")
+  targetJurisdictions JurisdictionCode[] @map("target_jurisdictions")
+  createdAt           DateTime           @default(now()) @map("created_at")
+  updatedAt           DateTime           @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  tasks        ProjectTask[]
+
+  @@index([userId])
+  @@map("user_projects")
+}
+
+/// タスクステータス（設計書④ project_tasks.status 準拠）。
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+/// プロジェクトタスク（設計書④ project_tasks 準拠、⑫ S16 チェックリスト・タスク・期限）。
+/// 設計書は checklist_item_ref で checklists マスタ（届出/認証/承認等の審査項目内容）を参照する構造だが、
+/// チェックリストの実内容は薬事の専門知識を要し、AIによる推測実装は誤った規制情報を生むリスクがあるため、
+/// 今回は checklists マスタを作らずユーザー自由入力のタスク管理とする（ユーザー承認済み）。
+/// title を必須の表示用ラベルとして追加し、checklistItemRef は将来 checklists マスタと連携する際の
+/// 参照用に nullable で予約する。
+model ProjectTask {
+  id               String     @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  projectId        String     @map("project_id") @db.Uuid
+  title            String
+  checklistItemRef String?    @map("checklist_item_ref")
+  status           TaskStatus @default(TODO)
+  dueDate          DateTime?  @map("due_date") @db.Date
+  assignee         String?
+  createdAt        DateTime   @default(now()) @map("created_at")
+  updatedAt        DateTime   @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_tasks")
 }

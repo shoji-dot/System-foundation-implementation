@@ -20,4 +20,6 @@ export interface CourseListResult {
 
 export interface CourseRepository {
   findMany(filters: CourseListFilters): Promise<CourseListResult>;
+  /** GET /api/v1/courses/:id（S10 コース詳細、レッスン一覧画面表示向けにユーザー承認済みで追加）。 */
+  findById(id: string): Promise<Course | null>;
 }

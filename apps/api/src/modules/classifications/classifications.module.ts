@@ -3,6 +3,7 @@ import { JwtModule } from "@nestjs/jwt";
 
 import { CLASSIFICATION_REPOSITORY } from "../../core/domain/classification.repository";
 import { TOKEN_SERVICE } from "../../core/domain/token-service";
+import { GetClassificationDetailUsecase } from "../../core/usecases/get-classification-detail.usecase";
 import { GetClassificationMappingsUsecase } from "../../core/usecases/get-classification-mappings.usecase";
 import { ListClassificationsUsecase } from "../../core/usecases/list-classifications.usecase";
 import { PrismaModule } from "../../infrastructure/database/prisma.module";
@@ -20,6 +21,7 @@ import { ClassificationsController } from "./classifications.controller";
   controllers: [ClassificationsController],
   providers: [
     ListClassificationsUsecase,
+    GetClassificationDetailUsecase,
     GetClassificationMappingsUsecase,
     { provide: CLASSIFICATION_REPOSITORY, useClass: PrismaClassificationRepository },
     { provide: TOKEN_SERVICE, useClass: JwtTokenService },

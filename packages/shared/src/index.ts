@@ -8,3 +8,4 @@ export * from "./auth";
 export * from "./workflow";
 export * from "./updates";
 export * from "./notifications";
+export * from "./projects";
