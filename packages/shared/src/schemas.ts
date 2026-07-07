@@ -584,3 +584,35 @@ export const aiChatCitationResponseSchema = z.object({
   heading: z.string(),
 });
 export type AiChatCitationResponse = z.infer<typeof aiChatCitationResponseSchema>;
+
+/**
+ * POST /api/v1/ai/classify リクエスト（設計書⑤⑥「機器概要→候補分類提示」）。
+ */
+export const aiClassifyRequestSchema = z.object({
+  description: z.string().trim().min(1).max(2000),
+});
+export type AiClassifyRequest = z.infer<typeof aiClassifyRequestSchema>;
+
+/**
+ * 分類候補応答（設計書⑥「検索+LLM再ランク」）。confidence/reasoningはLLMによる再ランク結果。
+ */
+export const classificationCandidateResponseSchema = z.object({
+  classificationId: z.string().uuid(),
+  scheme: classificationSchemeSchema,
+  jurisdiction: jurisdictionSummaryResponseSchema,
+  code: z.string(),
+  name: z.string(),
+  class: z.string().nullable(),
+  definition: z.string().nullable(),
+  confidence: z.number().min(0).max(1),
+  reasoning: z.string(),
+});
+export type ClassificationCandidateResponse = z.infer<typeof classificationCandidateResponseSchema>;
+
+/**
+ * POST /api/v1/ai/classify 応答。根拠となる候補が見つからない場合は空配列（chatの「根拠なし回答の禁止」と同方針）。
+ */
+export const aiClassifyResponseSchema = z.object({
+  candidates: z.array(classificationCandidateResponseSchema),
+});
+export type AiClassifyResponse = z.infer<typeof aiClassifyResponseSchema>;

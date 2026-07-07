@@ -1,6 +1,6 @@
-import { Body, Controller, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
-import type { AiChatCitationResponse } from "@yakuji/shared";
-import { aiChatCitationResponseSchema } from "@yakuji/shared";
+import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
+import type { AiChatCitationResponse, AiClassifyResponse } from "@yakuji/shared";
+import { aiChatCitationResponseSchema, aiClassifyResponseSchema } from "@yakuji/shared";
 import type { Response } from "express";
 
 import type { AuthenticatedRequest } from "../../common/guards/authenticated-request";
@@ -9,19 +9,26 @@ import { toDateOnlyString } from "../../common/utils/date-only";
 import type { AiChatCitation } from "../../core/domain/ai-chat.entity";
 import type { ChatWithAiEvent } from "../../core/usecases/chat-with-ai.usecase";
 import { ChatWithAiUsecase } from "../../core/usecases/chat-with-ai.usecase";
+import { ClassifyDeviceUsecase } from "../../core/usecases/classify-device.usecase";
 
 import { AiChatRequestDto } from "./dto/ai-chat-request.dto";
+import { AiClassifyRequestDto } from "./dto/ai-classify-request.dto";
 
 /**
- * 設計書⑤ POST /api/v1/ai/chat（SSEストリーミング、RAG回答＋出典、S14）。
+ * 設計書⑤ POST /api/v1/ai/{chat|classify}（設計書⑥「AI機能構成」の2機能をまとめて公開する）。
+ * chat: SSEストリーミング、RAG回答＋出典（S14）。
  * ヘッダ送信前（=最初のonEventが呼ばれる前）に例外が投げられた場合は、SSEを開始せず
  * Nestの標準例外フィルタ（RFC 9457）に委譲する（quota超過・sessionId不正等）。
  * ヘッダ送信後の失敗はSSE上のerrorイベントとして通知するしかない（HTTPステータスは変更不可のため）。
+ * classify: 通常のJSONレスポンス（SSE不要、設計書⑤のエンドポイント一覧でchatのみSSEと明記）。
  */
 @Controller("ai")
 @UseGuards(JwtAuthGuard)
 export class AiChatController {
-  constructor(private readonly chatWithAiUsecase: ChatWithAiUsecase) {}
+  constructor(
+    private readonly chatWithAiUsecase: ChatWithAiUsecase,
+    private readonly classifyDeviceUsecase: ClassifyDeviceUsecase,
+  ) {}
 
   @Post("chat")
   async chat(
@@ -76,6 +83,21 @@ export class AiChatController {
     }
 
     res.end();
+  }
+
+  @Post("classify")
+  @HttpCode(HttpStatus.OK)
+  async classify(
+    @Body() dto: AiClassifyRequestDto,
+    @Req() request: AuthenticatedRequest,
+  ): Promise<AiClassifyResponse> {
+    const candidates = await this.classifyDeviceUsecase.execute({
+      userId: request.user.userId,
+      plan: request.user.plan,
+      description: dto.description,
+    });
+
+    return aiClassifyResponseSchema.parse({ candidates });
   }
 }
 

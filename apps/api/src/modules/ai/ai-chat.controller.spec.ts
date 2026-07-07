@@ -4,6 +4,7 @@ import type { Response } from "express";
 import type { AuthenticatedRequest } from "../../common/guards/authenticated-request";
 import type { ChatWithAiEvent } from "../../core/usecases/chat-with-ai.usecase";
 import { ChatWithAiUsecase } from "../../core/usecases/chat-with-ai.usecase";
+import { ClassifyDeviceUsecase } from "../../core/usecases/classify-device.usecase";
 
 import { AiChatController } from "./ai-chat.controller";
 
@@ -22,9 +23,10 @@ describe("AiChatController", () => {
     } as unknown as jest.Mocked<Response>;
   }
 
-  function createController(execute: jest.Mock) {
-    const usecase = { execute } as unknown as ChatWithAiUsecase;
-    return new AiChatController(usecase);
+  function createController(execute: jest.Mock, classifyExecute: jest.Mock = jest.fn()) {
+    const chatWithAiUsecase = { execute } as unknown as ChatWithAiUsecase;
+    const classifyDeviceUsecase = { execute: classifyExecute } as unknown as ClassifyDeviceUsecase;
+    return new AiChatController(chatWithAiUsecase, classifyDeviceUsecase);
   }
 
   it("streams citations/token/done as SSE frames and ends the response", async () => {
@@ -99,5 +101,32 @@ describe("AiChatController", () => {
     const writtenFrames = res.write.mock.calls.map((call) => call[0] as string);
     expect(writtenFrames[writtenFrames.length - 1]).toContain("event: error");
     expect(res.end).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns classification candidates as plain JSON (no SSE) from the classify usecase", async () => {
+    const classifyExecute = jest.fn().mockResolvedValue([
+      {
+        classificationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e01",
+        scheme: "JMDN",
+        jurisdiction: { code: "JP", name: "日本" },
+        code: "35282000",
+        name: "汎用電子内視鏡",
+        class: "III",
+        definition: "体腔内を観察するための電子内視鏡。",
+        confidence: 0.9,
+        reasoning: "説明と一致する。",
+      },
+    ]);
+    const controller = createController(jest.fn(), classifyExecute);
+
+    const result = await controller.classify({ description: "内視鏡です" }, request);
+
+    expect(classifyExecute).toHaveBeenCalledWith({
+      userId: request.user.userId,
+      plan: request.user.plan,
+      description: "内視鏡です",
+    });
+    expect(result.candidates).toHaveLength(1);
+    expect(result.candidates[0]).toMatchObject({ code: "35282000", confidence: 0.9 });
   });
 });
