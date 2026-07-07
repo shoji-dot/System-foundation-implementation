@@ -41,6 +41,9 @@ describe("RefreshTokenUsecase", () => {
       findByEmail: jest.fn(),
       findById: jest.fn(),
       create: jest.fn(),
+      list: jest.fn(),
+      updateRole: jest.fn(),
+      updatePlan: jest.fn(),
     };
     const usecase = new RefreshTokenUsecase(tokenService, revocationStore, userRepository);
     return { usecase, tokenService, revocationStore, userRepository };

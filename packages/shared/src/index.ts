@@ -12,3 +12,4 @@ export * from "./updates";
 export * from "./notifications";
 export * from "./projects";
 export * from "./tags";
+export * from "./users";
