@@ -3,6 +3,7 @@ import { Test } from "@nestjs/testing";
 import type { TestingModule } from "@nestjs/testing";
 
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { GetClassificationDetailUsecase } from "../../core/usecases/get-classification-detail.usecase";
 import { GetClassificationMappingsUsecase } from "../../core/usecases/get-classification-mappings.usecase";
 import { ListClassificationsUsecase } from "../../core/usecases/list-classifications.usecase";
 
@@ -11,15 +12,18 @@ import { ClassificationsController } from "./classifications.controller";
 describe("ClassificationsController", () => {
   let controller: ClassificationsController;
   const listExecute = jest.fn();
+  const detailExecute = jest.fn();
   const mappingsExecute = jest.fn();
 
   beforeEach(async () => {
     listExecute.mockReset();
+    detailExecute.mockReset();
     mappingsExecute.mockReset();
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ClassificationsController],
       providers: [
         { provide: ListClassificationsUsecase, useValue: { execute: listExecute } },
+        { provide: GetClassificationDetailUsecase, useValue: { execute: detailExecute } },
         { provide: GetClassificationMappingsUsecase, useValue: { execute: mappingsExecute } },
       ],
     })
@@ -103,6 +107,45 @@ describe("ClassificationsController", () => {
       expect(result.items[0]?.class).toBeNull();
       expect(result.items[0]?.definition).toBeNull();
       expect(result.nextCursor).toBeNull();
+    });
+  });
+
+  describe("detail", () => {
+    it("maps the usecase result to a response DTO", async () => {
+      detailExecute.mockResolvedValue({
+        id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e6a",
+        jurisdiction: { code: "JP", name: "日本" },
+        scheme: "JMDN",
+        code: "35282000",
+        name: "汎用電子内視鏡",
+        class: "III",
+        definition: "体腔内又は体内管腔内を観察するために用いる電子内視鏡。",
+        createdAt: new Date("2026-07-04T00:00:00.000Z"),
+        updatedAt: new Date("2026-07-04T00:00:00.000Z"),
+      });
+
+      const result = await controller.detail({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e6a" });
+
+      expect(detailExecute).toHaveBeenCalledWith("018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e6a");
+      expect(result).toEqual({
+        id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e6a",
+        jurisdiction: { code: "JP", name: "日本" },
+        scheme: "JMDN",
+        code: "35282000",
+        name: "汎用電子内視鏡",
+        class: "III",
+        definition: "体腔内又は体内管腔内を観察するために用いる電子内視鏡。",
+      });
+    });
+
+    it("propagates NotFoundException from the usecase", async () => {
+      detailExecute.mockRejectedValue(
+        new NotFoundException("指定された機器分類が見つかりません。"),
+      );
+
+      await expect(
+        controller.detail({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e6a" }),
+      ).rejects.toBeInstanceOf(NotFoundException);
     });
   });
 

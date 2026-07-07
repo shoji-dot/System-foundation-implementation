@@ -33,9 +33,7 @@ export class PrismaUpdateFeedRepository implements UpdateFeedRepository {
         status: "PUBLISHED",
         ...(filters.since ? { publishedAt: { gt: filters.since } } : {}),
         regulation: {
-          ...(filters.jurisdictionCode
-            ? { jurisdiction: { code: filters.jurisdictionCode } }
-            : {}),
+          ...(filters.jurisdictionCode ? { jurisdiction: { code: filters.jurisdictionCode } } : {}),
           ...(filters.type ? { type: filters.type } : {}),
         },
       },

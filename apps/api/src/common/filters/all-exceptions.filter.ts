@@ -16,9 +16,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const exceptionResponse =
       exception instanceof HttpException ? exception.getResponse() : undefined;
@@ -33,12 +31,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
       this.logger.error(exception);
     }
 
-    response.status(status).contentType("application/problem+json").send({
-      type: "about:blank",
-      title: HttpStatus[status] ?? "Error",
-      status,
-      detail: Array.isArray(detail) ? detail.join(", ") : detail,
-      instance: request.url,
-    });
+    response
+      .status(status)
+      .contentType("application/problem+json")
+      .send({
+        type: "about:blank",
+        title: HttpStatus[status] ?? "Error",
+        status,
+        detail: Array.isArray(detail) ? detail.join(", ") : detail,
+        instance: request.url,
+      });
   }
 }

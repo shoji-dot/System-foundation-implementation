@@ -8,11 +8,13 @@ import { NestFactory } from "@nestjs/core";
 import { PrismaModule } from "../infrastructure/database/prisma.module";
 import { BullmqModule } from "../infrastructure/queue/bullmq.module";
 import { RedisModule } from "../infrastructure/queue/redis.module";
+import { AiModule } from "../modules/ai/ai.module";
 import { IngestionModule } from "../modules/ingestion/ingestion.module";
 
 /**
- * Worker プロセスのエントリポイント（Railway 2サービス目, 設計書①③⑨）。
- * IngestionModule（薬事情報更新パイプライン、設計書⑨）の日次cron登録・ジョブ実行を行う。
+ * Worker プロセスのエントリポイント（Railway 2サービス目, 設計書①③⑨⑥）。
+ * IngestionModule（薬事情報更新パイプライン、設計書⑨）の日次cron登録・ジョブ実行、
+ * AiModule（埋め込みバックフィル、設計書⑥ RAGパイプライン準備）の定期cron登録・ジョブ実行を行う。
  */
 @Module({
   imports: [
@@ -21,6 +23,7 @@ import { IngestionModule } from "../modules/ingestion/ingestion.module";
     RedisModule,
     BullmqModule,
     IngestionModule,
+    AiModule,
   ],
 })
 class WorkerModule {}

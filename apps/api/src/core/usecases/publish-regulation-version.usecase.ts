@@ -1,6 +1,9 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 
-import type { CreateNotificationInput, NotificationRepository } from "../domain/notification.repository";
+import type {
+  CreateNotificationInput,
+  NotificationRepository,
+} from "../domain/notification.repository";
 import { NOTIFICATION_REPOSITORY } from "../domain/notification.repository";
 import type {
   PendingReviewVersionDetail,

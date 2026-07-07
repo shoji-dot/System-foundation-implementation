@@ -72,10 +72,7 @@ export class PmdaRegulatorySource implements RegulatorySource {
     };
   }
 
-  normalize(
-    item: SourceListItem,
-    document: SourceDocument,
-  ): Promise<NormalizedRegulationDocument> {
+  normalize(item: SourceListItem, document: SourceDocument): Promise<NormalizedRegulationDocument> {
     return Promise.resolve({
       // このAdapterは常にJP/PMDAの安全対策通知のみを扱う（design doc⑨、他国はAdapter追加で対応）。
       jurisdiction: "JP",
@@ -83,8 +80,7 @@ export class PmdaRegulatorySource implements RegulatorySource {
       subtype: null,
       title: item.title,
       // 通知番号が無い行があるため（実ページ確認済み）、その場合はsourceDocId（常に存在）で代替する。
-      docNumber:
-        item.noticeNumbers.length > 0 ? item.noticeNumbers.join(" / ") : item.sourceDocId,
+      docNumber: item.noticeNumbers.length > 0 ? item.noticeNumbers.join(" / ") : item.sourceDocId,
       effectiveDate: item.issuedAt,
       sourceUrl: item.sourceUrl,
       fullText: document.rawContent,

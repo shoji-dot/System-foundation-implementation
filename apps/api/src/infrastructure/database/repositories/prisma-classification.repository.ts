@@ -63,6 +63,15 @@ export class PrismaClassificationRepository implements ClassificationRepository 
     };
   }
 
+  async findById(id: string): Promise<Classification | null> {
+    const record = await this.prisma.deviceClassification.findUnique({
+      where: { id },
+      include: { jurisdiction: true },
+    });
+
+    return record ? this.toDomain(record) : null;
+  }
+
   async findMappingsByClassificationId(
     classificationId: string,
   ): Promise<ClassificationMappingSummary[] | null> {

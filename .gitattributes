@@ -1,0 +1,4 @@
+# 改行コードをLFに統一する（設計書⑮品質ゲート「Prettier」、prettier.config.js/.editorconfigの
+# endOfLine: lf 指定に合わせる）。Windows環境でのCRLFコミットを防ぎ、Linux上のCI（format:check）との
+# 差異を解消するための設定。
+* text=auto eol=lf

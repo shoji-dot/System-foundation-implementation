@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { AI_CHAT_MESSAGE_ROLES } from "./ai";
 import { CLASSIFICATION_SCHEMES } from "./classifications";
 import { JURISDICTION_CODES } from "./jurisdictions";
 import { PROGRESS_STATUSES } from "./learning";
@@ -318,6 +319,22 @@ export const courseListResponseSchema = z.object({
 export type CourseListResponse = z.infer<typeof courseListResponseSchema>;
 
 /**
+ * 学習コース詳細応答（設計書⑤に明記は無いがS10のコース詳細（レッスン一覧）画面表示に必要なため
+ * ユーザー承認済みで追加、GET /api/v1/courses/:id）。classificationResponseSchema同様、
+ * コースに詳細固有の追加フィールドは無いためcourseSummaryResponseSchemaと同一。
+ */
+export const courseDetailResponseSchema = courseSummaryResponseSchema;
+export type CourseDetailResponse = z.infer<typeof courseDetailResponseSchema>;
+
+/**
+ * コースパラメータ（設計書⑤に明記は無いGET /api/v1/courses/:id、UUID検証）。
+ */
+export const courseIdParamSchema = z.object({
+  id: z.string().uuid(),
+});
+export type CourseIdParam = z.infer<typeof courseIdParamSchema>;
+
+/**
  * レッスン一覧項目応答（設計書④ lessons 準拠、GET /api/v1/lessons、S11）。
  * 本文(body)は一覧では返さず、詳細取得時に返す（regulation_versions一覧のfullText扱いに準拠）。
  */
@@ -445,6 +462,45 @@ export const progressResponseSchema = z.object({
 export type ProgressResponse = z.infer<typeof progressResponseSchema>;
 
 /**
+ * 学習進捗サマリ応答（GET /api/v1/progress/summary、S04「学習進捗」・S13準拠）。
+ * 設計書⑤の主要エンドポイント一覧に明記は無いが、進捗POSTと対で集計取得が必要なためユーザー承認済みで追加。
+ * 全レッスン数に対する完了・進行中の件数を返す（コース別内訳は今回のスコープ外）。
+ */
+export const progressSummaryResponseSchema = z.object({
+  totalLessons: z.number().int().min(0),
+  completedCount: z.number().int().min(0),
+  inProgressCount: z.number().int().min(0),
+});
+export type ProgressSummaryResponse = z.infer<typeof progressSummaryResponseSchema>;
+
+/**
+ * GET /api/v1/progress クエリ（設計書⑤に明記は無いがS13「修了状況・スコア」一覧表示に必要なため
+ * ユーザー承認済みで追加、カーソルページネーション準拠）。ログイン中のユーザー自身に限定するため
+ * userIdなどの絞り込み条件は持たない。
+ */
+export const listProgressQuerySchema = cursorPaginationQuerySchema;
+export type ListProgressQuery = z.infer<typeof listProgressQuerySchema>;
+
+/**
+ * 学習進捗一覧項目応答（GET /api/v1/progress、S13）。レッスン名・コース名を含めて一覧表示できるようにする。
+ */
+export const progressListItemResponseSchema = progressResponseSchema.extend({
+  lessonTitle: z.string(),
+  courseId: z.string().uuid(),
+  courseTitle: z.string(),
+});
+export type ProgressListItemResponse = z.infer<typeof progressListItemResponseSchema>;
+
+/**
+ * カーソルページネーション応答（学習進捗一覧、GET /api/v1/progress）。
+ */
+export const progressListResponseSchema = z.object({
+  items: z.array(progressListItemResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type ProgressListResponse = z.infer<typeof progressListResponseSchema>;
+
+/**
  * GET /api/v1/search スコープ（設計書⑤ ?scope=all|regulation|jmdn|generic-name|learning 準拠）。
  * jmdn/generic-nameはどちらもdevice_classificationsが対象だが、検索フィールド(code優先 / name・definition優先)が異なる。
  * learning(courses/lessons)は当該テーブル未実装のため、指定時は常に空配列を返す（設計書⑤のスコープ列挙自体は維持）。
@@ -501,3 +557,119 @@ export const searchResponseSchema = z.object({
   nextCursor: z.string().nullable(),
 });
 export type SearchResponse = z.infer<typeof searchResponseSchema>;
+
+/**
+ * POST /api/v1/ai/chat リクエスト（設計書⑤⑥、S14）。
+ * sessionIdを省略すると新規セッションを作成する。userIdはbodyに含めずアクセストークンから取得する
+ * （POST /api/v1/progress等と同じ方針）。
+ */
+export const aiChatRequestSchema = z.object({
+  sessionId: z.string().uuid().optional(),
+  message: z.string().trim().min(1).max(2000),
+});
+export type AiChatRequest = z.infer<typeof aiChatRequestSchema>;
+
+/**
+ * AIチャット出典（設計書⑥「回答には必ず出典（regulation_sectionsへの参照＋版・施行日）を付与」）。
+ * SSEの citations イベントのペイロードとして使用する。
+ */
+export const aiChatCitationResponseSchema = z.object({
+  sectionId: z.string().uuid(),
+  regulationId: z.string().uuid(),
+  regulationTitle: z.string(),
+  jurisdiction: jurisdictionSummaryResponseSchema,
+  versionNo: z.number().int().positive(),
+  effectiveFrom: z.string().date(),
+  effectiveTo: z.string().date().nullable(),
+  path: z.string(),
+  heading: z.string(),
+});
+export type AiChatCitationResponse = z.infer<typeof aiChatCitationResponseSchema>;
+
+/**
+ * AIチャットセッション応答（設計書⑤に明記は無いがS14「履歴」表示に必要なためユーザー承認済みで追加、
+ * GET /api/v1/ai/chat/sessions）。
+ */
+export const aiChatSessionResponseSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type AiChatSessionResponse = z.infer<typeof aiChatSessionResponseSchema>;
+
+/**
+ * カーソルページネーション応答（AIチャットセッション一覧）。
+ */
+export const aiChatSessionListResponseSchema = z.object({
+  items: z.array(aiChatSessionResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type AiChatSessionListResponse = z.infer<typeof aiChatSessionListResponseSchema>;
+
+/**
+ * AIチャットメッセージロール Zod スキーマ（設計書④ ai_chat_messages 準拠）。
+ */
+export const aiChatMessageRoleSchema = z.enum(AI_CHAT_MESSAGE_ROLES);
+
+/**
+ * AIチャットメッセージ応答（設計書⑤に明記は無いがS14「履歴」表示に必要なためユーザー承認済みで追加、
+ * GET /api/v1/ai/chat/sessions/:id/messages）。
+ */
+export const aiChatMessageResponseSchema = z.object({
+  id: z.string().uuid(),
+  role: aiChatMessageRoleSchema,
+  content: z.string(),
+  citations: z.array(aiChatCitationResponseSchema).nullable(),
+  createdAt: z.string().datetime(),
+});
+export type AiChatMessageResponse = z.infer<typeof aiChatMessageResponseSchema>;
+
+/**
+ * カーソルページネーション応答（セッション内メッセージ一覧）。
+ */
+export const aiChatMessageListResponseSchema = z.object({
+  items: z.array(aiChatMessageResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type AiChatMessageListResponse = z.infer<typeof aiChatMessageListResponseSchema>;
+
+/**
+ * GET /api/v1/ai/chat/sessions/:id/messages パラメータ（UUID検証）。
+ */
+export const aiChatSessionIdParamSchema = z.object({
+  id: z.string().uuid(),
+});
+export type AiChatSessionIdParam = z.infer<typeof aiChatSessionIdParamSchema>;
+
+/**
+ * POST /api/v1/ai/classify リクエスト（設計書⑤⑥「機器概要→候補分類提示」）。
+ */
+export const aiClassifyRequestSchema = z.object({
+  description: z.string().trim().min(1).max(2000),
+});
+export type AiClassifyRequest = z.infer<typeof aiClassifyRequestSchema>;
+
+/**
+ * 分類候補応答（設計書⑥「検索+LLM再ランク」）。confidence/reasoningはLLMによる再ランク結果。
+ */
+export const classificationCandidateResponseSchema = z.object({
+  classificationId: z.string().uuid(),
+  scheme: classificationSchemeSchema,
+  jurisdiction: jurisdictionSummaryResponseSchema,
+  code: z.string(),
+  name: z.string(),
+  class: z.string().nullable(),
+  definition: z.string().nullable(),
+  confidence: z.number().min(0).max(1),
+  reasoning: z.string(),
+});
+export type ClassificationCandidateResponse = z.infer<typeof classificationCandidateResponseSchema>;
+
+/**
+ * POST /api/v1/ai/classify 応答。根拠となる候補が見つからない場合は空配列（chatの「根拠なし回答の禁止」と同方針）。
+ */
+export const aiClassifyResponseSchema = z.object({
+  candidates: z.array(classificationCandidateResponseSchema),
+});
+export type AiClassifyResponse = z.infer<typeof aiClassifyResponseSchema>;

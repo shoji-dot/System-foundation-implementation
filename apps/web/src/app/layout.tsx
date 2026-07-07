@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { SessionProvider } from "next-auth/react";
 
+import { auth } from "@/shared/auth/auth";
+import { GlobalNav } from "@/shared/components/GlobalNav";
+
 import "./globals.css";
 
 const APP_NAME = "薬事支援";
@@ -37,15 +40,27 @@ export const viewport: Viewport = {
   themeColor: "#0071e3",
 };
 
-export default function RootLayout({
+/** 設計書⑫「グローバルナビ...5項目固定」: ログイン済みセッションがある場合のみナビを表示する。 */
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
   return (
     <html lang="ja">
       <body className="min-h-screen antialiased">
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          {session ? (
+            <>
+              <GlobalNav />
+              <div className="pb-14 md:pb-0 md:pl-56">{children}</div>
+            </>
+          ) : (
+            children
+          )}
+        </SessionProvider>
       </body>
     </html>
   );

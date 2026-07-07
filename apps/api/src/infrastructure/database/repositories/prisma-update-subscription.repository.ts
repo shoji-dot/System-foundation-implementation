@@ -73,6 +73,30 @@ export class PrismaUpdateSubscriptionRepository implements UpdateSubscriptionRep
     return subscriptions.map((subscription) => subscription.userId);
   }
 
+  async findManyForUser(userId: string): Promise<UpdateSubscription[]> {
+    const records = await this.prisma.updateSubscription.findMany({
+      where: { userId },
+      include: { jurisdiction: true },
+      // idはUUIDv7で生成順に単調増加するため、昇順で作成順表示になる。
+      orderBy: { id: "asc" },
+    });
+
+    return records.map((record) => this.toDomain(record));
+  }
+
+  async findById(id: string): Promise<UpdateSubscription | null> {
+    const record = await this.prisma.updateSubscription.findUnique({
+      where: { id },
+      include: { jurisdiction: true },
+    });
+
+    return record ? this.toDomain(record) : null;
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.updateSubscription.delete({ where: { id } });
+  }
+
   private toDomain(record: UpdateSubscriptionWithJurisdiction): UpdateSubscription {
     return {
       id: record.id,

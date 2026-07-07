@@ -33,4 +33,10 @@ export interface UpdateSubscriptionRepository {
    * （jurisdictionId/regulationTypeがnullは「全国」「全タイプ」を意味し一致扱い、設計書⑨通知生成用）。
    */
   findMatchingUserIds(input: FindMatchingSubscriptionUserIdsInput): Promise<string[]>;
+  /** GET /api/v1/subscriptions（S18「既存購読の一覧」）: ログイン中のユーザー自身の購読を作成順で返す。 */
+  findManyForUser(userId: string): Promise<UpdateSubscription[]>;
+  /** DELETE /api/v1/subscriptions/:id 向けの所有者確認用。存在しない場合はnull。 */
+  findById(id: string): Promise<UpdateSubscription | null>;
+  /** DELETE /api/v1/subscriptions/:id（S18「既存購読の解除」）。 */
+  delete(id: string): Promise<void>;
 }

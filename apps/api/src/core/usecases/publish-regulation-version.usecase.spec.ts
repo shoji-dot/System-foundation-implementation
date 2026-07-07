@@ -59,6 +59,9 @@ describe("PublishRegulationVersionUsecase", () => {
       existsForUser: jest.fn(),
       create: jest.fn(),
       findMatchingUserIds: jest.fn().mockResolvedValue([]),
+      findManyForUser: jest.fn(),
+      findById: jest.fn(),
+      delete: jest.fn(),
     };
     const notificationRepository: jest.Mocked<NotificationRepository> = {
       createMany: jest.fn(),
@@ -106,8 +109,12 @@ describe("PublishRegulationVersionUsecase", () => {
   });
 
   it("creates notifications for users whose subscription matches the published jurisdiction/type", async () => {
-    const { usecase, regulationIngestionRepository, updateSubscriptionRepository, notificationRepository } =
-      setup();
+    const {
+      usecase,
+      regulationIngestionRepository,
+      updateSubscriptionRepository,
+      notificationRepository,
+    } = setup();
     regulationIngestionRepository.findPendingReviewDetail.mockResolvedValue(pendingDetail);
     regulationIngestionRepository.publishVersion.mockResolvedValue(publishResult);
     updateSubscriptionRepository.findMatchingUserIds.mockResolvedValue(["user-1", "user-2"]);
@@ -135,8 +142,12 @@ describe("PublishRegulationVersionUsecase", () => {
   });
 
   it("does not call createMany when no subscription matches", async () => {
-    const { usecase, regulationIngestionRepository, updateSubscriptionRepository, notificationRepository } =
-      setup();
+    const {
+      usecase,
+      regulationIngestionRepository,
+      updateSubscriptionRepository,
+      notificationRepository,
+    } = setup();
     regulationIngestionRepository.findPendingReviewDetail.mockResolvedValue(pendingDetail);
     regulationIngestionRepository.publishVersion.mockResolvedValue(publishResult);
     updateSubscriptionRepository.findMatchingUserIds.mockResolvedValue([]);

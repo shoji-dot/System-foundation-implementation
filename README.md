@@ -11,14 +11,14 @@
 
 ## 技術スタック
 
-| 層 | 技術 |
-|---|---|
-| フロントエンド | Next.js 15 (App Router) / TypeScript strict / Tailwind CSS |
-| バックエンド | NestJS / TypeScript strict / Clean Architecture |
-| DB | PostgreSQL 16 (+ pg_trgm, pgvector) / Prisma |
-| キュー | Redis + BullMQ |
-| モノレポ | pnpm workspace + Turborepo |
-| CI/CD | GitHub Actions（Lint/Typecheck/Test/Build）+ Vercel/Railway 自動デプロイ |
+| 層             | 技術                                                                     |
+| -------------- | ------------------------------------------------------------------------ |
+| フロントエンド | Next.js 15 (App Router) / TypeScript strict / Tailwind CSS               |
+| バックエンド   | NestJS / TypeScript strict / Clean Architecture                          |
+| DB             | PostgreSQL 16 (+ pg_trgm, pgvector) / Prisma                             |
+| キュー         | Redis + BullMQ                                                           |
+| モノレポ       | pnpm workspace + Turborepo                                               |
+| CI/CD          | GitHub Actions（Lint/Typecheck/Test/Build）+ Vercel/Railway 自動デプロイ |
 
 ## ディレクトリ構成
 
@@ -98,14 +98,14 @@ Preview/Staging 環境へ自動デプロイされる。
 
 ## Git運用
 
-| ブランチ | 用途 |
-|---|---|
-| `main` | 常にデプロイ可能な本番ブランチ |
-| `develop` | 開発ブランチ |
-| `feature/xxxx` | 機能追加 |
-| `fix/xxxx` | バグ修正 |
-| `chore/xxxx` | 環境整備 |
-| `docs/xxxx` | ドキュメント |
+| ブランチ       | 用途                           |
+| -------------- | ------------------------------ |
+| `main`         | 常にデプロイ可能な本番ブランチ |
+| `develop`      | 開発ブランチ                   |
+| `feature/xxxx` | 機能追加                       |
+| `fix/xxxx`     | バグ修正                       |
+| `chore/xxxx`   | 環境整備                       |
+| `docs/xxxx`    | ドキュメント                   |
 
 1コミット = 1機能を原則とする。
 
