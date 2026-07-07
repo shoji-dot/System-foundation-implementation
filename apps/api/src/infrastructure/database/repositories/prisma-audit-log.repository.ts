@@ -3,8 +3,10 @@ import type { AuditLog as PrismaAuditLog } from "@prisma/client";
 
 import type { AuditLog } from "../../../core/domain/audit-log.entity";
 import type {
+  AuditLogListResult,
   AuditLogRepository,
   CreateAuditLogInput,
+  ListAuditLogsFilters,
 } from "../../../core/domain/audit-log.repository";
 import { PrismaService } from "../prisma.service";
 
@@ -25,6 +27,25 @@ export class PrismaAuditLogRepository implements AuditLogRepository {
     });
 
     return this.toDomain(record);
+  }
+
+  async list(filters: ListAuditLogsFilters): Promise<AuditLogListResult> {
+    // UUIDv7のidは生成順に単調増加するため、id desc で新しい記録から返す
+    // （取込レビュー一覧の listPendingReview と同様のカーソルページネーション方式）。
+    const records = await this.prisma.auditLog.findMany({
+      orderBy: { id: "desc" },
+      take: filters.limit + 1,
+      ...(filters.cursor ? { cursor: { id: filters.cursor }, skip: 1 } : {}),
+    });
+
+    const hasMore = records.length > filters.limit;
+    const page = hasMore ? records.slice(0, filters.limit) : records;
+    const nextCursor = hasMore ? (page[page.length - 1]?.id ?? null) : null;
+
+    return {
+      items: page.map((record) => this.toDomain(record)),
+      nextCursor,
+    };
   }
 
   private toDomain(record: PrismaAuditLog): AuditLog {

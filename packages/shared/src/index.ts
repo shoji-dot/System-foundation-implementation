@@ -1,4 +1,5 @@
 export * from "./ai";
+export * from "./audit";
 export * from "./classifications";
 export * from "./jurisdictions";
 export * from "./learning";

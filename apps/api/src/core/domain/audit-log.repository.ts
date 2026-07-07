@@ -17,7 +17,20 @@ export interface CreateAuditLogInput {
   target: string;
 }
 
+/** 監査ログ一覧のカーソルページネーション入力（設計書⑫、他一覧APIと同様の方式）。 */
+export interface ListAuditLogsFilters {
+  cursor?: string;
+  limit: number;
+}
+
+export interface AuditLogListResult {
+  items: AuditLog[];
+  nextCursor: string | null;
+}
+
 export interface AuditLogRepository {
   /** 監査ログは追記のみ（更新・削除しない）。 */
   create(input: CreateAuditLogInput): Promise<AuditLog>;
+  /** 新しい記録から順に返す（管理画面での閲覧用途のため）。 */
+  list(filters: ListAuditLogsFilters): Promise<AuditLogListResult>;
 }
