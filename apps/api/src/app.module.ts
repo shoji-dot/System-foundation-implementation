@@ -6,6 +6,7 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { PrismaModule } from "./infrastructure/database/prisma.module";
 import { BullmqModule } from "./infrastructure/queue/bullmq.module";
 import { RedisModule } from "./infrastructure/queue/redis.module";
+import { AiChatModule } from "./modules/ai/ai-chat.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { ClassificationsModule } from "./modules/classifications/classifications.module";
 import { HealthModule } from "./modules/health/health.module";
@@ -42,6 +43,7 @@ import { WorkflowModule } from "./modules/workflow/workflow.module";
     WorkflowModule,
     NotificationsModule,
     ProjectsModule,
+    AiChatModule,
   ],
   providers: [
     // NOTE: ThrottlerModule.forRoot はデフォルト設定を宣言するのみで、

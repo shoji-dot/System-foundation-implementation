@@ -556,3 +556,31 @@ export const searchResponseSchema = z.object({
   nextCursor: z.string().nullable(),
 });
 export type SearchResponse = z.infer<typeof searchResponseSchema>;
+
+/**
+ * POST /api/v1/ai/chat リクエスト（設計書⑤⑥、S14）。
+ * sessionIdを省略すると新規セッションを作成する。userIdはbodyに含めずアクセストークンから取得する
+ * （POST /api/v1/progress等と同じ方針）。
+ */
+export const aiChatRequestSchema = z.object({
+  sessionId: z.string().uuid().optional(),
+  message: z.string().trim().min(1).max(2000),
+});
+export type AiChatRequest = z.infer<typeof aiChatRequestSchema>;
+
+/**
+ * AIチャット出典（設計書⑥「回答には必ず出典（regulation_sectionsへの参照＋版・施行日）を付与」）。
+ * SSEの citations イベントのペイロードとして使用する。
+ */
+export const aiChatCitationResponseSchema = z.object({
+  sectionId: z.string().uuid(),
+  regulationId: z.string().uuid(),
+  regulationTitle: z.string(),
+  jurisdiction: jurisdictionSummaryResponseSchema,
+  versionNo: z.number().int().positive(),
+  effectiveFrom: z.string().date(),
+  effectiveTo: z.string().date().nullable(),
+  path: z.string(),
+  heading: z.string(),
+});
+export type AiChatCitationResponse = z.infer<typeof aiChatCitationResponseSchema>;
