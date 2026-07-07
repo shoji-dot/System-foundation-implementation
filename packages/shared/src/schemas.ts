@@ -402,6 +402,28 @@ export const lessonDetailResponseSchema = lessonSummaryResponseSchema.extend({
 export type LessonDetailResponse = z.infer<typeof lessonDetailResponseSchema>;
 
 /**
+ * POST /api/v1/admin/lessons リクエストボディ（S21「管理: コンテンツ管理」レッスン管理）。
+ */
+export const createLessonRequestSchema = z.object({
+  courseId: z.string().uuid(),
+  title: z.string().trim().min(1).max(200),
+  body: z.string().trim().min(1),
+  order: z.number().int().min(0),
+});
+export type CreateLessonRequest = z.infer<typeof createLessonRequestSchema>;
+
+/**
+ * PATCH /api/v1/admin/lessons/:id リクエストボディ（部分更新、S21「レッスン管理」）。
+ * courseId は変更不可（コース間移動は対象外、ユーザー承認済みスコープ外）。
+ */
+export const updateLessonRequestSchema = z.object({
+  title: z.string().trim().min(1).max(200).optional(),
+  body: z.string().trim().min(1).optional(),
+  order: z.number().int().min(0).optional(),
+});
+export type UpdateLessonRequest = z.infer<typeof updateLessonRequestSchema>;
+
+/**
  * クイズ選択肢（設計書④ quiz_questions.choices jsonb 準拠）。
  */
 export const quizChoiceResponseSchema = z.object({

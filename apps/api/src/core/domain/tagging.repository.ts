@@ -18,6 +18,12 @@ export interface TaggingRepository {
   exists(tagId: string, taggableType: TaggableType, taggableId: string): Promise<boolean>;
   delete(tagId: string, taggableType: TaggableType, taggableId: string): Promise<void>;
   /**
+   * 対象に付与されている全タグ付けを削除する（S21「レッスン管理」でレッスン削除時に使用）。
+   * taggings.taggable_id はpolymorphic設計上FK制約が無くDBのonDelete Cascadeでは自動削除されないため、
+   * レッスン削除の前にアプリ層で明示的に呼び出し、タグ付けの孤立を防ぐ。
+   */
+  deleteAllForTaggable(taggableType: TaggableType, taggableId: string): Promise<void>;
+  /**
    * 対象に付与されているタグの一覧をTag実体として返す（一覧画面ではタグ名が必要なため、
    * taggingsとtagsのJOINをリポジトリ内で行う。取込レビュー一覧のjurisdiction同梱と同様の方針）。
    */

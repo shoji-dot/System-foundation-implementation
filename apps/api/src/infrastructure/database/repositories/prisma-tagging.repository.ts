@@ -42,6 +42,10 @@ export class PrismaTaggingRepository implements TaggingRepository {
     });
   }
 
+  async deleteAllForTaggable(taggableType: TaggableType, taggableId: string): Promise<void> {
+    await this.prisma.tagging.deleteMany({ where: { taggableType, taggableId } });
+  }
+
   async listTagsForTaggable(taggableType: TaggableType, taggableId: string): Promise<Tag[]> {
     const records = await this.prisma.tagging.findMany({
       where: { taggableType, taggableId },

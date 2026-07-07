@@ -20,8 +20,27 @@ export interface LessonListResult {
   nextCursor: string | null;
 }
 
+export interface CreateLessonInput {
+  courseId: string;
+  title: string;
+  body: string;
+  order: number;
+}
+
+export interface UpdateLessonInput {
+  title?: string;
+  body?: string;
+  order?: number;
+}
+
 export interface LessonRepository {
   findMany(filters: LessonListFilters): Promise<LessonListResult>;
   /** 設計書⑤ GET /api/v1/lessons/:id（本文込み、S11詳細）。存在しない場合は null。 */
   findDetailById(id: string): Promise<Lesson | null>;
+  /** @@unique([courseId, order]) の事前チェック用（S21「レッスン管理」の重複order検知）。 */
+  findByCourseIdAndOrder(courseId: string, order: number): Promise<Lesson | null>;
+  /** S21「管理: コンテンツ管理」レッスン管理向け書き込みAPI。 */
+  create(input: CreateLessonInput): Promise<Lesson>;
+  update(id: string, input: UpdateLessonInput): Promise<Lesson>;
+  delete(id: string): Promise<void>;
 }
