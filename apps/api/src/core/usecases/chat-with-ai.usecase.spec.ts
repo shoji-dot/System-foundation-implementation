@@ -36,6 +36,8 @@ describe("ChatWithAiUsecase", () => {
       createSession: jest.fn(),
       findRecentMessages: jest.fn(),
       appendMessage: jest.fn(),
+      findManyForUser: jest.fn(),
+      findMessages: jest.fn(),
     };
     const ragSearchRepository: jest.Mocked<RagSearchRepository> = { hybridSearch: jest.fn() };
     const embeddingProvider: jest.Mocked<EmbeddingProvider> = {

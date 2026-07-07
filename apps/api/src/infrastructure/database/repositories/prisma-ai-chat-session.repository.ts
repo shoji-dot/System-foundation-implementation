@@ -3,11 +3,14 @@ import type { Prisma } from "@prisma/client";
 
 import type {
   AiChatHistoryMessage,
+  AiChatMessageListResult,
+  AiChatSessionListResult,
   AiChatSessionRef,
   AiChatSessionRepository,
   NewAiChatMessage,
   SavedAiChatMessage,
 } from "../../../core/domain/ai-chat-session.repository";
+import type { AiChatCitation, AiChatMessage } from "../../../core/domain/ai-chat.entity";
 import { PrismaService } from "../prisma.service";
 
 /**
@@ -61,9 +64,81 @@ export class PrismaAiChatSessionRepository implements AiChatSessionRepository {
       },
       select: { id: true, createdAt: true },
     });
-    // セッションの更新日時を最新化する（@updatedAt により自動更新、S14履歴一覧を updatedAt desc で表示する想定のため）。
+    // セッションの更新日時を最新化する（@updatedAt により自動更新）。一覧の並び順には使わない
+    // （findManyForUserはidキーセットのため）が、将来「最終更新」表示等に使えるよう正確に保つ。
     await this.prisma.aiChatSession.update({ where: { id: sessionId }, data: {} });
 
     return created;
+  }
+
+  async findManyForUser(
+    userId: string,
+    cursor: string | undefined,
+    limit: number,
+  ): Promise<AiChatSessionListResult> {
+    const records = await this.prisma.aiChatSession.findMany({
+      where: { userId },
+      orderBy: { id: "desc" },
+      take: limit + 1,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+    });
+
+    const hasMore = records.length > limit;
+    const page = hasMore ? records.slice(0, limit) : records;
+    const nextCursor = hasMore ? (page[page.length - 1]?.id ?? null) : null;
+
+    return { items: page, nextCursor };
+  }
+
+  async findMessages(
+    sessionId: string,
+    cursor: string | undefined,
+    limit: number,
+  ): Promise<AiChatMessageListResult> {
+    const records = await this.prisma.aiChatMessage.findMany({
+      where: { sessionId },
+      orderBy: { id: "desc" },
+      take: limit + 1,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+    });
+
+    const hasMore = records.length > limit;
+    const page = hasMore ? records.slice(0, limit) : records;
+    const nextCursor = hasMore ? (page[page.length - 1]?.id ?? null) : null;
+
+    return {
+      items: page.map(
+        (record): AiChatMessage => ({
+          id: record.id,
+          role: record.role,
+          content: record.content,
+          citations: this.parseCitations(record.citations),
+          createdAt: record.createdAt,
+        }),
+      ),
+      nextCursor,
+    };
+  }
+
+  /** citations jsonb → ドメイン型。effectiveFrom/effectiveToはJSON往復でISO文字列になるためDateへ戻す
+   * （RedisAiChatAnswerCache.getと同じ理由）。 */
+  private parseCitations(json: Prisma.JsonValue | null): AiChatCitation[] | null {
+    if (json == null) {
+      return null;
+    }
+
+    const rawCitations = json as unknown as (Omit<
+      AiChatCitation,
+      "effectiveFrom" | "effectiveTo"
+    > & {
+      effectiveFrom: string;
+      effectiveTo: string | null;
+    })[];
+
+    return rawCitations.map((citation) => ({
+      ...citation,
+      effectiveFrom: new Date(citation.effectiveFrom),
+      effectiveTo: citation.effectiveTo ? new Date(citation.effectiveTo) : null,
+    }));
   }
 }

@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { AI_CHAT_MESSAGE_ROLES } from "./ai";
 import { CLASSIFICATION_SCHEMES } from "./classifications";
 import { JURISDICTION_CODES } from "./jurisdictions";
 import { PROGRESS_STATUSES } from "./learning";
@@ -584,6 +585,62 @@ export const aiChatCitationResponseSchema = z.object({
   heading: z.string(),
 });
 export type AiChatCitationResponse = z.infer<typeof aiChatCitationResponseSchema>;
+
+/**
+ * AIチャットセッション応答（設計書⑤に明記は無いがS14「履歴」表示に必要なためユーザー承認済みで追加、
+ * GET /api/v1/ai/chat/sessions）。
+ */
+export const aiChatSessionResponseSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type AiChatSessionResponse = z.infer<typeof aiChatSessionResponseSchema>;
+
+/**
+ * カーソルページネーション応答（AIチャットセッション一覧）。
+ */
+export const aiChatSessionListResponseSchema = z.object({
+  items: z.array(aiChatSessionResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type AiChatSessionListResponse = z.infer<typeof aiChatSessionListResponseSchema>;
+
+/**
+ * AIチャットメッセージロール Zod スキーマ（設計書④ ai_chat_messages 準拠）。
+ */
+export const aiChatMessageRoleSchema = z.enum(AI_CHAT_MESSAGE_ROLES);
+
+/**
+ * AIチャットメッセージ応答（設計書⑤に明記は無いがS14「履歴」表示に必要なためユーザー承認済みで追加、
+ * GET /api/v1/ai/chat/sessions/:id/messages）。
+ */
+export const aiChatMessageResponseSchema = z.object({
+  id: z.string().uuid(),
+  role: aiChatMessageRoleSchema,
+  content: z.string(),
+  citations: z.array(aiChatCitationResponseSchema).nullable(),
+  createdAt: z.string().datetime(),
+});
+export type AiChatMessageResponse = z.infer<typeof aiChatMessageResponseSchema>;
+
+/**
+ * カーソルページネーション応答（セッション内メッセージ一覧）。
+ */
+export const aiChatMessageListResponseSchema = z.object({
+  items: z.array(aiChatMessageResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type AiChatMessageListResponse = z.infer<typeof aiChatMessageListResponseSchema>;
+
+/**
+ * GET /api/v1/ai/chat/sessions/:id/messages パラメータ（UUID検証）。
+ */
+export const aiChatSessionIdParamSchema = z.object({
+  id: z.string().uuid(),
+});
+export type AiChatSessionIdParam = z.infer<typeof aiChatSessionIdParamSchema>;
 
 /**
  * POST /api/v1/ai/classify リクエスト（設計書⑤⑥「機器概要→候補分類提示」）。

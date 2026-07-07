@@ -5,6 +5,8 @@ import type { AuthenticatedRequest } from "../../common/guards/authenticated-req
 import type { ChatWithAiEvent } from "../../core/usecases/chat-with-ai.usecase";
 import { ChatWithAiUsecase } from "../../core/usecases/chat-with-ai.usecase";
 import { ClassifyDeviceUsecase } from "../../core/usecases/classify-device.usecase";
+import { ListAiChatMessagesUsecase } from "../../core/usecases/list-ai-chat-messages.usecase";
+import { ListAiChatSessionsUsecase } from "../../core/usecases/list-ai-chat-sessions.usecase";
 
 import { AiChatController } from "./ai-chat.controller";
 
@@ -23,10 +25,26 @@ describe("AiChatController", () => {
     } as unknown as jest.Mocked<Response>;
   }
 
-  function createController(execute: jest.Mock, classifyExecute: jest.Mock = jest.fn()) {
+  function createController(
+    execute: jest.Mock,
+    classifyExecute: jest.Mock = jest.fn(),
+    listSessionsExecute: jest.Mock = jest.fn(),
+    listMessagesExecute: jest.Mock = jest.fn(),
+  ) {
     const chatWithAiUsecase = { execute } as unknown as ChatWithAiUsecase;
     const classifyDeviceUsecase = { execute: classifyExecute } as unknown as ClassifyDeviceUsecase;
-    return new AiChatController(chatWithAiUsecase, classifyDeviceUsecase);
+    const listAiChatSessionsUsecase = {
+      execute: listSessionsExecute,
+    } as unknown as ListAiChatSessionsUsecase;
+    const listAiChatMessagesUsecase = {
+      execute: listMessagesExecute,
+    } as unknown as ListAiChatMessagesUsecase;
+    return new AiChatController(
+      chatWithAiUsecase,
+      classifyDeviceUsecase,
+      listAiChatSessionsUsecase,
+      listAiChatMessagesUsecase,
+    );
   }
 
   it("streams citations/token/done as SSE frames and ends the response", async () => {
@@ -128,5 +146,79 @@ describe("AiChatController", () => {
     });
     expect(result.candidates).toHaveLength(1);
     expect(result.candidates[0]).toMatchObject({ code: "35282000", confidence: 0.9 });
+  });
+
+  it("lists the requesting user's chat sessions with ISO-formatted timestamps", async () => {
+    const listSessionsExecute = jest.fn().mockResolvedValue({
+      items: [
+        {
+          id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c",
+          title: "製造販売業の許可について",
+          createdAt: new Date("2026-07-07T00:00:00.000Z"),
+          updatedAt: new Date("2026-07-07T00:10:00.000Z"),
+        },
+      ],
+      nextCursor: null,
+    });
+    const controller = createController(jest.fn(), jest.fn(), listSessionsExecute);
+
+    const result = await controller.listSessions(request, { cursor: undefined, limit: 20 });
+
+    expect(listSessionsExecute).toHaveBeenCalledWith({
+      userId: request.user.userId,
+      cursor: undefined,
+      limit: 20,
+    });
+    expect(result.items[0]).toMatchObject({
+      id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c",
+      createdAt: "2026-07-07T00:00:00.000Z",
+      updatedAt: "2026-07-07T00:10:00.000Z",
+    });
+  });
+
+  it("lists messages for a session, mapping citations through the response schema", async () => {
+    const listMessagesExecute = jest.fn().mockResolvedValue({
+      items: [
+        {
+          id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5f",
+          role: "ASSISTANT",
+          content: "回答本文",
+          citations: [
+            {
+              sectionId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5d",
+              regulationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5e",
+              regulationTitle: "医薬品医療機器等法",
+              jurisdiction: { code: "JP", name: "日本" },
+              versionNo: 1,
+              effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
+              effectiveTo: null,
+              path: "第23条の2",
+              heading: "製造販売業の許可",
+            },
+          ],
+          createdAt: new Date("2026-07-07T00:10:00.000Z"),
+        },
+      ],
+      nextCursor: null,
+    });
+    const controller = createController(jest.fn(), jest.fn(), jest.fn(), listMessagesExecute);
+
+    const result = await controller.listMessages(
+      request,
+      { id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c" },
+      { cursor: undefined, limit: 20 },
+    );
+
+    expect(listMessagesExecute).toHaveBeenCalledWith({
+      userId: request.user.userId,
+      sessionId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5c",
+      cursor: undefined,
+      limit: 20,
+    });
+    expect(result.items[0]).toMatchObject({
+      role: "ASSISTANT",
+      content: "回答本文",
+      citations: [expect.objectContaining({ path: "第23条の2", effectiveFrom: "2026-01-01" })],
+    });
   });
 });

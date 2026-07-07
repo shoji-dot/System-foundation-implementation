@@ -14,6 +14,8 @@ import { RAG_SEARCH_REPOSITORY } from "../../core/domain/rag-search.repository";
 import { TOKEN_SERVICE } from "../../core/domain/token-service";
 import { ChatWithAiUsecase } from "../../core/usecases/chat-with-ai.usecase";
 import { ClassifyDeviceUsecase } from "../../core/usecases/classify-device.usecase";
+import { ListAiChatMessagesUsecase } from "../../core/usecases/list-ai-chat-messages.usecase";
+import { ListAiChatSessionsUsecase } from "../../core/usecases/list-ai-chat-sessions.usecase";
 import { PrismaModule } from "../../infrastructure/database/prisma.module";
 import { PrismaAiChatSessionRepository } from "../../infrastructure/database/repositories/prisma-ai-chat-session.repository";
 import { PrismaClassificationSearchRepository } from "../../infrastructure/database/repositories/prisma-classification-search.repository";
@@ -38,6 +40,8 @@ import { AiChatController } from "./ai-chat.controller";
   providers: [
     ChatWithAiUsecase,
     ClassifyDeviceUsecase,
+    ListAiChatSessionsUsecase,
+    ListAiChatMessagesUsecase,
     { provide: TOKEN_SERVICE, useClass: JwtTokenService },
     { provide: AI_CHAT_QUOTA_LIMITER, useClass: RedisAiChatQuotaLimiter },
     { provide: AI_CHAT_ANSWER_CACHE, useClass: RedisAiChatAnswerCache },
