@@ -19,6 +19,9 @@ describe("GetCourseDetailUsecase", () => {
     const courseRepository: jest.Mocked<CourseRepository> = {
       findMany: jest.fn(),
       findById: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
     };
     const usecase = new GetCourseDetailUsecase(courseRepository);
     return { usecase, courseRepository };

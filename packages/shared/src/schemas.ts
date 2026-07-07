@@ -335,6 +335,26 @@ export const courseIdParamSchema = z.object({
 export type CourseIdParam = z.infer<typeof courseIdParamSchema>;
 
 /**
+ * POST /api/v1/admin/courses リクエストボディ（S21「管理: コンテンツ管理」コース管理）。
+ */
+export const createCourseRequestSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(2000).nullable().optional(),
+  order: z.number().int().min(0),
+});
+export type CreateCourseRequest = z.infer<typeof createCourseRequestSchema>;
+
+/**
+ * PATCH /api/v1/admin/courses/:id リクエストボディ（部分更新、S21「コース管理」）。
+ */
+export const updateCourseRequestSchema = z.object({
+  title: z.string().trim().min(1).max(200).optional(),
+  description: z.string().trim().max(2000).nullable().optional(),
+  order: z.number().int().min(0).optional(),
+});
+export type UpdateCourseRequest = z.infer<typeof updateCourseRequestSchema>;
+
+/**
  * レッスン一覧項目応答（設計書④ lessons 準拠、GET /api/v1/lessons、S11）。
  * 本文(body)は一覧では返さず、詳細取得時に返す（regulation_versions一覧のfullText扱いに準拠）。
  */
