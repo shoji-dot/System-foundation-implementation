@@ -46,9 +46,9 @@ describe("UpdateUserRoleUsecase", () => {
     const { usecase, userRepository } = setup();
     userRepository.findById.mockResolvedValue(null);
 
-    await expect(
-      usecase.execute({ id: "missing", systemRole: "ADMIN" }),
-    ).rejects.toBeInstanceOf(NotFoundException);
+    await expect(usecase.execute({ id: "missing", systemRole: "ADMIN" })).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
     expect(userRepository.updateRole).not.toHaveBeenCalled();
   });
 });
