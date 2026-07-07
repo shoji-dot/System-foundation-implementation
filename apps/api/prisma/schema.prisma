@@ -25,7 +25,11 @@
 // Phase 6: 商用化（監査ログ）として audit_logs を追加。設計書④の列定義（actor, action, target, at）を
 //          そのまま採用し、種別・IDへの分割等の独自追加は行わない。actor_id は取込パイプライン(⑨)等
 //          システム起因の操作を許容するため nullable UUID FK とする。
-// 他ドメインテーブル (tags / ...) は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
+// Phase 6: 商用化（S21 管理: コンテンツ管理、タグ管理）として tags / taggings を追加。設計書④の
+//          「共通」区分に列挙されたタグ機能で、polymorphic（regulation/lesson/classification）設計だが、
+//          管理画面から編集可能な対象がlessonのみのため、TaggableTypeは今回LESSONのみを実装する
+//          （ユーザー承認済み。regulation/classificationは将来の編集画面実装時に追加）。
+// 他ドメインテーブル は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
 
 generator client {
   provider        = "prisma-client-js"
@@ -602,4 +606,40 @@ model AuditLog {
   @@index([actorId, createdAt])
   @@index([action, createdAt])
   @@map("audit_logs")
+}
+
+/// タグ付け対象の種別（設計書④ tags/taggings のpolymorphic対象）。管理画面(S21)から編集可能な
+/// lessonのみを今回実装する（regulation/classificationは編集画面が未実装のため対象外、ユーザー承認済み）。
+enum TaggableType {
+  LESSON
+}
+
+/// タグ（設計書④ tags 準拠、⑫ S21「コース・タグ・ユーザー管理」）。
+model Tag {
+  id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  taggings Tagging[]
+
+  @@map("tags")
+}
+
+/// タグ付け（設計書④ taggings 準拠、polymorphic: regulation/lesson/classification）。
+/// taggableId は対象種別により参照先テーブルが異なるため、DB外部キー制約は設定できない
+/// （整合性はアプリ層で担保する。device_classifications.schemeと同様、各国拡張時にスキーマ変更が
+/// 不要な設計方針に合わせた判断）。
+model Tagging {
+  id           String       @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  tagId        String       @map("tag_id") @db.Uuid
+  taggableType TaggableType @map("taggable_type")
+  taggableId   String       @map("taggable_id") @db.Uuid
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([tagId, taggableType, taggableId])
+  @@index([taggableType, taggableId])
+  @@map("taggings")
 }
