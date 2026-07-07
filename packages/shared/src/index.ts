@@ -11,3 +11,4 @@ export * from "./workflow";
 export * from "./updates";
 export * from "./notifications";
 export * from "./projects";
+export * from "./tags";

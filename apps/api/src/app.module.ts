@@ -16,6 +16,7 @@ import { NotificationsModule } from "./modules/notifications/notifications.modul
 import { ProjectsModule } from "./modules/projects/projects.module";
 import { RegulationsModule } from "./modules/regulations/regulations.module";
 import { SearchModule } from "./modules/search/search.module";
+import { TagsModule } from "./modules/tags/tags.module";
 import { UsersModule } from "./modules/users/users.module";
 import { WorkflowModule } from "./modules/workflow/workflow.module";
 
@@ -46,6 +47,7 @@ import { WorkflowModule } from "./modules/workflow/workflow.module";
     NotificationsModule,
     ProjectsModule,
     AiChatModule,
+    TagsModule,
   ],
   providers: [
     // NOTE: ThrottlerModule.forRoot はデフォルト設定を宣言するのみで、
