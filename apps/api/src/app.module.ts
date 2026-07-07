@@ -7,6 +7,7 @@ import { PrismaModule } from "./infrastructure/database/prisma.module";
 import { BullmqModule } from "./infrastructure/queue/bullmq.module";
 import { RedisModule } from "./infrastructure/queue/redis.module";
 import { AiChatModule } from "./modules/ai/ai-chat.module";
+import { AuditModule } from "./modules/audit/audit.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { ClassificationsModule } from "./modules/classifications/classifications.module";
 import { HealthModule } from "./modules/health/health.module";
@@ -33,6 +34,7 @@ import { WorkflowModule } from "./modules/workflow/workflow.module";
     PrismaModule,
     RedisModule,
     BullmqModule,
+    AuditModule,
     HealthModule,
     AuthModule,
     UsersModule,
