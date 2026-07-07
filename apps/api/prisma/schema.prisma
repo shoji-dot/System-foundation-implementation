@@ -19,6 +19,9 @@
 //          生むリスクがあるため、checklists マスタは作らずユーザー自由入力のタスク管理とする
 //          （ユーザー承認済み）。title を表示用ラベルとして追加し、checklist_item_ref は将来 checklists
 //          マスタと連携する際の参照用に nullable で予約する。
+// Phase 3: AIチャット基盤（S14「履歴」表示）として ai_chat_sessions / ai_chat_messages を追加。
+//          設計書④の主要テーブル一覧に該当テーブルが無いためユーザー承認済みで追加（update_subscriptions等と
+//          同方針）。出典(citations)は次コミットのchat API実装時に構造を確定するためjsonbとする。
 // 他ドメインテーブル (tags / ...) は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
 
 generator client {
@@ -75,11 +78,12 @@ model User {
   createdAt    DateTime   @default(now()) @map("created_at")
   updatedAt    DateTime   @updatedAt @map("updated_at")
 
-  memberships   Membership[]
-  progresses    UserProgress[]
-  subscriptions UpdateSubscription[]
-  notifications Notification[]
-  projects      Project[]
+  memberships    Membership[]
+  progresses     UserProgress[]
+  subscriptions  UpdateSubscription[]
+  notifications  Notification[]
+  projects       Project[]
+  aiChatSessions AiChatSession[]
 
   @@map("users")
 }
@@ -533,4 +537,45 @@ model ProjectTask {
 
   @@index([projectId])
   @@map("project_tasks")
+}
+
+/// AIチャットメッセージの発言者ロール（設計書⑫ S14「AIチャット」準拠）。
+enum AiChatMessageRole {
+  USER
+  ASSISTANT
+}
+
+/// AIチャットセッション（設計書④に列定義は無いためユーザー承認済みで追加、S14「履歴」表示に必要）。
+/// 1ユーザーが複数の会話スレッドを持てるようにする（一般的なチャットUXに準拠）。
+/// titleの自動生成方法・messages取得API・出典citationsの具体的な構造は、次コミットの
+/// chat API実装時に確定する（本コミットはDB基盤のみ）。
+model AiChatSession {
+  id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  title     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AiChatMessage[]
+
+  @@index([userId, updatedAt])
+  @@map("ai_chat_sessions")
+}
+
+/// AIチャットメッセージ（設計書④に列定義は無いためユーザー承認済みで追加、S14「履歴」表示に必要）。
+model AiChatMessage {
+  id        String            @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  sessionId String            @map("session_id") @db.Uuid
+  role      AiChatMessageRole
+  content   String
+  /// 出典（regulation_sections参照＋版・施行日等、設計書⑥「出典表示」）。構造は次コミットのchat API
+  /// 実装時に確定するためjsonbとする。
+  citations Json?
+  createdAt DateTime          @default(now()) @map("created_at")
+
+  session AiChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@map("ai_chat_messages")
 }

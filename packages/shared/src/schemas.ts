@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { AI_CHAT_MESSAGE_ROLES } from "./ai";
 import { CLASSIFICATION_SCHEMES } from "./classifications";
 import { JURISDICTION_CODES } from "./jurisdictions";
 import { PROGRESS_STATUSES } from "./learning";
@@ -556,3 +557,119 @@ export const searchResponseSchema = z.object({
   nextCursor: z.string().nullable(),
 });
 export type SearchResponse = z.infer<typeof searchResponseSchema>;
+
+/**
+ * POST /api/v1/ai/chat リクエスト（設計書⑤⑥、S14）。
+ * sessionIdを省略すると新規セッションを作成する。userIdはbodyに含めずアクセストークンから取得する
+ * （POST /api/v1/progress等と同じ方針）。
+ */
+export const aiChatRequestSchema = z.object({
+  sessionId: z.string().uuid().optional(),
+  message: z.string().trim().min(1).max(2000),
+});
+export type AiChatRequest = z.infer<typeof aiChatRequestSchema>;
+
+/**
+ * AIチャット出典（設計書⑥「回答には必ず出典（regulation_sectionsへの参照＋版・施行日）を付与」）。
+ * SSEの citations イベントのペイロードとして使用する。
+ */
+export const aiChatCitationResponseSchema = z.object({
+  sectionId: z.string().uuid(),
+  regulationId: z.string().uuid(),
+  regulationTitle: z.string(),
+  jurisdiction: jurisdictionSummaryResponseSchema,
+  versionNo: z.number().int().positive(),
+  effectiveFrom: z.string().date(),
+  effectiveTo: z.string().date().nullable(),
+  path: z.string(),
+  heading: z.string(),
+});
+export type AiChatCitationResponse = z.infer<typeof aiChatCitationResponseSchema>;
+
+/**
+ * AIチャットセッション応答（設計書⑤に明記は無いがS14「履歴」表示に必要なためユーザー承認済みで追加、
+ * GET /api/v1/ai/chat/sessions）。
+ */
+export const aiChatSessionResponseSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type AiChatSessionResponse = z.infer<typeof aiChatSessionResponseSchema>;
+
+/**
+ * カーソルページネーション応答（AIチャットセッション一覧）。
+ */
+export const aiChatSessionListResponseSchema = z.object({
+  items: z.array(aiChatSessionResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type AiChatSessionListResponse = z.infer<typeof aiChatSessionListResponseSchema>;
+
+/**
+ * AIチャットメッセージロール Zod スキーマ（設計書④ ai_chat_messages 準拠）。
+ */
+export const aiChatMessageRoleSchema = z.enum(AI_CHAT_MESSAGE_ROLES);
+
+/**
+ * AIチャットメッセージ応答（設計書⑤に明記は無いがS14「履歴」表示に必要なためユーザー承認済みで追加、
+ * GET /api/v1/ai/chat/sessions/:id/messages）。
+ */
+export const aiChatMessageResponseSchema = z.object({
+  id: z.string().uuid(),
+  role: aiChatMessageRoleSchema,
+  content: z.string(),
+  citations: z.array(aiChatCitationResponseSchema).nullable(),
+  createdAt: z.string().datetime(),
+});
+export type AiChatMessageResponse = z.infer<typeof aiChatMessageResponseSchema>;
+
+/**
+ * カーソルページネーション応答（セッション内メッセージ一覧）。
+ */
+export const aiChatMessageListResponseSchema = z.object({
+  items: z.array(aiChatMessageResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type AiChatMessageListResponse = z.infer<typeof aiChatMessageListResponseSchema>;
+
+/**
+ * GET /api/v1/ai/chat/sessions/:id/messages パラメータ（UUID検証）。
+ */
+export const aiChatSessionIdParamSchema = z.object({
+  id: z.string().uuid(),
+});
+export type AiChatSessionIdParam = z.infer<typeof aiChatSessionIdParamSchema>;
+
+/**
+ * POST /api/v1/ai/classify リクエスト（設計書⑤⑥「機器概要→候補分類提示」）。
+ */
+export const aiClassifyRequestSchema = z.object({
+  description: z.string().trim().min(1).max(2000),
+});
+export type AiClassifyRequest = z.infer<typeof aiClassifyRequestSchema>;
+
+/**
+ * 分類候補応答（設計書⑥「検索+LLM再ランク」）。confidence/reasoningはLLMによる再ランク結果。
+ */
+export const classificationCandidateResponseSchema = z.object({
+  classificationId: z.string().uuid(),
+  scheme: classificationSchemeSchema,
+  jurisdiction: jurisdictionSummaryResponseSchema,
+  code: z.string(),
+  name: z.string(),
+  class: z.string().nullable(),
+  definition: z.string().nullable(),
+  confidence: z.number().min(0).max(1),
+  reasoning: z.string(),
+});
+export type ClassificationCandidateResponse = z.infer<typeof classificationCandidateResponseSchema>;
+
+/**
+ * POST /api/v1/ai/classify 応答。根拠となる候補が見つからない場合は空配列（chatの「根拠なし回答の禁止」と同方針）。
+ */
+export const aiClassifyResponseSchema = z.object({
+  candidates: z.array(classificationCandidateResponseSchema),
+});
+export type AiClassifyResponse = z.infer<typeof aiClassifyResponseSchema>;

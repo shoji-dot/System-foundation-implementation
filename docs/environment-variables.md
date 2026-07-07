@@ -12,22 +12,25 @@
 
 ## apps/api (NestJS) — `apps/api/.env.example`
 
-| 変数           | 用途                         | ローカル既定値             | 本番 (Railway)                                                     |
-| -------------- | ---------------------------- | -------------------------- | ------------------------------------------------------------------ |
-| `NODE_ENV`     | 実行環境                     | `development`              | `production`                                                       |
-| `PORT`         | APIサーバ待受ポート          | `3001`                     | Railway が自動注入する `PORT` を使用                               |
-| `API_PREFIX`   | APIルートプレフィックス      | `api/v1`                   | 同左                                                               |
-| `CORS_ORIGIN`  | 許可オリジン（カンマ区切り） | `http://localhost:3000`    | VercelのProduction/Previewドメイン                                 |
-| `DATABASE_URL` | PostgreSQL接続文字列         | docker-compose の postgres | Railway Postgres プラグインの参照変数 `${{Postgres.DATABASE_URL}}` |
-| `REDIS_URL`    | Redis接続文字列              | docker-compose の redis    | Railway Redis プラグインの参照変数 `${{Redis.REDIS_URL}}`          |
+| 変数                      | 用途                                                                                                     | ローカル既定値                              | 本番 (Railway)                                                       |
+| ------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------- |
+| `NODE_ENV`                | 実行環境                                                                                                 | `development`                               | `production`                                                         |
+| `PORT`                    | APIサーバ待受ポート                                                                                      | `3001`                                      | Railway が自動注入する `PORT` を使用                                 |
+| `API_PREFIX`              | APIルートプレフィックス                                                                                  | `api/v1`                                    | 同左                                                                 |
+| `CORS_ORIGIN`             | 許可オリジン（カンマ区切り）                                                                             | `http://localhost:3000`                     | VercelのProduction/Previewドメイン                                   |
+| `DATABASE_URL`            | PostgreSQL接続文字列                                                                                     | docker-compose の postgres                  | Railway Postgres プラグインの参照変数 `${{Postgres.DATABASE_URL}}`   |
+| `REDIS_URL`               | Redis接続文字列                                                                                          | docker-compose の redis                     | Railway Redis プラグインの参照変数 `${{Redis.REDIS_URL}}`            |
+| `OPENAI_API_KEY`          | AIチャット(S14)埋め込み・生成用（infrastructure/external/llm、ユーザー承認済みでOpenAI一本の構成を採用） | OpenAIダッシュボードで発行した個人/組織キー | Railway Variablesに設定（Secretsとして扱う、コミット・ログ出力禁止） |
+| `EMBEDDING_BACKFILL_CRON` | regulation_sections埋め込みバックフィル（Worker）の定期実行cron式（任意、未設定時は5分毎）               | 未設定（既定値を使用）                      | 未設定（既定値を使用、必要になれば個別設定）                         |
 
 ## 管理方針
 
 - **ローカル**: `.env` / `.env.local` はコミットしない。`.env.example` のみバージョン管理する。
 - **GitHub Actions**: CI の Unit/E2Eテストは `.github/workflows/ci.yml` 内でジョブ専用の
-  ダミー値（サービスコンテナ接続情報）を直接指定しており、Secretsは不要（Phase 0時点。
-  Phase 3以降、LLM APIキー等の秘匿情報を扱う段階で GitHub Actions Secrets /
-  Railway・Vercel の環境変数機能に追加する）。
+  ダミー値（サービスコンテナ接続情報）を直接指定しており、Secretsは不要。`OPENAI_API_KEY`は
+  ユニットテストではfetchをモックするため実キー不要（各specでダミー値を設定）。実際にOpenAI APIを
+  呼び出すchat/classifyエンドポイントのE2E検証を追加する段階になったら、GitHub Actions Secretsへの
+  追加を検討する。
 - **Railway**: サービスの Variables タブで設定。Postgres/Redisプラグインの参照変数
   （`${{Postgres.DATABASE_URL}}` 等）を利用し、値のハードコードを避ける。
 - **Vercel**: Project Settings → Environment Variables で Production / Preview /
