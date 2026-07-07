@@ -17,6 +17,10 @@ describe("CreateUpdateSubscriptionUsecase", () => {
     const updateSubscriptionRepository: jest.Mocked<UpdateSubscriptionRepository> = {
       existsForUser: jest.fn(),
       create: jest.fn(),
+      findMatchingUserIds: jest.fn(),
+      findManyForUser: jest.fn(),
+      findById: jest.fn(),
+      delete: jest.fn(),
     };
     const usecase = new CreateUpdateSubscriptionUsecase(updateSubscriptionRepository);
     return { usecase, updateSubscriptionRepository };

@@ -11,6 +11,7 @@ import { ClassificationsModule } from "./modules/classifications/classifications
 import { HealthModule } from "./modules/health/health.module";
 import { LearningModule } from "./modules/learning/learning.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
+import { ProjectsModule } from "./modules/projects/projects.module";
 import { RegulationsModule } from "./modules/regulations/regulations.module";
 import { SearchModule } from "./modules/search/search.module";
 import { UsersModule } from "./modules/users/users.module";
@@ -40,6 +41,7 @@ import { WorkflowModule } from "./modules/workflow/workflow.module";
     SearchModule,
     WorkflowModule,
     NotificationsModule,
+    ProjectsModule,
   ],
   providers: [
     // NOTE: ThrottlerModule.forRoot はデフォルト設定を宣言するのみで、

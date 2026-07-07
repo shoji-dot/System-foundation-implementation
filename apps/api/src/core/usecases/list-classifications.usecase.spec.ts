@@ -19,6 +19,7 @@ describe("ListClassificationsUsecase", () => {
   function setup() {
     const classificationRepository: jest.Mocked<ClassificationRepository> = {
       findMany: jest.fn(),
+      findById: jest.fn(),
       findMappingsByClassificationId: jest.fn(),
     };
     const usecase = new ListClassificationsUsecase(classificationRepository);

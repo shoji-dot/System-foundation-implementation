@@ -80,6 +80,11 @@ const ACCESS_TOKEN_REFRESH_MARGIN_MS = 10_000;
 
 export const authConfig = {
   session: { strategy: "jwt" },
+  // ローカルの `next start`（Playwright e2eのwebServer含む）はAUTH_URL/NEXTAUTH_URLを設定していないため、
+  // 既定では "UntrustedHost" エラーでセッション取得自体が失敗し、認証必須ページの/loginリダイレクトが
+  // 機能しなくなる（2026-07-05 e2e実行で発覚）。Vercel本番はVERCEL環境変数により自動的に信頼されるため、
+  // ここでtrustHost:trueにしても本番の挙動は変わらない。
+  trustHost: true,
   pages: {
     // 設計書⑫ S02。フォームUIは別コミットで実装するため、現時点では未作成（次コミットで追加）。
     signIn: "/login",

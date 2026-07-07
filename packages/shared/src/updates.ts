@@ -56,6 +56,16 @@ export const updateFrequencySchema = z.enum(UPDATE_FREQUENCIES);
 export type UpdateFrequency = z.infer<typeof updateFrequencySchema>;
 
 /**
+ * 配信頻度の日本語表示名。フロントエンドの複数箇所（S18通知設定の登録フォーム・一覧）で
+ * 共通利用するため、DRY原則に基づきここに集約する。
+ */
+export const UPDATE_FREQUENCY_LABELS: Record<UpdateFrequency, string> = {
+  REALTIME: "即時",
+  DAILY: "日次まとめ",
+  WEEKLY: "週次まとめ",
+};
+
+/**
  * POST /api/v1/subscriptions リクエスト（設計書⑤、S18「購読国・タイプ・頻度」）。
  * jurisdiction/regulationTypeを省略した場合はそれぞれ「全国」「全タイプ」購読を意味する。
  */
@@ -77,3 +87,21 @@ export const subscriptionResponseSchema = z.object({
   createdAt: z.string().datetime(),
 });
 export type SubscriptionResponse = z.infer<typeof subscriptionResponseSchema>;
+
+/**
+ * 購読一覧応答（GET /api/v1/subscriptions）。設計書⑤に明記は無いが、S18「既存購読の一覧・解除」に
+ * 必要なためユーザー承認済みで追加。1ユーザーあたりの購読件数は少数想定のためページネーションは行わない
+ * （classification_mappings一覧と同様の判断）。
+ */
+export const subscriptionListResponseSchema = z.object({
+  items: z.array(subscriptionResponseSchema),
+});
+export type SubscriptionListResponse = z.infer<typeof subscriptionListResponseSchema>;
+
+/**
+ * 購読パラメータ（DELETE /api/v1/subscriptions/:id、UUID検証）。
+ */
+export const subscriptionIdParamSchema = z.object({
+  id: z.string().uuid(),
+});
+export type SubscriptionIdParam = z.infer<typeof subscriptionIdParamSchema>;

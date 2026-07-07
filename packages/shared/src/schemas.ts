@@ -318,6 +318,22 @@ export const courseListResponseSchema = z.object({
 export type CourseListResponse = z.infer<typeof courseListResponseSchema>;
 
 /**
+ * 学習コース詳細応答（設計書⑤に明記は無いがS10のコース詳細（レッスン一覧）画面表示に必要なため
+ * ユーザー承認済みで追加、GET /api/v1/courses/:id）。classificationResponseSchema同様、
+ * コースに詳細固有の追加フィールドは無いためcourseSummaryResponseSchemaと同一。
+ */
+export const courseDetailResponseSchema = courseSummaryResponseSchema;
+export type CourseDetailResponse = z.infer<typeof courseDetailResponseSchema>;
+
+/**
+ * コースパラメータ（設計書⑤に明記は無いGET /api/v1/courses/:id、UUID検証）。
+ */
+export const courseIdParamSchema = z.object({
+  id: z.string().uuid(),
+});
+export type CourseIdParam = z.infer<typeof courseIdParamSchema>;
+
+/**
  * レッスン一覧項目応答（設計書④ lessons 準拠、GET /api/v1/lessons、S11）。
  * 本文(body)は一覧では返さず、詳細取得時に返す（regulation_versions一覧のfullText扱いに準拠）。
  */
@@ -443,6 +459,45 @@ export const progressResponseSchema = z.object({
   completedAt: z.string().datetime().nullable(),
 });
 export type ProgressResponse = z.infer<typeof progressResponseSchema>;
+
+/**
+ * 学習進捗サマリ応答（GET /api/v1/progress/summary、S04「学習進捗」・S13準拠）。
+ * 設計書⑤の主要エンドポイント一覧に明記は無いが、進捗POSTと対で集計取得が必要なためユーザー承認済みで追加。
+ * 全レッスン数に対する完了・進行中の件数を返す（コース別内訳は今回のスコープ外）。
+ */
+export const progressSummaryResponseSchema = z.object({
+  totalLessons: z.number().int().min(0),
+  completedCount: z.number().int().min(0),
+  inProgressCount: z.number().int().min(0),
+});
+export type ProgressSummaryResponse = z.infer<typeof progressSummaryResponseSchema>;
+
+/**
+ * GET /api/v1/progress クエリ（設計書⑤に明記は無いがS13「修了状況・スコア」一覧表示に必要なため
+ * ユーザー承認済みで追加、カーソルページネーション準拠）。ログイン中のユーザー自身に限定するため
+ * userIdなどの絞り込み条件は持たない。
+ */
+export const listProgressQuerySchema = cursorPaginationQuerySchema;
+export type ListProgressQuery = z.infer<typeof listProgressQuerySchema>;
+
+/**
+ * 学習進捗一覧項目応答（GET /api/v1/progress、S13）。レッスン名・コース名を含めて一覧表示できるようにする。
+ */
+export const progressListItemResponseSchema = progressResponseSchema.extend({
+  lessonTitle: z.string(),
+  courseId: z.string().uuid(),
+  courseTitle: z.string(),
+});
+export type ProgressListItemResponse = z.infer<typeof progressListItemResponseSchema>;
+
+/**
+ * カーソルページネーション応答（学習進捗一覧、GET /api/v1/progress）。
+ */
+export const progressListResponseSchema = z.object({
+  items: z.array(progressListItemResponseSchema),
+  nextCursor: z.string().nullable(),
+});
+export type ProgressListResponse = z.infer<typeof progressListResponseSchema>;
 
 /**
  * GET /api/v1/search スコープ（設計書⑤ ?scope=all|regulation|jmdn|generic-name|learning 準拠）。

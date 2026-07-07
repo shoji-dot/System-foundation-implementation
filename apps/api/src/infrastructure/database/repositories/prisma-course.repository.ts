@@ -36,6 +36,12 @@ export class PrismaCourseRepository implements CourseRepository {
     };
   }
 
+  async findById(id: string): Promise<Course | null> {
+    const record = await this.prisma.course.findUnique({ where: { id } });
+
+    return record ? this.toDomain(record) : null;
+  }
+
   private toDomain(record: PrismaCourse): Course {
     return {
       id: record.id,
