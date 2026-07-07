@@ -3,9 +3,11 @@ import type { Lesson as PrismaLesson, Prisma } from "@prisma/client";
 
 import type { Lesson, LessonSummary } from "../../../core/domain/lesson.entity";
 import type {
+  CreateLessonInput,
   LessonListFilters,
   LessonListResult,
   LessonRepository,
+  UpdateLessonInput,
 } from "../../../core/domain/lesson.repository";
 import { PrismaService } from "../prisma.service";
 
@@ -47,6 +49,44 @@ export class PrismaLessonRepository implements LessonRepository {
       return null;
     }
     return this.toFullDomain(record);
+  }
+
+  async findByCourseIdAndOrder(courseId: string, order: number): Promise<Lesson | null> {
+    const record = await this.prisma.lesson.findUnique({
+      where: { courseId_order: { courseId, order } },
+    });
+
+    return record ? this.toFullDomain(record) : null;
+  }
+
+  async create(input: CreateLessonInput): Promise<Lesson> {
+    const record = await this.prisma.lesson.create({
+      data: {
+        courseId: input.courseId,
+        title: input.title,
+        body: input.body,
+        order: input.order,
+      },
+    });
+
+    return this.toFullDomain(record);
+  }
+
+  async update(id: string, input: UpdateLessonInput): Promise<Lesson> {
+    const record = await this.prisma.lesson.update({
+      where: { id },
+      data: {
+        ...(input.title !== undefined ? { title: input.title } : {}),
+        ...(input.body !== undefined ? { body: input.body } : {}),
+        ...(input.order !== undefined ? { order: input.order } : {}),
+      },
+    });
+
+    return this.toFullDomain(record);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.lesson.delete({ where: { id } });
   }
 
   private toDomain(record: PrismaLesson): LessonSummary {

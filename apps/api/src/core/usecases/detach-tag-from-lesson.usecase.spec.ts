@@ -13,6 +13,7 @@ describe("DetachTagFromLessonUsecase", () => {
       create: jest.fn(),
       exists: jest.fn(),
       delete: jest.fn(),
+      deleteAllForTaggable: jest.fn(),
       listTagsForTaggable: jest.fn(),
     };
     const usecase = new DetachTagFromLessonUsecase(taggingRepository);

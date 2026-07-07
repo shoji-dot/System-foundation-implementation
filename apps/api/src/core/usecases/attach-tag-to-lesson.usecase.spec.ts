@@ -29,6 +29,10 @@ describe("AttachTagToLessonUsecase", () => {
     const lessonRepository: jest.Mocked<LessonRepository> = {
       findMany: jest.fn(),
       findDetailById: jest.fn(),
+      findByCourseIdAndOrder: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
     };
     const tagRepository: jest.Mocked<TagRepository> = {
       create: jest.fn(),
@@ -42,6 +46,7 @@ describe("AttachTagToLessonUsecase", () => {
       create: jest.fn(),
       exists: jest.fn(),
       delete: jest.fn(),
+      deleteAllForTaggable: jest.fn(),
       listTagsForTaggable: jest.fn(),
     };
     const usecase = new AttachTagToLessonUsecase(

@@ -27,6 +27,10 @@ describe("DeleteCourseUsecase", () => {
     const lessonRepository: jest.Mocked<LessonRepository> = {
       findMany: jest.fn(),
       findDetailById: jest.fn(),
+      findByCourseIdAndOrder: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
     };
     const usecase = new DeleteCourseUsecase(courseRepository, lessonRepository);
     return { usecase, courseRepository, lessonRepository };
