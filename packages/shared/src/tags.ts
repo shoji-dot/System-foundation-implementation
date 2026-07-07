@@ -59,3 +59,37 @@ export const tagIdParamSchema = z.object({
   id: z.string().uuid(),
 });
 export type TagIdParam = z.infer<typeof tagIdParamSchema>;
+
+/**
+ * レッスンIDパラメータ（GET/POST /api/v1/admin/lessons/:lessonId/tags 共通）。
+ */
+export const lessonTagsParamSchema = z.object({
+  lessonId: z.string().uuid(),
+});
+export type LessonTagsParam = z.infer<typeof lessonTagsParamSchema>;
+
+/**
+ * レッスンID・タグIDパラメータ（DELETE /api/v1/admin/lessons/:lessonId/tags/:tagId）。
+ */
+export const lessonTagParamSchema = z.object({
+  lessonId: z.string().uuid(),
+  tagId: z.string().uuid(),
+});
+export type LessonTagParam = z.infer<typeof lessonTagParamSchema>;
+
+/**
+ * POST /api/v1/admin/lessons/:lessonId/tags リクエストボディ。
+ */
+export const attachTagToLessonRequestSchema = z.object({
+  tagId: z.string().uuid(),
+});
+export type AttachTagToLessonRequest = z.infer<typeof attachTagToLessonRequestSchema>;
+
+/**
+ * レッスンに付与されたタグ一覧応答。件数が少ないためカーソルページネーションは行わない
+ * （プロジェクトタスク一覧 projectTaskListResponseSchema と同様の方針）。
+ */
+export const lessonTagListResponseSchema = z.object({
+  items: z.array(tagResponseSchema),
+});
+export type LessonTagListResponse = z.infer<typeof lessonTagListResponseSchema>;
