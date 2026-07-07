@@ -107,7 +107,9 @@ describe("CoursesController", () => {
     });
 
     it("propagates NotFoundException from the usecase", async () => {
-      detailExecute.mockRejectedValue(new NotFoundException("指定された学習コースが見つかりません。"));
+      detailExecute.mockRejectedValue(
+        new NotFoundException("指定された学習コースが見つかりません。"),
+      );
 
       await expect(
         controller.detail({ id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e6a" }),

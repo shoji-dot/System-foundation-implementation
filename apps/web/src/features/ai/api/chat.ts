@@ -187,7 +187,10 @@ function handleSseEvent(rawEvent: string, handlers: ChatStreamHandlers): void {
       handlers.onDone(payload.sessionId as string, payload.messageId as string);
       break;
     case "error":
-      throw new ChatApiError((payload.detail as string) ?? "回答の生成中にエラーが発生しました。", 500);
+      throw new ChatApiError(
+        (payload.detail as string) ?? "回答の生成中にエラーが発生しました。",
+        500,
+      );
     default:
       break;
   }

@@ -34,7 +34,9 @@ export function ClassifyPanel() {
       setCandidates(response.candidates);
       setSearched(true);
     } catch (cause) {
-      setError(cause instanceof ClassifyApiError ? cause.message : "分類候補の取得に失敗しました。");
+      setError(
+        cause instanceof ClassifyApiError ? cause.message : "分類候補の取得に失敗しました。",
+      );
       setCandidates(null);
     } finally {
       setIsLoading(false);
@@ -44,7 +46,10 @@ export function ClassifyPanel() {
   return (
     <div className="flex h-full flex-col gap-4">
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <label htmlFor="classify-description" className="text-[13px] font-medium text-text-secondary">
+        <label
+          htmlFor="classify-description"
+          className="text-[13px] font-medium text-text-secondary"
+        >
           医療機器の概要を入力してください
         </label>
         <textarea
@@ -59,11 +64,7 @@ export function ClassifyPanel() {
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
           ].join(" ")}
         />
-        <Button
-          type="submit"
-          disabled={isLoading || !description.trim()}
-          className="self-start"
-        >
+        <Button type="submit" disabled={isLoading || !description.trim()} className="self-start">
           {isLoading ? "検索中…" : "候補を検索"}
         </Button>
       </form>

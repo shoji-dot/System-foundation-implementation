@@ -65,10 +65,7 @@ export class ChatWithAiUsecase {
     private readonly chatCompletionProvider: ChatCompletionProvider,
   ) {}
 
-  async execute(
-    input: ChatWithAiInput,
-    onEvent: (event: ChatWithAiEvent) => void,
-  ): Promise<void> {
+  async execute(input: ChatWithAiInput, onEvent: (event: ChatWithAiEvent) => void): Promise<void> {
     const quota = await this.quotaLimiter.consume(input.userId, input.plan);
     if (!quota.allowed) {
       throw new HttpException(
@@ -204,12 +201,10 @@ export class ChatWithAiUsecase {
 
     return [
       { role: "system", content: systemPrompt },
-      ...history.map(
-        (message): ChatCompletionMessage => ({
-          role: message.role === "USER" ? "user" : "assistant",
-          content: message.content,
-        }),
-      ),
+      ...history.map((message): ChatCompletionMessage => ({
+        role: message.role === "USER" ? "user" : "assistant",
+        content: message.content,
+      })),
     ];
   }
 }

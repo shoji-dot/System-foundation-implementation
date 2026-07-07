@@ -1,4 +1,7 @@
-import type { ClassificationJurisdictionSummary, ClassificationScheme } from "./classification.entity";
+import type {
+  ClassificationJurisdictionSummary,
+  ClassificationScheme,
+} from "./classification.entity";
 
 /**
  * リポジトリはインターフェースを domain 側に定義する（設計書③、Repository Pattern）。

@@ -23,10 +23,7 @@ export function RegulationSections({ sections, fullText }: RegulationSectionsPro
     <div className="flex flex-col gap-4">
       {sections.map((section) => (
         <section key={section.id} aria-labelledby={`section-${section.id}`}>
-          <h3
-            id={`section-${section.id}`}
-            className="text-[14px] font-medium text-text-secondary"
-          >
+          <h3 id={`section-${section.id}`} className="text-[14px] font-medium text-text-secondary">
             {section.path} {section.heading}
           </h3>
           <p className="mt-1 rounded-sm border border-border bg-surface p-4 text-[14px] whitespace-pre-wrap text-text">

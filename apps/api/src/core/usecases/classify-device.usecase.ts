@@ -133,7 +133,9 @@ export class ClassifyDeviceUsecase {
     }
 
     return (parsed as { candidates: unknown[] }).candidates
-      .filter((item): item is LlmRankedCandidate => this.isValidRankedCandidate(item, shortlistSize))
+      .filter((item): item is LlmRankedCandidate =>
+        this.isValidRankedCandidate(item, shortlistSize),
+      )
       .map((item) => ({ ...item, confidence: Math.min(Math.max(item.confidence, 0), 1) }));
   }
 

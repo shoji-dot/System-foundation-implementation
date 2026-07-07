@@ -48,28 +48,26 @@ describe("AiChatController", () => {
   }
 
   it("streams citations/token/done as SSE frames and ends the response", async () => {
-    const execute = jest.fn(
-      async (_input: unknown, onEvent: (event: ChatWithAiEvent) => void) => {
-        onEvent({
-          type: "citations",
-          citations: [
-            {
-              sectionId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5d",
-              regulationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5e",
-              regulationTitle: "医薬品医療機器等法",
-              jurisdiction: { code: "JP", name: "日本" },
-              versionNo: 1,
-              effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
-              effectiveTo: null,
-              path: "第23条の2",
-              heading: "製造販売業の許可",
-            },
-          ],
-        });
-        onEvent({ type: "token", token: "回答です" });
-        onEvent({ type: "done", sessionId: "sess-1", messageId: "msg-1" });
-      },
-    );
+    const execute = jest.fn(async (_input: unknown, onEvent: (event: ChatWithAiEvent) => void) => {
+      onEvent({
+        type: "citations",
+        citations: [
+          {
+            sectionId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5d",
+            regulationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5e",
+            regulationTitle: "医薬品医療機器等法",
+            jurisdiction: { code: "JP", name: "日本" },
+            versionNo: 1,
+            effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
+            effectiveTo: null,
+            path: "第23条の2",
+            heading: "製造販売業の許可",
+          },
+        ],
+      });
+      onEvent({ type: "token", token: "回答です" });
+      onEvent({ type: "done", sessionId: "sess-1", messageId: "msg-1" });
+    });
     const controller = createController(execute);
     const res = createMockResponse();
 
@@ -81,7 +79,9 @@ describe("AiChatController", () => {
     const writtenFrames = res.write.mock.calls.map((call) => call[0] as string);
     expect(writtenFrames[0]).toContain("event: citations");
     expect(writtenFrames[0]).toContain("第23条の2");
-    expect(writtenFrames[1]).toBe(`event: token\ndata: ${JSON.stringify({ token: "回答です" })}\n\n`);
+    expect(writtenFrames[1]).toBe(
+      `event: token\ndata: ${JSON.stringify({ token: "回答です" })}\n\n`,
+    );
     expect(writtenFrames[2]).toBe(
       `event: done\ndata: ${JSON.stringify({ sessionId: "sess-1", messageId: "msg-1" })}\n\n`,
     );
@@ -105,12 +105,10 @@ describe("AiChatController", () => {
   });
 
   it("emits an SSE error event (instead of rethrowing) when the usecase fails after streaming started", async () => {
-    const execute = jest.fn(
-      async (_input: unknown, onEvent: (event: ChatWithAiEvent) => void) => {
-        onEvent({ type: "citations", citations: [] });
-        throw new Error("OpenAI API failure");
-      },
-    );
+    const execute = jest.fn(async (_input: unknown, onEvent: (event: ChatWithAiEvent) => void) => {
+      onEvent({ type: "citations", citations: [] });
+      throw new Error("OpenAI API failure");
+    });
     const controller = createController(execute);
     const res = createMockResponse();
 

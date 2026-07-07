@@ -36,7 +36,10 @@ export async function classifyDevice(
 
   if (!response.ok) {
     const problem = (await response.json().catch(() => null)) as ProblemDetails | null;
-    throw new ClassifyApiError(problem?.detail ?? "分類候補の取得に失敗しました。", response.status);
+    throw new ClassifyApiError(
+      problem?.detail ?? "分類候補の取得に失敗しました。",
+      response.status,
+    );
   }
 
   return aiClassifyResponseSchema.parse(await response.json());

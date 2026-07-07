@@ -1,4 +1,7 @@
-import type { ClassificationJurisdictionSummary, ClassificationScheme } from "./classification.entity";
+import type {
+  ClassificationJurisdictionSummary,
+  ClassificationScheme,
+} from "./classification.entity";
 
 /**
  * 分類候補ドメインエンティティ（設計書⑤⑥ POST /api/v1/ai/classify「機器概要→候補分類提示」）。

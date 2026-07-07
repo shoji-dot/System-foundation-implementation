@@ -62,7 +62,9 @@ export function RegulationDiffViewer({ regulationId, versions }: RegulationDiffV
       const diff = await getRegulationDiff(session.accessToken, regulationId, from, to);
       setResult(diff);
     } catch (cause) {
-      setError(cause instanceof RegulationApiError ? cause.message : "改正差分の取得に失敗しました。");
+      setError(
+        cause instanceof RegulationApiError ? cause.message : "改正差分の取得に失敗しました。",
+      );
     } finally {
       setIsLoading(false);
     }

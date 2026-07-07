@@ -97,13 +97,21 @@ describe("ChatWithAiUsecase", () => {
     sessionRepository.findSessionOwnedByUser.mockResolvedValue(null);
 
     await expect(
-      usecase.execute({ userId, plan: "FREE", sessionId: "other-session", message: "質問" }, jest.fn()),
+      usecase.execute(
+        { userId, plan: "FREE", sessionId: "other-session", message: "質問" },
+        jest.fn(),
+      ),
     ).rejects.toThrow("指定されたチャットセッションが見つかりません。");
   });
 
   it("creates a new session (title truncated from the message) when sessionId is omitted", async () => {
-    const { usecase, sessionRepository, ragSearchRepository, embeddingProvider, chatCompletionProvider } =
-      setup();
+    const {
+      usecase,
+      sessionRepository,
+      ragSearchRepository,
+      embeddingProvider,
+      chatCompletionProvider,
+    } = setup();
     embeddingProvider.embed.mockResolvedValue([0.1]);
     ragSearchRepository.hybridSearch.mockResolvedValue([hit]);
     chatCompletionProvider.streamComplete.mockImplementation(async (_messages, onToken) => {
@@ -111,7 +119,10 @@ describe("ChatWithAiUsecase", () => {
       return "回答本文";
     });
 
-    await usecase.execute({ userId, plan: "PRO", message: "承認申請の流れを教えてください" }, jest.fn());
+    await usecase.execute(
+      { userId, plan: "PRO", message: "承認申請の流れを教えてください" },
+      jest.fn(),
+    );
 
     expect(sessionRepository.createSession).toHaveBeenCalledWith(
       userId,

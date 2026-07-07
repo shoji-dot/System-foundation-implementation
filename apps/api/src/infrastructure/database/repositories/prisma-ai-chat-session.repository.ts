@@ -51,10 +51,7 @@ export class PrismaAiChatSessionRepository implements AiChatSessionRepository {
     return messages.reverse();
   }
 
-  async appendMessage(
-    sessionId: string,
-    message: NewAiChatMessage,
-  ): Promise<SavedAiChatMessage> {
+  async appendMessage(sessionId: string, message: NewAiChatMessage): Promise<SavedAiChatMessage> {
     const created = await this.prisma.aiChatMessage.create({
       data: {
         sessionId,
@@ -107,15 +104,13 @@ export class PrismaAiChatSessionRepository implements AiChatSessionRepository {
     const nextCursor = hasMore ? (page[page.length - 1]?.id ?? null) : null;
 
     return {
-      items: page.map(
-        (record): AiChatMessage => ({
-          id: record.id,
-          role: record.role,
-          content: record.content,
-          citations: this.parseCitations(record.citations),
-          createdAt: record.createdAt,
-        }),
-      ),
+      items: page.map((record): AiChatMessage => ({
+        id: record.id,
+        role: record.role,
+        content: record.content,
+        citations: this.parseCitations(record.citations),
+        createdAt: record.createdAt,
+      })),
       nextCursor,
     };
   }

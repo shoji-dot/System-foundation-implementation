@@ -31,9 +31,7 @@ interface ClassificationsPageProps {
  * S06と同様、フィルタは`<form method="get">`によるサーバーコンポーネントのままの実装とする
  * （クライアントJS不要、フィルタ変更時はcursorが自然にリセットされる）。
  */
-export default async function ClassificationsListPage({
-  searchParams,
-}: ClassificationsPageProps) {
+export default async function ClassificationsListPage({ searchParams }: ClassificationsPageProps) {
   const session = await auth();
   if (!session) {
     redirect("/login");

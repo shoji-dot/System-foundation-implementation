@@ -44,7 +44,9 @@ export function QuizPlayer({ lessonId, quiz }: QuizPlayerProps) {
     setSubmitted(true);
 
     if (!session?.accessToken) {
-      setError("セッションが切れています。再度ログインしてください（結果は記録されませんでした）。");
+      setError(
+        "セッションが切れています。再度ログインしてください（結果は記録されませんでした）。",
+      );
       return;
     }
 
@@ -57,9 +59,7 @@ export function QuizPlayer({ lessonId, quiz }: QuizPlayerProps) {
       });
       setProgressStatus("done");
     } catch (cause) {
-      setError(
-        cause instanceof ProgressApiError ? cause.message : "結果の記録に失敗しました。",
-      );
+      setError(cause instanceof ProgressApiError ? cause.message : "結果の記録に失敗しました。");
       setProgressStatus("idle");
     }
   };
@@ -91,9 +91,7 @@ export function QuizPlayer({ lessonId, quiz }: QuizPlayerProps) {
                       value={choice.id}
                       checked={selected === choice.id}
                       disabled={submitted}
-                      onChange={() =>
-                        setAnswers((prev) => ({ ...prev, [question.id]: choice.id }))
-                      }
+                      onChange={() => setAnswers((prev) => ({ ...prev, [question.id]: choice.id }))}
                       className="h-5 w-5 accent-accent"
                     />
                     <span>{choice.text}</span>

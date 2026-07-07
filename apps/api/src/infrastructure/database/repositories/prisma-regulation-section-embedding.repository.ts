@@ -13,9 +13,7 @@ import { PrismaService } from "../prisma.service";
  * '[0.1,0.2,...]' を vector へキャストする）。
  */
 @Injectable()
-export class PrismaRegulationSectionEmbeddingRepository
-  implements RegulationSectionEmbeddingRepository
-{
+export class PrismaRegulationSectionEmbeddingRepository implements RegulationSectionEmbeddingRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findManyWithoutEmbedding(limit: number): Promise<RegulationSectionForEmbedding[]> {

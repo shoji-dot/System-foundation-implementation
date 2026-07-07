@@ -13,7 +13,9 @@ interface ClassificationMappingListProps {
  */
 export function ClassificationMappingList({ items }: ClassificationMappingListProps) {
   if (items.length === 0) {
-    return <p className="text-[14px] text-text-secondary">登録されている各国マッピングはありません。</p>;
+    return (
+      <p className="text-[14px] text-text-secondary">登録されている各国マッピングはありません。</p>
+    );
   }
 
   return (

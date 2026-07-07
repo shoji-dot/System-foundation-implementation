@@ -44,9 +44,7 @@ async function loadDetail(accessToken: string, classificationId: string) {
  * 対応する（バックエンド未実装のため今回は対象外、regulation_relations同様の判断）。
  * S08一覧（実装済み）から遷移するため戻り導線を持つ。
  */
-export default async function ClassificationDetailPage({
-  params,
-}: ClassificationDetailPageProps) {
+export default async function ClassificationDetailPage({ params }: ClassificationDetailPageProps) {
   const session = await auth();
   if (!session) {
     redirect("/login");

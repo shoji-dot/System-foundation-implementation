@@ -66,7 +66,9 @@ export default async function CourseDetailPage({ params, searchParams }: CourseD
       <section>
         <h2 className="mb-2 text-[18px] font-semibold text-text">レッスン</h2>
         {lessons.items.length === 0 ? (
-          <p className="text-[14px] text-text-secondary">このコースにはまだレッスンがありません。</p>
+          <p className="text-[14px] text-text-secondary">
+            このコースにはまだレッスンがありません。
+          </p>
         ) : (
           <ul className="flex flex-col gap-3">
             {lessons.items.map((lesson) => (

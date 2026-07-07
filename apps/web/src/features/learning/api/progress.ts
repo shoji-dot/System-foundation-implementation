@@ -94,13 +94,10 @@ export async function listLearningProgress(
   }
   const queryString = query.toString();
 
-  const response = await fetch(
-    `${API_BASE_URL}/progress${queryString ? `?${queryString}` : ""}`,
-    {
-      headers: { Authorization: `Bearer ${accessToken}` },
-      cache: "no-store",
-    },
-  );
+  const response = await fetch(`${API_BASE_URL}/progress${queryString ? `?${queryString}` : ""}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
 
   if (!response.ok) {
     await parseProblemOrThrow(response, "学習進捗一覧の取得に失敗しました。");

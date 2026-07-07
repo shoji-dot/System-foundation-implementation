@@ -23,9 +23,9 @@ describe("ListAiChatMessagesUsecase", () => {
     const { usecase, sessionRepository } = setup();
     sessionRepository.findSessionOwnedByUser.mockResolvedValue(null);
 
-    await expect(
-      usecase.execute({ userId, sessionId, limit: 20 }),
-    ).rejects.toThrow("指定されたチャットセッションが見つかりません。");
+    await expect(usecase.execute({ userId, sessionId, limit: 20 })).rejects.toThrow(
+      "指定されたチャットセッションが見つかりません。",
+    );
     expect(sessionRepository.findMessages).not.toHaveBeenCalled();
   });
 

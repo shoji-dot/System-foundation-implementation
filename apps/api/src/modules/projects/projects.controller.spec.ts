@@ -189,11 +189,15 @@ describe("ProjectsController", () => {
         updatedAt: new Date("2026-07-05T00:00:00.000Z"),
       });
 
-      const result = await controller.createTask(request, { id: project.id }, {
-        title: "添付文書案の作成",
-        dueDate: "2026-08-01",
-        assignee: "山田",
-      });
+      const result = await controller.createTask(
+        request,
+        { id: project.id },
+        {
+          title: "添付文書案の作成",
+          dueDate: "2026-08-01",
+          assignee: "山田",
+        },
+      );
 
       expect(createTaskExecute).toHaveBeenCalledWith({
         userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b",

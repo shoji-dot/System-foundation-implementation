@@ -77,6 +77,9 @@ export async function deleteSubscription(accessToken: string, id: string): Promi
 
   if (!response.ok) {
     const problem = (await response.json().catch(() => null)) as ProblemDetails | null;
-    throw new SubscriptionApiError(problem?.detail ?? "購読の解除に失敗しました。", response.status);
+    throw new SubscriptionApiError(
+      problem?.detail ?? "購読の解除に失敗しました。",
+      response.status,
+    );
   }
 }

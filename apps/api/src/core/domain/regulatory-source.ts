@@ -70,8 +70,5 @@ export interface RegulatorySource {
    * 一覧取得時点のSourceListItemが保持しているため、両方を受け取る形とする
    * （PDF/HTML本文からタイトル・日付を再抽出するのは不安定なため避ける）。
    */
-  normalize(
-    item: SourceListItem,
-    document: SourceDocument,
-  ): Promise<NormalizedRegulationDocument>;
+  normalize(item: SourceListItem, document: SourceDocument): Promise<NormalizedRegulationDocument>;
 }

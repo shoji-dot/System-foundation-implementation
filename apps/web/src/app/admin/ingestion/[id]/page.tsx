@@ -88,10 +88,7 @@ export default async function IngestionReviewDetailPage({
 
       <section>
         <h2 className="mb-2 text-[18px] font-semibold text-text">本文差分</h2>
-        <DiffView
-          oldText={detail.currentPublished?.fullText ?? null}
-          newText={detail.fullText}
-        />
+        <DiffView oldText={detail.currentPublished?.fullText ?? null} newText={detail.fullText} />
       </section>
 
       <section>

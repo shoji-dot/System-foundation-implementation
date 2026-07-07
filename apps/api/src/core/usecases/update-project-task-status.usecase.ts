@@ -33,10 +33,7 @@ export class UpdateProjectTaskStatusUsecase {
       throw new NotFoundException("指定されたプロジェクトが見つかりません。");
     }
 
-    const task = await this.projectTaskRepository.findByIdForProject(
-      input.taskId,
-      input.projectId,
-    );
+    const task = await this.projectTaskRepository.findByIdForProject(input.taskId, input.projectId);
     if (!task) {
       throw new NotFoundException("指定されたタスクが見つかりません。");
     }

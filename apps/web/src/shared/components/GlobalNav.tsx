@@ -66,7 +66,12 @@ export function GlobalNav() {
         className="fixed inset-x-0 bottom-0 z-10 flex h-14 border-t border-border bg-bg md:hidden"
       >
         {NAV_ITEMS.map((item) => (
-          <NavLink key={item.href} item={item} active={isActive(pathname, item.href)} variant="mobile" />
+          <NavLink
+            key={item.href}
+            item={item}
+            active={isActive(pathname, item.href)}
+            variant="mobile"
+          />
         ))}
       </nav>
 
@@ -75,7 +80,12 @@ export function GlobalNav() {
         className="fixed inset-y-0 left-0 z-10 hidden w-56 flex-col gap-1 border-r border-border bg-bg p-4 md:flex"
       >
         {NAV_ITEMS.map((item) => (
-          <NavLink key={item.href} item={item} active={isActive(pathname, item.href)} variant="desktop" />
+          <NavLink
+            key={item.href}
+            item={item}
+            active={isActive(pathname, item.href)}
+            variant="desktop"
+          />
         ))}
       </nav>
     </>

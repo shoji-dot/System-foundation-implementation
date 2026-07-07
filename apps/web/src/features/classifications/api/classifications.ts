@@ -32,10 +32,7 @@ export class ClassificationApiError extends Error {
   }
 }
 
-async function parseProblemOrThrow(
-  response: Response,
-  fallbackMessage: string,
-): Promise<never> {
+async function parseProblemOrThrow(response: Response, fallbackMessage: string): Promise<never> {
   const problem = (await response.json().catch(() => null)) as ProblemDetails | null;
   throw new ClassificationApiError(problem?.detail ?? fallbackMessage, response.status);
 }
