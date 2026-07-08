@@ -9,6 +9,7 @@ import { PrismaModule } from "../../infrastructure/database/prisma.module";
 import { PrismaIngestionJobRepository } from "../../infrastructure/database/repositories/prisma-ingestion-job.repository";
 import { PrismaRegulationIngestionRepository } from "../../infrastructure/database/repositories/prisma-regulation-ingestion.repository";
 import { FdaRegulatorySource } from "../../infrastructure/external/regulatory-sources/fda.regulatory-source";
+import { MdcgRegulatorySource } from "../../infrastructure/external/regulatory-sources/mdcg.regulatory-source";
 import { PmdaRegulatorySource } from "../../infrastructure/external/regulatory-sources/pmda.regulatory-source";
 
 import { INGESTION_QUEUE_NAME } from "./ingestion.constants";
@@ -25,6 +26,9 @@ import { IngestionScheduler } from "./ingestion.scheduler";
  * providers/useFactoryにAdapterを1行追加するだけでよい）。
  * 2026-07-08（同日）: FdaRegulatorySource（US、Federal Register API）を追加し、稼働Adapterが
  * PMDA（JP）・FDA（US）の2件になった（設計書⑮ Phase6「多国Adapter追加(US/EUから)」）。
+ * 2026-07-08（同日）: MdcgRegulatorySource（EU、MDCGガイダンス一覧）を追加し、JP/US/EUの3件に
+ * なった（設計書⑮ Phase6「多国Adapter追加(US/EUから)」完了。EUR-Lex法令本体は別Adapterとして
+ * 別途検討、MdcgRegulatorySourceのクラスdocコメント参照）。
  */
 @Module({
   imports: [PrismaModule, BullModule.registerQueue({ name: INGESTION_QUEUE_NAME })],
@@ -34,10 +38,15 @@ import { IngestionScheduler } from "./ingestion.scheduler";
     IngestionScheduler,
     PmdaRegulatorySource,
     FdaRegulatorySource,
+    MdcgRegulatorySource,
     {
       provide: REGULATORY_SOURCES,
-      useFactory: (pmda: PmdaRegulatorySource, fda: FdaRegulatorySource) => [pmda, fda],
-      inject: [PmdaRegulatorySource, FdaRegulatorySource],
+      useFactory: (
+        pmda: PmdaRegulatorySource,
+        fda: FdaRegulatorySource,
+        mdcg: MdcgRegulatorySource,
+      ) => [pmda, fda, mdcg],
+      inject: [PmdaRegulatorySource, FdaRegulatorySource, MdcgRegulatorySource],
     },
     { provide: INGESTION_JOB_REPOSITORY, useClass: PrismaIngestionJobRepository },
     { provide: REGULATION_INGESTION_REPOSITORY, useClass: PrismaRegulationIngestionRepository },
