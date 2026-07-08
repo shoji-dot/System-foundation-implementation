@@ -8,13 +8,21 @@ interface UpdateFeedWidgetProps {
 
 /**
  * S04「更新フィード」ウィジェット（設計書⑫、GET /api/v1/updates の最新n件）。
- * S17（更新情報フィード一覧画面）は未実装のため「すべて見る」導線は持たない。
+ * 「すべて見る」でS17（更新情報フィード一覧、`/updates`）へ遷移する。
  * 項目タップでS07（法令詳細）へ遷移する（設計書⑬「S17 ─ S07（新着タップ）」に準拠、S07実装済み）。
  */
 export function UpdateFeedWidget({ items, errorMessage }: UpdateFeedWidgetProps) {
   return (
     <section className="flex flex-col gap-3 rounded-lg bg-surface p-4">
-      <h2 className="text-[16px] font-semibold text-text">更新フィード</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-[16px] font-semibold text-text">更新フィード</h2>
+        <Link
+          href="/updates"
+          className="flex min-h-[44px] items-center text-[14px] font-medium text-accent hover:underline"
+        >
+          すべて見る
+        </Link>
+      </div>
       {errorMessage ? (
         <p className="text-[14px] text-danger">{errorMessage}</p>
       ) : items.length === 0 ? (
