@@ -78,6 +78,7 @@ export class ProjectsController {
   ): Promise<ProjectResponse> {
     const project = await this.createProjectUsecase.execute({
       userId: request.user.userId,
+      plan: request.user.plan,
       name: body.name,
       deviceClass: body.deviceClass,
       targetJurisdictions: body.targetJurisdictions,

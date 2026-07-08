@@ -59,6 +59,7 @@ export class SubscriptionsController {
   ): Promise<SubscriptionResponse> {
     const subscription = await this.createUpdateSubscriptionUsecase.execute({
       userId: request.user.userId,
+      plan: request.user.plan,
       jurisdiction: body.jurisdiction,
       regulationType: body.regulationType,
       frequency: body.frequency,

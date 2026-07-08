@@ -20,6 +20,7 @@ describe("DeleteSubscriptionUsecase", () => {
       findManyForUser: jest.fn(),
       findById: jest.fn(),
       delete: jest.fn(),
+      countForUser: jest.fn(),
     };
     const usecase = new DeleteSubscriptionUsecase(updateSubscriptionRepository);
     return { usecase, updateSubscriptionRepository };

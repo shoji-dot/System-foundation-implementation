@@ -103,3 +103,28 @@ jobs:
 
       - name: API e2e tests
         run: pnpm --filter @yakuji/api test:e2e
+
+  security-audit:
+    name: Security Audit (dependency vulnerabilities)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # NOTE: 現時点で@nestjs系の推移依存にhigh重度の既知脆弱性が複数存在するため（2026-07-08時点で
+      # 本番依存11件、lodash/multer/tar等）、ユーザー承認済み方針として非ブロッキングで可視化のみ行う。
+      # continue-on-error を外せばブロッキング化できる（既存脆弱性の修正/pin後に切り替える想定）。
+      - name: pnpm audit (high severity, non-blocking)
+        run: pnpm audit --audit-level=high
+        continue-on-error: true

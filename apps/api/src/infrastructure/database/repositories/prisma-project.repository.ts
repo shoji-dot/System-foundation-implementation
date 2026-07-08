@@ -58,6 +58,10 @@ export class PrismaProjectRepository implements ProjectRepository {
     return record ? this.toDomain(record) : null;
   }
 
+  async countForUser(userId: string): Promise<number> {
+    return this.prisma.project.count({ where: { userId } });
+  }
+
   private toDomain(record: PrismaProject): Project {
     return {
       id: record.id,
