@@ -6,6 +6,7 @@ import type {
   CompleteOnboardingInput,
   ListUsersFilters,
   NewUser,
+  UpdateProfileInput,
   UserListResult,
   UserRepository,
 } from "../../../core/domain/user.repository";
@@ -81,6 +82,19 @@ export class PrismaUserRepository implements UserRepository {
         profession: input.profession,
         interestedJurisdictions: input.interestedJurisdictions,
         onboardingCompletedAt: new Date(),
+      },
+    });
+    return this.toDomain(record);
+  }
+
+  async updateProfile(id: string, input: UpdateProfileInput): Promise<User> {
+    const record = await this.prisma.user.update({
+      where: { id },
+      data: {
+        name: input.name,
+        locale: input.locale,
+        profession: input.profession,
+        interestedJurisdictions: input.interestedJurisdictions,
       },
     });
     return this.toDomain(record);

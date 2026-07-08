@@ -31,6 +31,7 @@ describe("SignupUserUsecase", () => {
       updateRole: jest.fn(),
       updatePlan: jest.fn(),
       completeOnboarding: jest.fn(),
+      updateProfile: jest.fn(),
     };
     const passwordHasher: jest.Mocked<PasswordHasher> = {
       hash: jest.fn(),
