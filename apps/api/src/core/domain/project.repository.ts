@@ -38,4 +38,6 @@ export interface ProjectRepository {
    * （Projectエンティティはuser_idを公開しないため、絞り込みはクエリ側で行う）。
    */
   findByIdForUser(id: string, userId: string): Promise<Project | null>;
+  /** 指定ユーザーが所有するプロジェクトの総数を返す（設計書⑦ エンタイトルメント: プラン別プロジェクト数上限の判定用）。 */
+  countForUser(userId: string): Promise<number>;
 }

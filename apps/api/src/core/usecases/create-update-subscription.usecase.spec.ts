@@ -21,18 +21,21 @@ describe("CreateUpdateSubscriptionUsecase", () => {
       findManyForUser: jest.fn(),
       findById: jest.fn(),
       delete: jest.fn(),
+      countForUser: jest.fn(),
     };
     const usecase = new CreateUpdateSubscriptionUsecase(updateSubscriptionRepository);
     return { usecase, updateSubscriptionRepository };
   }
 
-  it("creates a subscription when no duplicate exists", async () => {
+  it("creates a subscription when no duplicate exists and under the plan limit", async () => {
     const { usecase, updateSubscriptionRepository } = setup();
     updateSubscriptionRepository.existsForUser.mockResolvedValue(false);
+    updateSubscriptionRepository.countForUser.mockResolvedValue(0);
     updateSubscriptionRepository.create.mockResolvedValue(subscription);
 
     const result = await usecase.execute({
       userId: subscription.userId,
+      plan: "FREE",
       jurisdiction: "JP",
       regulationType: "NOTICE",
       frequency: "DAILY",
@@ -44,6 +47,7 @@ describe("CreateUpdateSubscriptionUsecase", () => {
       regulationType: "NOTICE",
       frequency: "DAILY",
     });
+    expect(updateSubscriptionRepository.countForUser).toHaveBeenCalledWith(subscription.userId);
     expect(updateSubscriptionRepository.create).toHaveBeenCalledWith({
       userId: subscription.userId,
       jurisdictionCode: "JP",
@@ -58,7 +62,7 @@ describe("CreateUpdateSubscriptionUsecase", () => {
     updateSubscriptionRepository.existsForUser.mockResolvedValue(true);
 
     await expect(
-      usecase.execute({ userId: subscription.userId, frequency: "DAILY" }),
+      usecase.execute({ userId: subscription.userId, plan: "FREE", frequency: "DAILY" }),
     ).rejects.toThrow("指定の条件では既に購読済みです。");
     expect(updateSubscriptionRepository.create).not.toHaveBeenCalled();
   });
@@ -66,13 +70,14 @@ describe("CreateUpdateSubscriptionUsecase", () => {
   it("supports a global subscription with no jurisdiction/regulationType", async () => {
     const { usecase, updateSubscriptionRepository } = setup();
     updateSubscriptionRepository.existsForUser.mockResolvedValue(false);
+    updateSubscriptionRepository.countForUser.mockResolvedValue(0);
     updateSubscriptionRepository.create.mockResolvedValue({
       ...subscription,
       jurisdiction: null,
       regulationType: null,
     });
 
-    await usecase.execute({ userId: subscription.userId, frequency: "WEEKLY" });
+    await usecase.execute({ userId: subscription.userId, plan: "FREE", frequency: "WEEKLY" });
 
     expect(updateSubscriptionRepository.existsForUser).toHaveBeenCalledWith({
       userId: subscription.userId,
@@ -80,5 +85,37 @@ describe("CreateUpdateSubscriptionUsecase", () => {
       regulationType: undefined,
       frequency: "WEEKLY",
     });
+  });
+
+  it("throws 403 and does not create when the FREE plan has reached the limit (3)", async () => {
+    const { usecase, updateSubscriptionRepository } = setup();
+    updateSubscriptionRepository.existsForUser.mockResolvedValue(false);
+    updateSubscriptionRepository.countForUser.mockResolvedValue(3);
+
+    await expect(
+      usecase.execute({ userId: subscription.userId, plan: "FREE", frequency: "DAILY" }),
+    ).rejects.toMatchObject({ status: 403 });
+    expect(updateSubscriptionRepository.create).not.toHaveBeenCalled();
+  });
+
+  it("throws 403 when the PRO plan has reached the limit (20)", async () => {
+    const { usecase, updateSubscriptionRepository } = setup();
+    updateSubscriptionRepository.existsForUser.mockResolvedValue(false);
+    updateSubscriptionRepository.countForUser.mockResolvedValue(20);
+
+    await expect(
+      usecase.execute({ userId: subscription.userId, plan: "PRO", frequency: "DAILY" }),
+    ).rejects.toMatchObject({ status: 403 });
+  });
+
+  it("never blocks the unlimited ENTERPRISE plan", async () => {
+    const { usecase, updateSubscriptionRepository } = setup();
+    updateSubscriptionRepository.existsForUser.mockResolvedValue(false);
+    updateSubscriptionRepository.countForUser.mockResolvedValue(10_000);
+    updateSubscriptionRepository.create.mockResolvedValue(subscription);
+
+    await usecase.execute({ userId: subscription.userId, plan: "ENTERPRISE", frequency: "DAILY" });
+
+    expect(updateSubscriptionRepository.create).toHaveBeenCalled();
   });
 });

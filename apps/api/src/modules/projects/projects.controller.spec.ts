@@ -50,7 +50,7 @@ describe("ProjectsController", () => {
   });
 
   const request = {
-    user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b" },
+    user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b", plan: "FREE" },
   } as AuthenticatedRequest;
 
   const project = {
@@ -102,6 +102,7 @@ describe("ProjectsController", () => {
 
       expect(createExecute).toHaveBeenCalledWith({
         userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b",
+        plan: "FREE",
         name: project.name,
         deviceClass: project.deviceClass,
         targetJurisdictions: project.targetJurisdictions,

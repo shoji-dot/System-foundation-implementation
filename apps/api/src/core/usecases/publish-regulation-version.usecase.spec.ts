@@ -64,6 +64,7 @@ describe("PublishRegulationVersionUsecase", () => {
       findManyForUser: jest.fn(),
       findById: jest.fn(),
       delete: jest.fn(),
+      countForUser: jest.fn(),
     };
     const notificationRepository: jest.Mocked<NotificationRepository> = {
       createMany: jest.fn(),

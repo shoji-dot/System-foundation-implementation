@@ -8,6 +8,7 @@ describe("ListProjectsUsecase", () => {
       findManyForUser: jest.fn(),
       create: jest.fn(),
       findByIdForUser: jest.fn(),
+      countForUser: jest.fn(),
     };
     const usecase = new ListProjectsUsecase(projectRepository);
     return { usecase, projectRepository };
