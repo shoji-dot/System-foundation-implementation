@@ -47,7 +47,7 @@ describe("SubscriptionsController", () => {
       });
 
       const request = {
-        user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b" },
+        user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b", plan: "FREE" },
       } as AuthenticatedRequest;
 
       const result = await controller.create(request, {
@@ -58,6 +58,7 @@ describe("SubscriptionsController", () => {
 
       expect(createExecute).toHaveBeenCalledWith({
         userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b",
+        plan: "FREE",
         jurisdiction: "JP",
         regulationType: "NOTICE",
         frequency: "DAILY",
@@ -82,7 +83,7 @@ describe("SubscriptionsController", () => {
       });
 
       const request = {
-        user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b" },
+        user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b", plan: "FREE" },
       } as AuthenticatedRequest;
 
       const result = await controller.create(request, { frequency: "WEEKLY" });
@@ -95,7 +96,7 @@ describe("SubscriptionsController", () => {
       createExecute.mockRejectedValue(new ConflictException("指定の条件では既に購読済みです。"));
 
       const request = {
-        user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b" },
+        user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b", plan: "FREE" },
       } as AuthenticatedRequest;
 
       await expect(controller.create(request, { frequency: "DAILY" })).rejects.toBeInstanceOf(
@@ -118,7 +119,7 @@ describe("SubscriptionsController", () => {
       ]);
 
       const request = {
-        user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b" },
+        user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b", plan: "FREE" },
       } as AuthenticatedRequest;
 
       const result = await controller.list(request);
@@ -143,7 +144,7 @@ describe("SubscriptionsController", () => {
       deleteExecute.mockResolvedValue(undefined);
 
       const request = {
-        user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b" },
+        user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b", plan: "FREE" },
       } as AuthenticatedRequest;
 
       await controller.remove(request, { id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a" });
@@ -158,7 +159,7 @@ describe("SubscriptionsController", () => {
       deleteExecute.mockRejectedValue(new NotFoundException("指定された購読が見つかりません。"));
 
       const request = {
-        user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b" },
+        user: { userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b", plan: "FREE" },
       } as AuthenticatedRequest;
 
       await expect(

@@ -97,6 +97,10 @@ export class PrismaUpdateSubscriptionRepository implements UpdateSubscriptionRep
     await this.prisma.updateSubscription.delete({ where: { id } });
   }
 
+  async countForUser(userId: string): Promise<number> {
+    return this.prisma.updateSubscription.count({ where: { userId } });
+  }
+
   private toDomain(record: UpdateSubscriptionWithJurisdiction): UpdateSubscription {
     return {
       id: record.id,
