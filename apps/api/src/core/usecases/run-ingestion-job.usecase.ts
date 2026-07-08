@@ -6,7 +6,6 @@ import { INGESTION_JOB_REPOSITORY } from "../domain/ingestion-job.repository";
 import type { RegulationIngestionRepository } from "../domain/regulation-ingestion.repository";
 import { REGULATION_INGESTION_REPOSITORY } from "../domain/regulation-ingestion.repository";
 import type { RegulatorySource, SourceListItem } from "../domain/regulatory-source";
-import { REGULATORY_SOURCE } from "../domain/regulatory-source";
 
 type ItemOutcome = "created" | "updated" | "unchanged" | "skipped";
 
@@ -25,29 +24,31 @@ const FETCH_INTERVAL_MS = 500;
  * 既知の制約: fetchListが返す全項目を毎回fetchDocumentする（設計書⑨の記述に忠実な実装）。
  * PMDA一覧は現状120件程度だが、件数増加時は取込元サーバーへの負荷を考慮し、
  * 既知sourceDocIdのスキップ等の最適化を別コミットで検討すること。
+ *
+ * 2026-07-08: 複数Adapter対応（US Adapter追加）にあわせ、対象のRegulatorySourceを
+ * コンストラクタ注入からexecute()の引数に変更した（1つのusecaseインスタンスを
+ * IngestionProcessorが全Adapterで使い回せるようにするため。設計書⑨「国追加=Adapter追加のみ」）。
  */
 @Injectable()
 export class RunIngestionJobUsecase {
   private readonly logger = new Logger(RunIngestionJobUsecase.name);
 
   constructor(
-    @Inject(REGULATORY_SOURCE)
-    private readonly source: RegulatorySource,
     @Inject(INGESTION_JOB_REPOSITORY)
     private readonly ingestionJobRepository: IngestionJobRepository,
     @Inject(REGULATION_INGESTION_REPOSITORY)
     private readonly regulationIngestionRepository: RegulationIngestionRepository,
   ) {}
 
-  async execute(): Promise<IngestionJob> {
+  async execute(source: RegulatorySource): Promise<IngestionJob> {
     const job = await this.ingestionJobRepository.create({
-      source: this.source.sourceId,
+      source: source.sourceId,
       status: "RUNNING",
       runAt: new Date(),
     });
 
     try {
-      const items = await this.source.fetchList();
+      const items = await source.fetchList();
       const counters: Record<ItemOutcome, number> = {
         created: 0,
         updated: 0,
@@ -56,7 +57,7 @@ export class RunIngestionJobUsecase {
       };
 
       for (const item of items) {
-        const outcome = await this.processItem(item);
+        const outcome = await this.processItem(source, item);
         counters[outcome] += 1;
         await this.sleep(FETCH_INTERVAL_MS);
       }
@@ -71,7 +72,7 @@ export class RunIngestionJobUsecase {
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      this.logger.error(`取込ジョブが失敗しました（source: ${this.source.sourceId}）: ${message}`);
+      this.logger.error(`取込ジョブが失敗しました（source: ${source.sourceId}）: ${message}`);
       return this.ingestionJobRepository.update(job.id, {
         status: "FAILED",
         errorMessage: message,
@@ -79,14 +80,14 @@ export class RunIngestionJobUsecase {
     }
   }
 
-  private async processItem(item: SourceListItem): Promise<ItemOutcome> {
+  private async processItem(source: RegulatorySource, item: SourceListItem): Promise<ItemOutcome> {
     if (!item.issuedAt) {
       this.logger.warn(`発出年月日を解釈できなかったためスキップします: ${item.sourceUrl}`);
       return "skipped";
     }
 
-    const document = await this.source.fetchDocument(item);
-    const normalized = await this.source.normalize(item, document);
+    const document = await source.fetchDocument(item);
+    const normalized = await source.normalize(item, document);
 
     const existing = await this.regulationIngestionRepository.findLatestByDocNumber(
       normalized.jurisdiction,
