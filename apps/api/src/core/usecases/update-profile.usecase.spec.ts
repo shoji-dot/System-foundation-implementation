@@ -3,9 +3,9 @@ import { NotFoundException } from "@nestjs/common";
 import type { User } from "../domain/user.entity";
 import type { UserRepository } from "../domain/user.repository";
 
-import { CompleteOnboardingUsecase } from "./complete-onboarding.usecase";
+import { UpdateProfileUsecase } from "./update-profile.usecase";
 
-describe("CompleteOnboardingUsecase", () => {
+describe("UpdateProfileUsecase", () => {
   const user: User = {
     id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e4f",
     email: "user@example.com",
@@ -14,9 +14,9 @@ describe("CompleteOnboardingUsecase", () => {
     locale: "ja",
     systemRole: "USER",
     plan: "FREE",
-    profession: null,
-    interestedJurisdictions: [],
-    onboardingCompletedAt: null,
+    profession: "REGULATORY",
+    interestedJurisdictions: ["JP"],
+    onboardingCompletedAt: new Date("2026-07-01T00:00:00.000Z"),
     createdAt: new Date("2026-07-01T00:00:00.000Z"),
     updatedAt: new Date("2026-07-01T00:00:00.000Z"),
   };
@@ -32,33 +32,37 @@ describe("CompleteOnboardingUsecase", () => {
       completeOnboarding: jest.fn(),
       updateProfile: jest.fn(),
     };
-    const usecase = new CompleteOnboardingUsecase(userRepository);
+    const usecase = new UpdateProfileUsecase(userRepository);
     return { usecase, userRepository };
   }
 
-  it("saves the profession and interested jurisdictions and marks onboarding complete", async () => {
+  it("updates the profile fields and returns the public user", async () => {
     const { usecase, userRepository } = setup();
     userRepository.findById.mockResolvedValue(user);
-    userRepository.completeOnboarding.mockResolvedValue({
+    userRepository.updateProfile.mockResolvedValue({
       ...user,
-      profession: "REGULATORY",
+      name: "New Name",
+      locale: "en",
+      profession: "QA",
       interestedJurisdictions: ["JP", "US"],
-      onboardingCompletedAt: new Date("2026-07-07T00:00:00.000Z"),
     });
 
     const result = await usecase.execute({
       id: user.id,
-      profession: "REGULATORY",
+      name: "New Name",
+      locale: "en",
+      profession: "QA",
       interestedJurisdictions: ["JP", "US"],
     });
 
-    expect(userRepository.completeOnboarding).toHaveBeenCalledWith(user.id, {
-      profession: "REGULATORY",
+    expect(userRepository.updateProfile).toHaveBeenCalledWith(user.id, {
+      name: "New Name",
+      locale: "en",
+      profession: "QA",
       interestedJurisdictions: ["JP", "US"],
     });
-    expect(result.profession).toBe("REGULATORY");
-    expect(result.interestedJurisdictions).toEqual(["JP", "US"]);
-    expect(result.onboardingCompletedAt).not.toBeNull();
+    expect(result.name).toBe("New Name");
+    expect(result.locale).toBe("en");
     expect(result).not.toHaveProperty("passwordHash");
   });
 
@@ -67,8 +71,14 @@ describe("CompleteOnboardingUsecase", () => {
     userRepository.findById.mockResolvedValue(null);
 
     await expect(
-      usecase.execute({ id: "missing", profession: "QA", interestedJurisdictions: ["JP"] }),
+      usecase.execute({
+        id: "missing",
+        name: "Name",
+        locale: "ja",
+        profession: "QA",
+        interestedJurisdictions: ["JP"],
+      }),
     ).rejects.toBeInstanceOf(NotFoundException);
-    expect(userRepository.completeOnboarding).not.toHaveBeenCalled();
+    expect(userRepository.updateProfile).not.toHaveBeenCalled();
   });
 });

@@ -14,3 +14,4 @@ export * from "./projects";
 export * from "./tags";
 export * from "./users";
 export * from "./onboarding";
+export * from "./organizations";

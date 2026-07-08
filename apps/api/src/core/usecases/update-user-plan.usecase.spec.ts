@@ -30,6 +30,7 @@ describe("UpdateUserPlanUsecase", () => {
       updateRole: jest.fn(),
       updatePlan: jest.fn(),
       completeOnboarding: jest.fn(),
+      updateProfile: jest.fn(),
     };
     const usecase = new UpdateUserPlanUsecase(userRepository);
     return { usecase, userRepository };

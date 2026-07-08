@@ -30,6 +30,14 @@ export interface CompleteOnboardingInput {
   interestedJurisdictions: JurisdictionCode[];
 }
 
+/** 設計書⑫ S19「アカウント設定・プロフィール」編集入力（設計書⑤に明記は無いがユーザー承認済みで追加）。 */
+export interface UpdateProfileInput {
+  name: string;
+  locale: string;
+  profession: Profession;
+  interestedJurisdictions: JurisdictionCode[];
+}
+
 export interface UserRepository {
   findByEmail(email: string): Promise<User | null>;
   /** refresh token の sub(userId) からユーザーを引く（設計書⑤ /auth/refresh）。 */
@@ -43,4 +51,6 @@ export interface UserRepository {
   updatePlan(id: string, plan: Plan): Promise<User>;
   /** 設計書⑫ S03「オンボーディング」完了（職能・関心国を保存し、onboardingCompletedAtを設定）。 */
   completeOnboarding(id: string, input: CompleteOnboardingInput): Promise<User>;
+  /** 設計書⑫ S19「アカウント設定・プロフィール」編集（氏名・ロケール・職能・関心国を更新）。 */
+  updateProfile(id: string, input: UpdateProfileInput): Promise<User>;
 }
