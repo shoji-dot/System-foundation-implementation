@@ -30,3 +30,17 @@ export const PROFESSIONS = [
 ] as const;
 export type Profession = (typeof PROFESSIONS)[number];
 export const professionSchema = z.enum(PROFESSIONS);
+
+/**
+ * 職能属性の日本語表示名（S03オンボーディング画面で使用。JURISDICTION_LABELSと同様、
+ * 複数画面での再利用に備えDRY原則に基づきここに集約する）。
+ */
+export const PROFESSION_LABELS: Record<Profession, string> = {
+  REGULATORY: "薬事(レギュラトリー)",
+  QA: "品質保証(QA)",
+  SAFETY: "安全性(セーフティ)",
+  SALES: "営業・マーケティング",
+  DESIGN: "設計・開発",
+  MEDICAL: "医療従事者",
+  ACADEMIC: "研究・学術",
+};
