@@ -117,8 +117,17 @@ export const authConfig = {
 
       // S03オンボーディング完了直後、再ログインせずにセッションへ反映するための更新トリガー
       // （client側 `update({ onboardingCompletedAt })` 呼び出しに対応。設計書⑬ S03→S04遷移に必要）。
-      if (trigger === "update" && session?.onboardingCompletedAt !== undefined) {
-        return { ...token, onboardingCompletedAt: session.onboardingCompletedAt };
+      // S19プロフィール編集直後も同様に、氏名・ロケールの変更を再ログイン無しでセッションへ反映する
+      // （client側 `update({ name, locale })` 呼び出しに対応、ユーザー承認済み）。
+      if (trigger === "update") {
+        return {
+          ...token,
+          ...(session?.onboardingCompletedAt !== undefined
+            ? { onboardingCompletedAt: session.onboardingCompletedAt }
+            : {}),
+          ...(session?.name !== undefined ? { name: session.name } : {}),
+          ...(session?.locale !== undefined ? { locale: session.locale } : {}),
+        };
       }
 
       if (Date.now() < token.accessTokenExpiresAt - ACCESS_TOKEN_REFRESH_MARGIN_MS) {
