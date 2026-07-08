@@ -3,10 +3,14 @@ import type { RegulationType } from "./regulation.entity";
 
 /**
  * 薬事情報ソースアダプタのポート（設計書⑨ 準拠）。
- * 実装は infrastructure/external 配下の国別プラグイン（例: PmdaRegulatorySource）。
+ * 実装は infrastructure/external 配下の国別プラグイン（例: PmdaRegulatorySource, FdaRegulatorySource）。
  * usecase層は各国サイトのHTML/PDF/RSS構造に直接依存しない（設計書③の依存方向ルール）。
  * 国追加はこのインターフェースを実装するAdapterの追加のみで対応する（設計書⑨「国追加=Adapter追加のみ」）。
  * MVPはJPのみ稼働、他国はAdapter空実装（設計書⑨）。
+ *
+ * 2026-07-08: 複数Adapter対応（US Adapter追加）にあわせ、DIトークンをREGULATORY_SOURCESに変更した
+ * （旧REGULATORY_SOURCE単数トークンは廃止）。登録された全Adapterの配列として注入し、
+ * IngestionScheduler/IngestionProcessorがAdapterごとに個別ジョブを実行する。
  */
 
 /**
@@ -52,13 +56,14 @@ export interface NormalizedRegulationDocument {
   contentHash: string;
 }
 
-export const REGULATORY_SOURCE = Symbol("REGULATORY_SOURCE");
+/** 登録済み全Adapterを配列として注入するDIトークン（設計書⑨「国追加=Adapter追加のみ」）。 */
+export const REGULATORY_SOURCES = Symbol("REGULATORY_SOURCES");
 
 /**
  * 設計書⑨ Source Adapterインターフェース: `RegulatorySource { fetchList(); fetchDocument(); normalize(); }`。
  */
 export interface RegulatorySource {
-  /** このAdapterが扱うソース識別子（例: "PMDA_NOTICES"）。ingestion_jobs.sourceの値としても使う。 */
+  /** このAdapterが扱うソース識別子（例: "PMDA_DEVICE_SAFETY_NOTICES"）。ingestion_jobs.sourceの値としても使う。 */
   readonly sourceId: string;
   /** ソース側の一覧（通知一覧・Federal Register等）を取得する。 */
   fetchList(): Promise<SourceListItem[]>;
