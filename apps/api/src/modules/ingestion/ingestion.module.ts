@@ -8,6 +8,7 @@ import { RunIngestionJobUsecase } from "../../core/usecases/run-ingestion-job.us
 import { PrismaModule } from "../../infrastructure/database/prisma.module";
 import { PrismaIngestionJobRepository } from "../../infrastructure/database/repositories/prisma-ingestion-job.repository";
 import { PrismaRegulationIngestionRepository } from "../../infrastructure/database/repositories/prisma-regulation-ingestion.repository";
+import { FdaRegulatorySource } from "../../infrastructure/external/regulatory-sources/fda.regulatory-source";
 import { PmdaRegulatorySource } from "../../infrastructure/external/regulatory-sources/pmda.regulatory-source";
 
 import { INGESTION_QUEUE_NAME } from "./ingestion.constants";
@@ -21,8 +22,9 @@ import { IngestionScheduler } from "./ingestion.scheduler";
  *
  * 2026-07-08: 複数Adapter対応（US Adapter追加）にあわせ、REGULATORY_SOURCESをuseFactoryで
  * 配列登録するよう変更した（設計書⑨「国追加=Adapter追加のみ」。国追加時はこのファイルの
- * providers/useFactoryにAdapterを1行追加するだけでよい）。このコミット時点ではPMDA
- * （JPのみ）を配列化しただけで、稼働するAdapterはPmdaRegulatorySourceのみ（挙動は変更前と同一）。
+ * providers/useFactoryにAdapterを1行追加するだけでよい）。
+ * 2026-07-08（同日）: FdaRegulatorySource（US、Federal Register API）を追加し、稼働Adapterが
+ * PMDA（JP）・FDA（US）の2件になった（設計書⑮ Phase6「多国Adapter追加(US/EUから)」）。
  */
 @Module({
   imports: [PrismaModule, BullModule.registerQueue({ name: INGESTION_QUEUE_NAME })],
@@ -31,10 +33,11 @@ import { IngestionScheduler } from "./ingestion.scheduler";
     IngestionProcessor,
     IngestionScheduler,
     PmdaRegulatorySource,
+    FdaRegulatorySource,
     {
       provide: REGULATORY_SOURCES,
-      useFactory: (pmda: PmdaRegulatorySource) => [pmda],
-      inject: [PmdaRegulatorySource],
+      useFactory: (pmda: PmdaRegulatorySource, fda: FdaRegulatorySource) => [pmda, fda],
+      inject: [PmdaRegulatorySource, FdaRegulatorySource],
     },
     { provide: INGESTION_JOB_REPOSITORY, useClass: PrismaIngestionJobRepository },
     { provide: REGULATION_INGESTION_REPOSITORY, useClass: PrismaRegulationIngestionRepository },
