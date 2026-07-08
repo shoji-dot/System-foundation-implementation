@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
 import { SessionProvider } from "next-auth/react";
 
 import { auth } from "@/shared/auth/auth";
 import { GlobalNav } from "@/shared/components/GlobalNav";
+import { THEME_COOKIE_NAME, isThemePreference, toHtmlDataTheme } from "@/shared/theme/theme";
 
 import "./globals.css";
 
@@ -40,16 +42,24 @@ export const viewport: Viewport = {
   themeColor: "#0071e3",
 };
 
-/** 設計書⑫「グローバルナビ...5項目固定」: ログイン済みセッションがある場合のみナビを表示する。 */
+/**
+ * 設計書⑫「グローバルナビ...5項目固定」: ログイン済みセッションがある場合のみナビを表示する。
+ * 設計書⑭「ダークモード: OS追従+手動切替（S19）」: テーマCookieをServer Component側で読み、
+ * 初回描画から<html data-theme>に反映することでちらつき（FOUC）を防ぐ
+ * （Cookie未設定＝"system"の場合はdata-theme属性を付けず、CSSのprefers-color-schemeに委ねる）。
+ */
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const session = await auth();
+  const cookieStore = await cookies();
+  const themeCookieValue = cookieStore.get(THEME_COOKIE_NAME)?.value;
+  const themePreference = isThemePreference(themeCookieValue) ? themeCookieValue : "system";
 
   return (
-    <html lang="ja">
+    <html lang="ja" data-theme={toHtmlDataTheme(themePreference)}>
       <body className="min-h-screen antialiased">
         <SessionProvider>
           {session ? (
