@@ -44,10 +44,31 @@
   }
 }
 
-/* 手動切替（S19 アカウント設定）: <html data-theme="dark|light"> で上書き */
+/*
+ * 手動切替（S19 アカウント設定、設計書⑭「ダークモード: OS追従+手動切替」）: <html data-theme="dark|light">
+ * で上書き。属性がない場合（"system"選択時）は上のprefers-color-schemeのみに従う。
+ * html[data-theme]はOSメディアクエリ内の:rootよりセレクタ詳細度が高いため、OS設定と逆方向の
+ * 手動指定でも確実に上書きできる。
+ */
 html[data-theme="dark"] {
+  --bg: #000000;
+  --surface: #1c1c1e;
+  --text: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --accent: #0a84ff;
+  --danger: #ff453a;
+  --border: #38383a;
+
   color-scheme: dark;
 }
 html[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #f5f5f7;
+  --text: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --accent: #0071e3;
+  --danger: #d70015;
+  --border: #d2d2d7;
+
   color-scheme: light;
 }
