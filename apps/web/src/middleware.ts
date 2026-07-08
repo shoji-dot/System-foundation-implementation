@@ -7,8 +7,18 @@ import { auth } from "@/shared/auth/auth";
  * ログイン済みだがオンボーディング未完了(onboardingCompletedAt===null)のユーザーは、/onboarding以外の
  * ページへアクセスしようとした場合、常に/onboardingへリダイレクトする。
  * 未ログイン時のガード（/loginへのリダイレクト）は各ページのauth()チェックに引き続き委ねる（既存方針を維持）。
+ * 利用規約・プライバシーポリシー等の法務ページはオンボーディング状況を問わず常時閲覧できるようEXEMPT_PREFIXESに含める。
  */
-const EXEMPT_PREFIXES = ["/onboarding", "/login", "/signup", "/api"];
+const EXEMPT_PREFIXES = [
+  "/onboarding",
+  "/login",
+  "/signup",
+  "/api",
+  "/terms",
+  "/privacy",
+  "/ai-policy",
+  "/security-policy",
+];
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
