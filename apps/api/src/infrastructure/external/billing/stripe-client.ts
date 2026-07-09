@@ -2,9 +2,11 @@ import { Injectable } from "@nestjs/common";
 
 import type {
   CreateCheckoutSessionInput,
+  CreatePortalSessionInput,
   StripeCheckoutSession,
   StripeClient,
   StripeEvent,
+  StripePortalSession,
 } from "../../../core/domain/stripe-client";
 
 import { verifyStripeSignature } from "./stripe-webhook-signature";
@@ -63,6 +65,34 @@ export class StripeRestClient implements StripeClient {
     }
 
     return { id: json.id, url: json.url };
+  }
+
+  async createPortalSession(input: CreatePortalSessionInput): Promise<StripePortalSession> {
+    const secretKey = this.getSecretKey();
+
+    const body = new URLSearchParams();
+    body.set("customer", input.customerId);
+    body.set("return_url", input.returnUrl);
+
+    const response = await fetch(`${StripeRestClient.API_URL}/billing_portal/sessions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Stripe-Version": StripeRestClient.API_VERSION,
+      },
+      body: body.toString(),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(
+        `Stripe Customer Portal Session作成に失敗しました: ${response.status} ${errorBody}`,
+      );
+    }
+
+    const json = (await response.json()) as { url: string };
+    return { url: json.url };
   }
 
   constructEvent(payload: Buffer, signatureHeader: string): StripeEvent {

@@ -16,6 +16,7 @@ describe("CreateCheckoutSessionUsecase", () => {
   function setup() {
     const stripeClient: jest.Mocked<StripeClient> = {
       createCheckoutSession: jest.fn(),
+      createPortalSession: jest.fn(),
       constructEvent: jest.fn(),
     };
     const membershipRepository: jest.Mocked<MembershipRepository> = {

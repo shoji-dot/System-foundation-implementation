@@ -1,12 +1,14 @@
 import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
-import type { CheckoutSessionResponse } from "@yakuji/shared";
-import { checkoutSessionResponseSchema } from "@yakuji/shared";
+import type { CheckoutSessionResponse, PortalSessionResponse } from "@yakuji/shared";
+import { checkoutSessionResponseSchema, portalSessionResponseSchema } from "@yakuji/shared";
 
 import type { AuthenticatedRequest } from "../../common/guards/authenticated-request";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { CreateCheckoutSessionUsecase } from "../../core/usecases/create-checkout-session.usecase";
+import { CreatePortalSessionUsecase } from "../../core/usecases/create-portal-session.usecase";
 
 import { CreateCheckoutSessionRequestDto } from "./dto/create-checkout-session-request.dto";
+import { CreatePortalSessionRequestDto } from "./dto/create-portal-session-request.dto";
 
 /**
  * 課金モジュール（設計変更書③ billing、S27、Phase7 7-1）。
@@ -16,7 +18,10 @@ import { CreateCheckoutSessionRequestDto } from "./dto/create-checkout-session-r
 @Controller("billing")
 @UseGuards(JwtAuthGuard)
 export class BillingController {
-  constructor(private readonly createCheckoutSessionUsecase: CreateCheckoutSessionUsecase) {}
+  constructor(
+    private readonly createCheckoutSessionUsecase: CreateCheckoutSessionUsecase,
+    private readonly createPortalSessionUsecase: CreatePortalSessionUsecase,
+  ) {}
 
   @Post("checkout")
   async checkout(
@@ -32,5 +37,18 @@ export class BillingController {
     });
 
     return checkoutSessionResponseSchema.parse({ url: session.url });
+  }
+
+  @Post("portal")
+  async portal(
+    @Req() request: AuthenticatedRequest,
+    @Body() body: CreatePortalSessionRequestDto,
+  ): Promise<PortalSessionResponse> {
+    const session = await this.createPortalSessionUsecase.execute({
+      userId: request.user.userId,
+      organizationId: body.organizationId,
+    });
+
+    return portalSessionResponseSchema.parse({ url: session.url });
   }
 }

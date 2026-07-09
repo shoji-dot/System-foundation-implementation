@@ -7,6 +7,7 @@ import type {
 } from "../../../core/domain/billing-subscription.entity";
 import type {
   BillingSubscriptionRepository,
+  FindStripeCustomerIdInput,
   UpsertStripeSubscriptionInput,
 } from "../../../core/domain/billing-subscription.repository";
 import type { Plan } from "../../../core/domain/user.entity";
@@ -45,6 +46,17 @@ export class PrismaBillingSubscriptionRepository implements BillingSubscriptionR
     });
 
     return this.toDomain(record);
+  }
+
+  async findStripeCustomerId(input: FindStripeCustomerIdInput): Promise<string | null> {
+    const record = await this.prisma.subscription.findFirst({
+      where: input.organizationId
+        ? { organizationId: input.organizationId }
+        : { userId: input.userId },
+      select: { stripeCustomerId: true },
+    });
+
+    return record?.stripeCustomerId ?? null;
   }
 
   private toDomain(record: PrismaBillingSubscription): BillingSubscription {

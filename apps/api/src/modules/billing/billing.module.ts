@@ -6,6 +6,7 @@ import { MEMBERSHIP_REPOSITORY } from "../../core/domain/membership.repository";
 import { STRIPE_CLIENT } from "../../core/domain/stripe-client";
 import { TOKEN_SERVICE } from "../../core/domain/token-service";
 import { CreateCheckoutSessionUsecase } from "../../core/usecases/create-checkout-session.usecase";
+import { CreatePortalSessionUsecase } from "../../core/usecases/create-portal-session.usecase";
 import { ProcessStripeWebhookUsecase } from "../../core/usecases/process-stripe-webhook.usecase";
 import { PrismaModule } from "../../infrastructure/database/prisma.module";
 import { PrismaBillingSubscriptionRepository } from "../../infrastructure/database/repositories/prisma-billing-subscription.repository";
@@ -26,6 +27,7 @@ import { BillingController } from "./billing.controller";
   controllers: [BillingController, BillingWebhookController],
   providers: [
     CreateCheckoutSessionUsecase,
+    CreatePortalSessionUsecase,
     ProcessStripeWebhookUsecase,
     { provide: MEMBERSHIP_REPOSITORY, useClass: PrismaMembershipRepository },
     { provide: BILLING_SUBSCRIPTION_REPOSITORY, useClass: PrismaBillingSubscriptionRepository },

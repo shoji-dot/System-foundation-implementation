@@ -4,19 +4,23 @@ import type { TestingModule } from "@nestjs/testing";
 import type { AuthenticatedRequest } from "../../common/guards/authenticated-request";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { CreateCheckoutSessionUsecase } from "../../core/usecases/create-checkout-session.usecase";
+import { CreatePortalSessionUsecase } from "../../core/usecases/create-portal-session.usecase";
 
 import { BillingController } from "./billing.controller";
 
 describe("BillingController", () => {
   let controller: BillingController;
   const checkoutExecute = jest.fn();
+  const portalExecute = jest.fn();
 
   beforeEach(async () => {
     checkoutExecute.mockReset();
+    portalExecute.mockReset();
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BillingController],
       providers: [
         { provide: CreateCheckoutSessionUsecase, useValue: { execute: checkoutExecute } },
+        { provide: CreatePortalSessionUsecase, useValue: { execute: portalExecute } },
       ],
     })
       .overrideGuard(JwtAuthGuard)
@@ -74,6 +78,46 @@ describe("BillingController", () => {
       });
 
       expect(checkoutExecute).toHaveBeenCalledWith(
+        expect.objectContaining({ organizationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b" }),
+      );
+    });
+  });
+
+  describe("portal", () => {
+    it("passes the authenticated user's id to the usecase and returns the portal url", async () => {
+      portalExecute.mockResolvedValue({ url: "https://billing.stripe.com/session/test" });
+
+      const request = {
+        user: {
+          userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
+          email: "user@example.com",
+          plan: "PRO",
+        },
+      } as AuthenticatedRequest;
+
+      const result = await controller.portal(request, {});
+
+      expect(portalExecute).toHaveBeenCalledWith({
+        userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
+        organizationId: undefined,
+      });
+      expect(result).toEqual({ url: "https://billing.stripe.com/session/test" });
+    });
+
+    it("forwards organizationId for an organization's billing portal", async () => {
+      portalExecute.mockResolvedValue({ url: "https://billing.stripe.com/session/org" });
+
+      const request = {
+        user: {
+          userId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
+          email: "admin@example.com",
+          plan: "BUSINESS",
+        },
+      } as AuthenticatedRequest;
+
+      await controller.portal(request, { organizationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b" });
+
+      expect(portalExecute).toHaveBeenCalledWith(
         expect.objectContaining({ organizationId: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5b" }),
       );
     });
