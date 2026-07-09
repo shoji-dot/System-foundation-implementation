@@ -1,16 +1,21 @@
+import { createHmac } from "node:crypto";
+
 import { StripeRestClient } from "./stripe-client";
 
 describe("StripeRestClient", () => {
   const originalSecretKey = process.env.STRIPE_SECRET_KEY;
+  const originalWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   let client: StripeRestClient;
 
   beforeEach(() => {
     process.env.STRIPE_SECRET_KEY = "sk_test_dummy";
+    process.env.STRIPE_WEBHOOK_SECRET = "whsec_test_dummy";
     client = new StripeRestClient();
   });
 
   afterEach(() => {
     process.env.STRIPE_SECRET_KEY = originalSecretKey;
+    process.env.STRIPE_WEBHOOK_SECRET = originalWebhookSecret;
     jest.restoreAllMocks();
   });
 
@@ -39,6 +44,7 @@ describe("StripeRestClient", () => {
     expect(url).toBe("https://api.stripe.com/v1/checkout/sessions");
     expect((init as RequestInit).headers).toMatchObject({
       Authorization: "Bearer sk_test_dummy",
+      "Stripe-Version": "2025-03-31.basil",
     });
     const body = (init as RequestInit).body as string;
     expect(body).toContain("customer_email=user%40example.com");
@@ -77,5 +83,53 @@ describe("StripeRestClient", () => {
         metadata: {},
       }),
     ).rejects.toThrow("Stripe Checkout Session作成に失敗しました: 400");
+  });
+
+  describe("constructEvent", () => {
+    function sign(
+      payload: Buffer,
+      secret: string,
+      timestamp = Math.floor(Date.now() / 1000),
+    ): string {
+      const signature = createHmac("sha256", secret)
+        .update(`${timestamp}.${payload.toString("utf8")}`)
+        .digest("hex");
+      return `t=${timestamp},v1=${signature}`;
+    }
+
+    it("verifies the signature and returns the parsed event", () => {
+      const payload = Buffer.from(
+        JSON.stringify({
+          id: "evt_1",
+          type: "customer.subscription.updated",
+          data: { object: {} },
+        }),
+      );
+      const header = sign(payload, "whsec_test_dummy");
+
+      expect(client.constructEvent(payload, header)).toEqual({
+        id: "evt_1",
+        type: "customer.subscription.updated",
+        data: { object: {} },
+      });
+    });
+
+    it("throws when the signature is invalid", () => {
+      const payload = Buffer.from(JSON.stringify({ id: "evt_1" }));
+      const header = sign(payload, "whsec_wrong_secret");
+
+      expect(() => client.constructEvent(payload, header)).toThrow(
+        "Stripe Webhookの署名検証に失敗しました。",
+      );
+    });
+
+    it("throws when STRIPE_WEBHOOK_SECRET is not set", () => {
+      delete process.env.STRIPE_WEBHOOK_SECRET;
+      const payload = Buffer.from(JSON.stringify({ id: "evt_1" }));
+
+      expect(() => client.constructEvent(payload, "t=1,v1=abc")).toThrow(
+        "STRIPE_WEBHOOK_SECRET が設定されていません。",
+      );
+    });
   });
 });

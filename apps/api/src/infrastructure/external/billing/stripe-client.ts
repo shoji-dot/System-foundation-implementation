@@ -4,7 +4,10 @@ import type {
   CreateCheckoutSessionInput,
   StripeCheckoutSession,
   StripeClient,
+  StripeEvent,
 } from "../../../core/domain/stripe-client";
+
+import { verifyStripeSignature } from "./stripe-webhook-signature";
 
 interface StripeCheckoutSessionResponse {
   id: string;
@@ -14,10 +17,13 @@ interface StripeCheckoutSessionResponse {
 /**
  * StripeClientのfetchベース実装（設計書③ infrastructure/external、OpenAiChatCompletionProviderと同方針）。
  * Stripe REST APIはapplication/x-www-form-urlencodedのネスト表記（line_items[0][price]等）を要求する。
+ * Stripe-Versionを明示固定し、Stripe側のデフォルトAPIバージョン変更による意図しない破壊的変更を防ぐ
+ * （2025-03-31以降、Subscription.current_period_endはSubscriptionItem側に移動済み、webhook側で前提とする）。
  */
 @Injectable()
 export class StripeRestClient implements StripeClient {
   private static readonly API_URL = "https://api.stripe.com/v1";
+  private static readonly API_VERSION = "2025-03-31.basil";
 
   async createCheckoutSession(input: CreateCheckoutSessionInput): Promise<StripeCheckoutSession> {
     const secretKey = this.getSecretKey();
@@ -31,7 +37,7 @@ export class StripeRestClient implements StripeClient {
     body.set("cancel_url", input.cancelUrl);
     for (const [key, value] of Object.entries(input.metadata)) {
       body.set(`metadata[${key}]`, value);
-      // Webhook側(checkout.session.completed)はsubscriptionオブジェクトのmetadataを参照するため、
+      // Webhook側(customer.subscription.*)はsubscriptionオブジェクトのmetadataを参照するため、
       // subscription_dataにも同じメタデータを複製する（Checkout Session自体のmetadataとは別物）。
       body.set(`subscription_data[metadata][${key}]`, value);
     }
@@ -41,6 +47,7 @@ export class StripeRestClient implements StripeClient {
       headers: {
         Authorization: `Bearer ${secretKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
+        "Stripe-Version": StripeRestClient.API_VERSION,
       },
       body: body.toString(),
     });
@@ -58,11 +65,26 @@ export class StripeRestClient implements StripeClient {
     return { id: json.id, url: json.url };
   }
 
+  constructEvent(payload: Buffer, signatureHeader: string): StripeEvent {
+    const webhookSecret = this.getWebhookSecret();
+    verifyStripeSignature(payload, signatureHeader, webhookSecret);
+
+    return JSON.parse(payload.toString("utf8")) as StripeEvent;
+  }
+
   private getSecretKey(): string {
     const secretKey = process.env.STRIPE_SECRET_KEY;
     if (!secretKey) {
       throw new Error("STRIPE_SECRET_KEY が設定されていません。");
     }
     return secretKey;
+  }
+
+  private getWebhookSecret(): string {
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      throw new Error("STRIPE_WEBHOOK_SECRET が設定されていません。");
+    }
+    return webhookSecret;
   }
 }

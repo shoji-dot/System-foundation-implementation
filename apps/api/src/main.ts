@@ -8,7 +8,9 @@ import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
 import { ZodValidationPipe } from "./common/pipes/zod-validation.pipe";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // rawBody: true — POST /billing/webhookのStripe署名検証に生ボディが必要なため
+  // （req.rawBodyとして全リクエストに付与されるが、req.bodyの通常パースには影響しない）。
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   const prefix = process.env.API_PREFIX ?? "api/v1";
   app.setGlobalPrefix(prefix);
