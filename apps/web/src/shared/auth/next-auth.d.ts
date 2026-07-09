@@ -11,6 +11,8 @@ declare module "next-auth" {
     locale: string;
     systemRole: SystemRole;
     plan: Plan;
+    /** S03オンボーディング未完了ユーザーは null（設計書⑫、S04等へのリダイレクトゲートに使用）。 */
+    onboardingCompletedAt: string | null;
     /** NestJS access token（設計書⑦、15分）。 */
     accessToken: string;
     /** NestJS refresh token（設計書⑦、30日）。jwtコールバック内でのみ使用しクライアントへは渡さない。 */
@@ -24,6 +26,7 @@ declare module "next-auth" {
       locale: string;
       systemRole: SystemRole;
       plan: Plan;
+      onboardingCompletedAt: string | null;
     };
     accessToken: string;
     error?: "RefreshAccessTokenError";
@@ -36,6 +39,7 @@ declare module "next-auth/jwt" {
     locale: string;
     systemRole: SystemRole;
     plan: Plan;
+    onboardingCompletedAt: string | null;
     accessToken: string;
     refreshToken: string;
     accessTokenExpiresAt: number;

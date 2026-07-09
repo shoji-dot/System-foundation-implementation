@@ -39,4 +39,6 @@ export interface UpdateSubscriptionRepository {
   findById(id: string): Promise<UpdateSubscription | null>;
   /** DELETE /api/v1/subscriptions/:id（S18「既存購読の解除」）。 */
   delete(id: string): Promise<void>;
+  /** 指定ユーザーの購読総数を返す（設計書⑦ エンタイトルメント: プラン別購読数上限の判定用）。 */
+  countForUser(userId: string): Promise<number>;
 }

@@ -6,6 +6,7 @@ describe("RecordAuditLogUsecase", () => {
   function setup() {
     const auditLogRepository: jest.Mocked<AuditLogRepository> = {
       create: jest.fn(),
+      list: jest.fn(),
     };
     const usecase = new RecordAuditLogUsecase(auditLogRepository);
     return { usecase, auditLogRepository };

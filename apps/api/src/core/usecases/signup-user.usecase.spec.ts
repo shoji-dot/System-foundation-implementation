@@ -15,6 +15,9 @@ describe("SignupUserUsecase", () => {
     locale: "ja",
     systemRole: "USER",
     plan: "FREE",
+    profession: null,
+    interestedJurisdictions: [],
+    onboardingCompletedAt: null,
     createdAt: new Date("2026-07-01T00:00:00.000Z"),
     updatedAt: new Date("2026-07-01T00:00:00.000Z"),
   };
@@ -24,6 +27,11 @@ describe("SignupUserUsecase", () => {
       findByEmail: jest.fn(),
       findById: jest.fn(),
       create: jest.fn(),
+      list: jest.fn(),
+      updateRole: jest.fn(),
+      updatePlan: jest.fn(),
+      completeOnboarding: jest.fn(),
+      updateProfile: jest.fn(),
     };
     const passwordHasher: jest.Mocked<PasswordHasher> = {
       hash: jest.fn(),

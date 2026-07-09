@@ -1,8 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import type { User as PrismaUser } from "@prisma/client";
 
-import type { User } from "../../../core/domain/user.entity";
-import type { NewUser, UserRepository } from "../../../core/domain/user.repository";
+import type { Plan, SystemRole, User } from "../../../core/domain/user.entity";
+import type {
+  CompleteOnboardingInput,
+  ListUsersFilters,
+  NewUser,
+  UpdateProfileInput,
+  UserListResult,
+  UserRepository,
+} from "../../../core/domain/user.repository";
 import { PrismaService } from "../prisma.service";
 
 /**
@@ -33,6 +40,66 @@ export class PrismaUserRepository implements UserRepository {
     return this.toDomain(record);
   }
 
+  async list(filters: ListUsersFilters): Promise<UserListResult> {
+    // UUIDv7のidは生成順に単調増加するため、id desc で新しい記録から返す
+    // （タグ一覧・監査ログ一覧と同様のカーソルページネーション方式）。
+    const records = await this.prisma.user.findMany({
+      orderBy: { id: "desc" },
+      take: filters.limit + 1,
+      ...(filters.cursor ? { cursor: { id: filters.cursor }, skip: 1 } : {}),
+    });
+
+    const hasMore = records.length > filters.limit;
+    const page = hasMore ? records.slice(0, filters.limit) : records;
+    const nextCursor = hasMore ? (page[page.length - 1]?.id ?? null) : null;
+
+    return {
+      items: page.map((record) => this.toDomain(record)),
+      nextCursor,
+    };
+  }
+
+  async updateRole(id: string, systemRole: SystemRole): Promise<User> {
+    const record = await this.prisma.user.update({
+      where: { id },
+      data: { systemRole },
+    });
+    return this.toDomain(record);
+  }
+
+  async updatePlan(id: string, plan: Plan): Promise<User> {
+    const record = await this.prisma.user.update({
+      where: { id },
+      data: { plan },
+    });
+    return this.toDomain(record);
+  }
+
+  async completeOnboarding(id: string, input: CompleteOnboardingInput): Promise<User> {
+    const record = await this.prisma.user.update({
+      where: { id },
+      data: {
+        profession: input.profession,
+        interestedJurisdictions: input.interestedJurisdictions,
+        onboardingCompletedAt: new Date(),
+      },
+    });
+    return this.toDomain(record);
+  }
+
+  async updateProfile(id: string, input: UpdateProfileInput): Promise<User> {
+    const record = await this.prisma.user.update({
+      where: { id },
+      data: {
+        name: input.name,
+        locale: input.locale,
+        profession: input.profession,
+        interestedJurisdictions: input.interestedJurisdictions,
+      },
+    });
+    return this.toDomain(record);
+  }
+
   private toDomain(record: PrismaUser): User {
     return {
       id: record.id,
@@ -42,6 +109,9 @@ export class PrismaUserRepository implements UserRepository {
       locale: record.locale,
       systemRole: record.systemRole,
       plan: record.plan,
+      profession: record.profession,
+      interestedJurisdictions: record.interestedJurisdictions,
+      onboardingCompletedAt: record.onboardingCompletedAt,
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
     };

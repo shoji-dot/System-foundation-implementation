@@ -20,6 +20,7 @@ describe("ListProjectTasksUsecase", () => {
       findManyForUser: jest.fn(),
       create: jest.fn(),
       findByIdForUser: jest.fn(),
+      countForUser: jest.fn(),
     };
     const projectTaskRepository: jest.Mocked<ProjectTaskRepository> = {
       findManyForProject: jest.fn(),

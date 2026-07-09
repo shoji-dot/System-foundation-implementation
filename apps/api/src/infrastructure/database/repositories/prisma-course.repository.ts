@@ -6,6 +6,8 @@ import type {
   CourseListFilters,
   CourseListResult,
   CourseRepository,
+  CreateCourseInput,
+  UpdateCourseInput,
 } from "../../../core/domain/course.repository";
 import { PrismaService } from "../prisma.service";
 
@@ -40,6 +42,35 @@ export class PrismaCourseRepository implements CourseRepository {
     const record = await this.prisma.course.findUnique({ where: { id } });
 
     return record ? this.toDomain(record) : null;
+  }
+
+  async create(input: CreateCourseInput): Promise<Course> {
+    const record = await this.prisma.course.create({
+      data: {
+        title: input.title,
+        description: input.description ?? null,
+        order: input.order,
+      },
+    });
+
+    return this.toDomain(record);
+  }
+
+  async update(id: string, input: UpdateCourseInput): Promise<Course> {
+    const record = await this.prisma.course.update({
+      where: { id },
+      data: {
+        ...(input.title !== undefined ? { title: input.title } : {}),
+        ...(input.description !== undefined ? { description: input.description } : {}),
+        ...(input.order !== undefined ? { order: input.order } : {}),
+      },
+    });
+
+    return this.toDomain(record);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.course.delete({ where: { id } });
   }
 
   private toDomain(record: PrismaCourse): Course {

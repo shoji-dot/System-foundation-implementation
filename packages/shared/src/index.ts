@@ -1,4 +1,5 @@
 export * from "./ai";
+export * from "./audit";
 export * from "./classifications";
 export * from "./jurisdictions";
 export * from "./learning";
@@ -10,3 +11,7 @@ export * from "./workflow";
 export * from "./updates";
 export * from "./notifications";
 export * from "./projects";
+export * from "./tags";
+export * from "./users";
+export * from "./onboarding";
+export * from "./organizations";

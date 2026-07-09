@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import { planSchema, systemRoleSchema } from "./roles";
+import { planSchema, professionSchema, systemRoleSchema } from "./roles";
+import { jurisdictionCodeSchema } from "./schemas";
 
 /**
  * サインアップ要求（設計書⑤ POST /api/v1/auth/signup 準拠）。
@@ -23,6 +24,11 @@ export const userResponseSchema = z.object({
   locale: z.string(),
   systemRole: systemRoleSchema,
   plan: planSchema,
+  /** S03オンボーディング未完了ユーザーは null（設計書⑫、権限モデルを汚さない表示パーソナライズ属性）。 */
+  profession: professionSchema.nullable(),
+  interestedJurisdictions: z.array(jurisdictionCodeSchema),
+  /** S03オンボーディング未完了ユーザーは null（S04等へのリダイレクトゲートに使用）。 */
+  onboardingCompletedAt: z.string().datetime().nullable(),
   createdAt: z.string().datetime(),
 });
 export type UserResponse = z.infer<typeof userResponseSchema>;

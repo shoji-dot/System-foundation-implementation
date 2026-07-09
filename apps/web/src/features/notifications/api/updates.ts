@@ -1,4 +1,4 @@
-import type { UpdateFeedListResponse } from "@yakuji/shared";
+import type { JurisdictionCode, RegulationType, UpdateFeedListResponse } from "@yakuji/shared";
 import { updateFeedListResponseSchema } from "@yakuji/shared";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001/api/v1";
@@ -23,9 +23,15 @@ export class UpdateFeedApiError extends Error {
 
 export interface ListUpdateFeedParams {
   limit?: number;
+  jurisdiction?: JurisdictionCode;
+  type?: RegulationType;
+  cursor?: string;
 }
 
-/** GET /api/v1/updates（設計書⑤、S04「更新フィード」向けに最新n件を取得する用途）。 */
+/**
+ * GET /api/v1/updates（設計書⑤、S04「更新フィード」最新n件・S17「国別新着・改正」一覧の両方で使う）。
+ * S04はlimitのみ、S17はjurisdiction/type/cursorも指定する。
+ */
 export async function listUpdateFeed(
   accessToken: string,
   params: ListUpdateFeedParams = {},
@@ -33,6 +39,15 @@ export async function listUpdateFeed(
   const query = new URLSearchParams();
   if (params.limit) {
     query.set("limit", String(params.limit));
+  }
+  if (params.jurisdiction) {
+    query.set("jurisdiction", params.jurisdiction);
+  }
+  if (params.type) {
+    query.set("type", params.type);
+  }
+  if (params.cursor) {
+    query.set("cursor", params.cursor);
   }
   const queryString = query.toString();
 

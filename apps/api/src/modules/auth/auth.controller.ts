@@ -32,6 +32,7 @@ export class AuthController {
 
     return userResponseSchema.parse({
       ...user,
+      onboardingCompletedAt: user.onboardingCompletedAt?.toISOString() ?? null,
       createdAt: user.createdAt.toISOString(),
     });
   }

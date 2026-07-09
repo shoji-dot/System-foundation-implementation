@@ -103,3 +103,33 @@ jobs:
 
       - name: API e2e tests
         run: pnpm --filter @yakuji/api test:e2e
+
+  security-audit:
+    name: Security Audit (dependency vulnerabilities)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 本番依存(--prod)のhigh重度脆弱性は2026-07-08時点で0件（multer/lodashのpin、bcrypt→bcryptjs
+      # 置換で解消済み、PR #41/#42）。本番runtimeへの実害基準としてここをブロッキングにする。
+      - name: pnpm audit --prod (high severity, blocking)
+        run: pnpm audit --prod --audit-level=high
+
+      # devDependencies側は将来的にも高頻度で新規CVEが公開されうる（ビルド/テストツールの推移依存、
+      # 本番runtimeには同梱されない）。ブロッキングにすると無関係な理由でCIが頻繁に赤くなるため、
+      # 可視化のみの非ブロッキングとして維持する。
+      - name: pnpm audit (all deps incl. dev, high severity, non-blocking)
+        run: pnpm audit --audit-level=high
+        continue-on-error: true
