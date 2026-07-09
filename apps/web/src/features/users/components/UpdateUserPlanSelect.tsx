@@ -11,6 +11,7 @@ import { updateUserPlan } from "../api/admin-users";
 const PLAN_LABEL: Record<Plan, string> = {
   FREE: "無料",
   PRO: "プロ",
+  BUSINESS: "ビジネス",
   ENTERPRISE: "エンタープライズ",
 };
 

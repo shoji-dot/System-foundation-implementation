@@ -5,7 +5,8 @@ import type { JurisdictionCode } from "./jurisdiction.entity";
  * フレームワーク非依存（Prisma型に直接依存しない、設計書③の依存方向ルール）。
  */
 export type SystemRole = "ADMIN" | "EDITOR" | "USER";
-export type Plan = "FREE" | "PRO" | "ENTERPRISE";
+// Phase7 ⑦-1: BUSINESS追加（設計変更書_ライフサイクル管理_SaaS化.md ⑥ プラン分離 準拠、Prisma Plan enumと同期）。
+export type Plan = "FREE" | "PRO" | "BUSINESS" | "ENTERPRISE";
 /** 職能属性（設計書⑦、権限ではなく表示パーソナライズに使用、S03オンボーディングで選択）。 */
 export type Profession =
   "REGULATORY" | "QA" | "SAFETY" | "SALES" | "DESIGN" | "MEDICAL" | "ACADEMIC";

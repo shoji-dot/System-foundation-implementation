@@ -35,6 +35,12 @@
 //          オンボーディング未完了ユーザーはS04等へ進めない）を実現するために必須のためユーザー承認済み
 //          で追加。interested_jurisdictions は user_projects.target_jurisdictions と同様、配列カラムで
 //          直接保持する（jurisdictions とのjoinテーブルを設けない）。
+// Phase 7 (⑦-1 課金基盤): 設計変更書_ライフサイクル管理_SaaS化.md v1.0（2026-07-09ユーザー承認）に基づき、
+//          Plan enum に BUSINESS を追加（既存 FREE/PRO/ENTERPRISE 互換）し、subscriptions テーブルを追加。
+//          source(STRIPE/COMPLIMENTARY) により Stripe を経由しない社内・特別付与プランを表現する
+//          （admin による手動付与、設計変更書⑥「社内利用（無償フル機能）」準拠）。
+//          既存の PLAN_PROJECT_LIMITS/PLAN_SUBSCRIPTION_LIMITS の BUSINESS 値は PRO と同一（20件、ユーザー承認済み。
+//          設計変更書に明記が無かったため個別確認した）。
 // 他ドメインテーブル は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
 
 generator client {
@@ -56,10 +62,12 @@ enum SystemRole {
   USER
 }
 
-/// 課金プラン（設計書 ⑦ 準拠）: エンタイトルメント層の判定に用いる。課金実装前でも判定層のみ先行させる。
+/// 課金プラン（設計書 ⑦ 準拠、Phase7 ⑦-1 で BUSINESS 追加）: エンタイトルメント層の判定に用いる。
+/// BUSINESS は組織向け中間プラン（設計変更書_ライフサイクル管理_SaaS化.md ⑥ プラン分離 準拠）。
 enum Plan {
   FREE
   PRO
+  BUSINESS
   ENTERPRISE
 }
 
@@ -108,13 +116,16 @@ model User {
   createdAt              DateTime           @default(now()) @map("created_at")
   updatedAt              DateTime           @updatedAt @map("updated_at")
 
-  memberships    Membership[]
-  progresses     UserProgress[]
-  subscriptions  UpdateSubscription[]
-  notifications  Notification[]
-  projects       Project[]
-  aiChatSessions AiChatSession[]
-  auditLogs      AuditLog[]
+  memberships          Membership[]
+  progresses           UserProgress[]
+  subscriptions        UpdateSubscription[]
+  notifications        Notification[]
+  projects             Project[]
+  aiChatSessions       AiChatSession[]
+  auditLogs            AuditLog[]
+  /// 課金サブスクリプション（Phase7 ⑦-1）。既存の`subscriptions`（更新通知購読, UpdateSubscription）と
+  /// 名称が衝突するため billingSubscriptions とする。
+  billingSubscriptions Subscription[]
 
   @@map("users")
 }
@@ -127,8 +138,10 @@ model Organization {
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime         @updatedAt @map("updated_at")
 
-  memberships Membership[]
-  projects    Project[]
+  memberships          Membership[]
+  projects             Project[]
+  /// 課金サブスクリプション（Phase7 ⑦-1、組織単位のBusiness/Enterpriseプラン）。
+  billingSubscriptions Subscription[]
 
   @@map("organizations")
 }
@@ -665,4 +678,53 @@ model Tagging {
   @@unique([tagId, taggableType, taggableId])
   @@index([taggableType, taggableId])
   @@map("taggings")
+}
+
+/// 課金サブスクリプションの発行元（Phase7 ⑦-1、設計変更書⑥「社内利用（無償フル機能）」準拠）。
+/// STRIPE: 通常のStripe課金経由。COMPLIMENTARY: Stripeを通さずadminが組織/ユーザーへ手動付与
+/// （自社ドッグフーディング等、実質Enterprise相当を無償付与するためのフラグ）。
+enum SubscriptionSource {
+  STRIPE
+  COMPLIMENTARY
+}
+
+/// 課金サブスクリプションの状態（Phase7 ⑦-1）。Stripe Subscription の status を1:1でマッピングする
+/// （webhook実装時にそのまま同期するため、Stripe側の値集合と語彙を一致させる）。COMPLIMENTARY発行分は
+/// 通常 ACTIVE のみを用いる（admin失効時は CANCELED）。
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELED
+  UNPAID
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  PAUSED
+}
+
+/// 課金サブスクリプション（設計変更書_ライフサイクル管理_SaaS化.md ② DB変更 Subscription 準拠）。
+/// userId必須+organizationIdはnullable（user_projectsと同方針: 個人契約と組織契約の両方を1テーブルで表現）。
+/// stripeCustomerId/stripeSubscriptionIdはCOMPLIMENTARY発行分ではnull（Postgresのunique indexはnull同士を
+/// 重複とみなさないため、複数の複合付与が可能）。plan/statusの実同期ロジックはbilling module実装時に追加する
+/// （本コミットはスキーマ追加のみ）。
+model Subscription {
+  id                   String              @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  userId               String              @map("user_id") @db.Uuid
+  organizationId       String?             @map("organization_id") @db.Uuid
+  stripeCustomerId     String?             @unique @map("stripe_customer_id")
+  stripeSubscriptionId String?             @unique @map("stripe_subscription_id")
+  plan                 Plan
+  status               SubscriptionStatus  @default(ACTIVE)
+  source               SubscriptionSource  @default(STRIPE)
+  currentPeriodEnd     DateTime?           @map("current_period_end")
+  seats                Int                 @default(1)
+  createdAt            DateTime            @default(now()) @map("created_at")
+  updatedAt            DateTime            @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@map("subscriptions")
 }

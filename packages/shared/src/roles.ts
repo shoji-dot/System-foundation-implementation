@@ -8,9 +8,9 @@ export type SystemRole = (typeof SYSTEM_ROLES)[number];
 export const systemRoleSchema = z.enum(SYSTEM_ROLES);
 
 /**
- * 課金プラン（設計書⑦ 準拠）: apps/api の Plan と値を一致させる。
+ * 課金プラン（設計書⑦ 準拠、Phase7 ⑦-1でBUSINESS追加）: apps/api の Plan と値を一致させる。
  */
-export const PLANS = ["FREE", "PRO", "ENTERPRISE"] as const;
+export const PLANS = ["FREE", "PRO", "BUSINESS", "ENTERPRISE"] as const;
 export type Plan = (typeof PLANS)[number];
 export const planSchema = z.enum(PLANS);
 
@@ -22,6 +22,7 @@ export const planSchema = z.enum(PLANS);
 export const PLAN_LABELS: Record<Plan, string> = {
   FREE: "フリー",
   PRO: "プロ",
+  BUSINESS: "ビジネス",
   ENTERPRISE: "エンタープライズ",
 };
 
