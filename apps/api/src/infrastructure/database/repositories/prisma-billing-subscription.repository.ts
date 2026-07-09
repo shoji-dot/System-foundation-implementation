@@ -8,6 +8,7 @@ import type {
 import type {
   BillingSubscriptionRepository,
   FindStripeCustomerIdInput,
+  UpsertComplimentarySubscriptionInput,
   UpsertStripeSubscriptionInput,
 } from "../../../core/domain/billing-subscription.repository";
 import type { Plan } from "../../../core/domain/user.entity";
@@ -57,6 +58,53 @@ export class PrismaBillingSubscriptionRepository implements BillingSubscriptionR
     });
 
     return record?.stripeCustomerId ?? null;
+  }
+
+  async upsertComplimentary(
+    input: UpsertComplimentarySubscriptionInput,
+  ): Promise<BillingSubscription> {
+    const existing = await this.prisma.subscription.findFirst({
+      where: { userId: input.userId, source: "COMPLIMENTARY" },
+    });
+
+    const record = existing
+      ? await this.prisma.subscription.update({
+          where: { id: existing.id },
+          data: {
+            organizationId: input.organizationId,
+            plan: input.plan,
+            status: "ACTIVE",
+          },
+        })
+      : await this.prisma.subscription.create({
+          data: {
+            user: { connect: { id: input.userId } },
+            organization: input.organizationId
+              ? { connect: { id: input.organizationId } }
+              : undefined,
+            plan: input.plan,
+            status: "ACTIVE",
+            source: "COMPLIMENTARY",
+          },
+        });
+
+    return this.toDomain(record);
+  }
+
+  async revokeComplimentary(userId: string): Promise<BillingSubscription | null> {
+    const existing = await this.prisma.subscription.findFirst({
+      where: { userId, source: "COMPLIMENTARY" },
+    });
+    if (!existing) {
+      return null;
+    }
+
+    const record = await this.prisma.subscription.update({
+      where: { id: existing.id },
+      data: { status: "CANCELED" },
+    });
+
+    return this.toDomain(record);
   }
 
   private toDomain(record: PrismaBillingSubscription): BillingSubscription {

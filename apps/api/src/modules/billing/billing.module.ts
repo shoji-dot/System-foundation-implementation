@@ -5,15 +5,20 @@ import { BILLING_SUBSCRIPTION_REPOSITORY } from "../../core/domain/billing-subsc
 import { MEMBERSHIP_REPOSITORY } from "../../core/domain/membership.repository";
 import { STRIPE_CLIENT } from "../../core/domain/stripe-client";
 import { TOKEN_SERVICE } from "../../core/domain/token-service";
+import { USER_REPOSITORY } from "../../core/domain/user.repository";
 import { CreateCheckoutSessionUsecase } from "../../core/usecases/create-checkout-session.usecase";
 import { CreatePortalSessionUsecase } from "../../core/usecases/create-portal-session.usecase";
+import { GrantComplimentarySubscriptionUsecase } from "../../core/usecases/grant-complimentary-subscription.usecase";
 import { ProcessStripeWebhookUsecase } from "../../core/usecases/process-stripe-webhook.usecase";
+import { RevokeComplimentarySubscriptionUsecase } from "../../core/usecases/revoke-complimentary-subscription.usecase";
 import { PrismaModule } from "../../infrastructure/database/prisma.module";
 import { PrismaBillingSubscriptionRepository } from "../../infrastructure/database/repositories/prisma-billing-subscription.repository";
 import { PrismaMembershipRepository } from "../../infrastructure/database/repositories/prisma-membership.repository";
+import { PrismaUserRepository } from "../../infrastructure/database/repositories/prisma-user.repository";
 import { StripeRestClient } from "../../infrastructure/external/billing/stripe-client";
 import { JwtTokenService } from "../../infrastructure/security/jwt-token.service";
 
+import { AdminSubscriptionsController } from "./admin-subscriptions.controller";
 import { BillingWebhookController } from "./billing-webhook.controller";
 import { BillingController } from "./billing.controller";
 
@@ -21,16 +26,21 @@ import { BillingController } from "./billing.controller";
  * 設計変更書③ billingモジュール（Phase7 7-1）。JwtAuthGuard・MEMBERSHIP_REPOSITORYは
  * notifications/usersモジュール同様に自己完結で登録する。
  * BillingWebhookControllerはJwtAuthGuardを使わない（Stripeからの直接呼び出しのため）。
+ * AdminSubscriptionsController（PR④）はUSER_REPOSITORYも必要とする
+ * （complimentary付与時にusers.planを同期するため、usersモジュールと同様に自己完結で登録）。
  */
 @Module({
   imports: [PrismaModule, JwtModule.register({})],
-  controllers: [BillingController, BillingWebhookController],
+  controllers: [BillingController, BillingWebhookController, AdminSubscriptionsController],
   providers: [
     CreateCheckoutSessionUsecase,
     CreatePortalSessionUsecase,
     ProcessStripeWebhookUsecase,
+    GrantComplimentarySubscriptionUsecase,
+    RevokeComplimentarySubscriptionUsecase,
     { provide: MEMBERSHIP_REPOSITORY, useClass: PrismaMembershipRepository },
     { provide: BILLING_SUBSCRIPTION_REPOSITORY, useClass: PrismaBillingSubscriptionRepository },
+    { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
     { provide: STRIPE_CLIENT, useClass: StripeRestClient },
     { provide: TOKEN_SERVICE, useClass: JwtTokenService },
   ],
