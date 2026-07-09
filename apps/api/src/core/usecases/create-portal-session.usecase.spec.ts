@@ -20,6 +20,8 @@ describe("CreatePortalSessionUsecase", () => {
     const billingSubscriptionRepository: jest.Mocked<BillingSubscriptionRepository> = {
       upsertFromStripe: jest.fn(),
       findStripeCustomerId: jest.fn(),
+      upsertComplimentary: jest.fn(),
+      revokeComplimentary: jest.fn(),
     };
     const membershipRepository: jest.Mocked<MembershipRepository> = {
       findManyForUser: jest.fn(),

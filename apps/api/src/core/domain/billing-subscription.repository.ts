@@ -24,6 +24,12 @@ export interface FindStripeCustomerIdInput {
   organizationId?: string | null;
 }
 
+export interface UpsertComplimentarySubscriptionInput {
+  userId: string;
+  organizationId: string | null;
+  plan: Plan;
+}
+
 export interface BillingSubscriptionRepository {
   /**
    * Stripe Webhook（customer.subscription.created/updated/deleted）を冪等に反映する
@@ -37,4 +43,15 @@ export interface BillingSubscriptionRepository {
    * （COMPLIMENTARYのみ、または未契約）場合はnullを返す。
    */
   findStripeCustomerId(input: FindStripeCustomerIdInput): Promise<string | null>;
+  /**
+   * admin向けcomplimentary手動付与（設計変更書⑥「社内利用（無償フル機能）」、Phase7 7-1 PR④）。
+   * stripeSubscriptionId等のunique制約が使えないため（COMPLIMENTARY発行分はnull）、
+   * userId+source=COMPLIMENTARYをアプリケーション側の一意キーとしてfindFirst+create/updateで
+   * べき等性を担保する（1ユーザーにつきcomplimentary付与は常に最大1件）。
+   */
+  upsertComplimentary(input: UpsertComplimentarySubscriptionInput): Promise<BillingSubscription>;
+  /**
+   * 上記の失効（status=CANCELEDへ更新）。該当レコードが無ければ何もせずnullを返す（べき等）。
+   */
+  revokeComplimentary(userId: string): Promise<BillingSubscription | null>;
 }
