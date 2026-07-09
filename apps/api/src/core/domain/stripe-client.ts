@@ -19,6 +19,15 @@ export interface StripeCheckoutSession {
   url: string;
 }
 
+export interface CreatePortalSessionInput {
+  customerId: string;
+  returnUrl: string;
+}
+
+export interface StripePortalSession {
+  url: string;
+}
+
 /** Stripe Webhookイベントの共通エンベロープ（型はイベント種別ごとにusecase側で狭める）。 */
 export interface StripeEvent {
   id: string;
@@ -28,6 +37,11 @@ export interface StripeEvent {
 
 export interface StripeClient {
   createCheckoutSession(input: CreateCheckoutSessionInput): Promise<StripeCheckoutSession>;
+  /**
+   * Stripe Customer Portal Session発行（設計変更書③ POST /billing/portal）。
+   * 顧客自身がプラン変更・請求書確認・支払方法変更を行える画面のURLを返す。
+   */
+  createPortalSession(input: CreatePortalSessionInput): Promise<StripePortalSession>;
   /**
    * Webhookペイロードの署名検証+パースを行う（設計変更書③ POST /billing/webhook「署名検証」）。
    * 署名不正・期限切れの場合は例外を投げる（呼び出し側でBadRequestへマッピングする）。

@@ -25,10 +25,12 @@ describe("ProcessStripeWebhookUsecase", () => {
   function setup() {
     const stripeClient: jest.Mocked<StripeClient> = {
       createCheckoutSession: jest.fn(),
+      createPortalSession: jest.fn(),
       constructEvent: jest.fn(),
     };
     const billingSubscriptionRepository: jest.Mocked<BillingSubscriptionRepository> = {
       upsertFromStripe: jest.fn(),
+      findStripeCustomerId: jest.fn(),
     };
     const usecase = new ProcessStripeWebhookUsecase(stripeClient, billingSubscriptionRepository);
     return { usecase, stripeClient, billingSubscriptionRepository };

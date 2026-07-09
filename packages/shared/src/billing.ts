@@ -29,3 +29,18 @@ export const checkoutSessionResponseSchema = z.object({
   url: z.string().url(),
 });
 export type CheckoutSessionResponse = z.infer<typeof checkoutSessionResponseSchema>;
+
+/**
+ * POST /api/v1/billing/portal リクエスト（設計変更書③、S27）。
+ * organizationIdはBUSINESS組織の請求ポータルを開く場合のみ指定（ORG_ADMIN限定、checkoutと同じ方針）。
+ */
+export const createPortalSessionRequestSchema = z.object({
+  organizationId: z.string().uuid().optional(),
+});
+export type CreatePortalSessionRequest = z.infer<typeof createPortalSessionRequestSchema>;
+
+/** Customer Portal Session発行応答。フロントはurlへリダイレクトするのみ（設計変更書⑤S27）。 */
+export const portalSessionResponseSchema = z.object({
+  url: z.string().url(),
+});
+export type PortalSessionResponse = z.infer<typeof portalSessionResponseSchema>;

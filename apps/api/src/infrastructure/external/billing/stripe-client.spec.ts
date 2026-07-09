@@ -85,6 +85,51 @@ describe("StripeRestClient", () => {
     ).rejects.toThrow("Stripe Checkout Session作成に失敗しました: 400");
   });
 
+  describe("createPortalSession", () => {
+    it("posts to /billing_portal/sessions and returns the session url", async () => {
+      const fetchSpy = jest.spyOn(global, "fetch").mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ url: "https://billing.stripe.com/session/test" }),
+      } as Response);
+
+      const result = await client.createPortalSession({
+        customerId: "cus_test_1",
+        returnUrl: "https://app.example.com/account/billing",
+      });
+
+      expect(result).toEqual({ url: "https://billing.stripe.com/session/test" });
+
+      const call = fetchSpy.mock.calls[0];
+      if (!call) {
+        throw new Error("fetch was not called");
+      }
+      const [url, init] = call;
+      expect(url).toBe("https://api.stripe.com/v1/billing_portal/sessions");
+      expect((init as RequestInit).headers).toMatchObject({
+        Authorization: "Bearer sk_test_dummy",
+        "Stripe-Version": "2025-03-31.basil",
+      });
+      const body = (init as RequestInit).body as string;
+      expect(body).toContain("customer=cus_test_1");
+      expect(body).toContain("return_url=https%3A%2F%2Fapp.example.com%2Faccount%2Fbilling");
+    });
+
+    it("throws with the response body when Stripe returns an error", async () => {
+      jest.spyOn(global, "fetch").mockResolvedValue({
+        ok: false,
+        status: 400,
+        text: () => Promise.resolve('{"error":{"message":"No such customer"}}'),
+      } as Response);
+
+      await expect(
+        client.createPortalSession({
+          customerId: "cus_invalid",
+          returnUrl: "https://app.example.com/account/billing",
+        }),
+      ).rejects.toThrow("Stripe Customer Portal Session作成に失敗しました: 400");
+    });
+  });
+
   describe("constructEvent", () => {
     function sign(
       payload: Buffer,
