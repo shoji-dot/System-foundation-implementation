@@ -50,7 +50,9 @@ export class PrismaBillingSubscriptionRepository implements BillingSubscriptionR
 
   async findStripeCustomerId(input: FindStripeCustomerIdInput): Promise<string | null> {
     const record = await this.prisma.subscription.findFirst({
-      where: input.organizationId ? { organizationId: input.organizationId } : { userId: input.userId },
+      where: input.organizationId
+        ? { organizationId: input.organizationId }
+        : { userId: input.userId },
       select: { stripeCustomerId: true },
     });
 
