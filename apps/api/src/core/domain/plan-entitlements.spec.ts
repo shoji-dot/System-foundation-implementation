@@ -16,6 +16,11 @@ describe("hasReachedProjectLimit", () => {
     expect(hasReachedProjectLimit("PRO", 20)).toBe(true);
   });
 
+  it("returns true once the BUSINESS plan count reaches the limit (20, same as PRO)", () => {
+    expect(hasReachedProjectLimit("BUSINESS", 19)).toBe(false);
+    expect(hasReachedProjectLimit("BUSINESS", 20)).toBe(true);
+  });
+
   it("always returns false for the unlimited ENTERPRISE plan", () => {
     expect(hasReachedProjectLimit("ENTERPRISE", 0)).toBe(false);
     expect(hasReachedProjectLimit("ENTERPRISE", 10_000)).toBe(false);
@@ -36,6 +41,11 @@ describe("hasReachedSubscriptionLimit", () => {
   it("returns true once the PRO plan count reaches the limit (20)", () => {
     expect(hasReachedSubscriptionLimit("PRO", 19)).toBe(false);
     expect(hasReachedSubscriptionLimit("PRO", 20)).toBe(true);
+  });
+
+  it("returns true once the BUSINESS plan count reaches the limit (20, same as PRO)", () => {
+    expect(hasReachedSubscriptionLimit("BUSINESS", 19)).toBe(false);
+    expect(hasReachedSubscriptionLimit("BUSINESS", 20)).toBe(true);
   });
 
   it("always returns false for the unlimited ENTERPRISE plan", () => {

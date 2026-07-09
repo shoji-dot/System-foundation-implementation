@@ -9,12 +9,17 @@ import type { Plan } from "./user.entity";
 export const PLAN_PROJECT_LIMITS: Record<Plan, number | null> = {
   FREE: 3,
   PRO: 20,
+  // Phase7でBUSINESSを追加する際、上限値が設計変更書に未記載だったためユーザーに個別確認し、
+  // PROと同値（20件）に決定（2026-07-09）。
+  BUSINESS: 20,
   ENTERPRISE: null,
 };
 
 export const PLAN_SUBSCRIPTION_LIMITS: Record<Plan, number | null> = {
   FREE: 3,
   PRO: 20,
+  // 上記PLAN_PROJECT_LIMITSと同じ経緯・同じ理由でPROと同値。
+  BUSINESS: 20,
   ENTERPRISE: null,
 };
 

@@ -9,6 +9,7 @@ import { RedisModule } from "./infrastructure/queue/redis.module";
 import { AiChatModule } from "./modules/ai/ai-chat.module";
 import { AuditModule } from "./modules/audit/audit.module";
 import { AuthModule } from "./modules/auth/auth.module";
+import { BillingModule } from "./modules/billing/billing.module";
 import { ClassificationsModule } from "./modules/classifications/classifications.module";
 import { HealthModule } from "./modules/health/health.module";
 import { LearningModule } from "./modules/learning/learning.module";
@@ -46,6 +47,7 @@ import { WorkflowModule } from "./modules/workflow/workflow.module";
     WorkflowModule,
     NotificationsModule,
     ProjectsModule,
+    BillingModule,
     AiChatModule,
     TagsModule,
   ],
