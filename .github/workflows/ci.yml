@@ -122,9 +122,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # NOTE: 現時点で@nestjs系の推移依存にhigh重度の既知脆弱性が複数存在するため（2026-07-08時点で
-      # 本番依存11件、lodash/multer/tar等）、ユーザー承認済み方針として非ブロッキングで可視化のみ行う。
-      # continue-on-error を外せばブロッキング化できる（既存脆弱性の修正/pin後に切り替える想定）。
-      - name: pnpm audit (high severity, non-blocking)
+      # 本番依存(--prod)のhigh重度脆弱性は2026-07-08時点で0件（multer/lodashのpin、bcrypt→bcryptjs
+      # 置換で解消済み、PR #41/#42）。本番runtimeへの実害基準としてここをブロッキングにする。
+      - name: pnpm audit --prod (high severity, blocking)
+        run: pnpm audit --prod --audit-level=high
+
+      # devDependencies側は将来的にも高頻度で新規CVEが公開されうる（ビルド/テストツールの推移依存、
+      # 本番runtimeには同梱されない）。ブロッキングにすると無関係な理由でCIが頻繁に赤くなるため、
+      # 可視化のみの非ブロッキングとして維持する。
+      - name: pnpm audit (all deps incl. dev, high severity, non-blocking)
         run: pnpm audit --audit-level=high
         continue-on-error: true
