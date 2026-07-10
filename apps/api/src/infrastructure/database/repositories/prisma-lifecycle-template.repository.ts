@@ -227,7 +227,7 @@ export class PrismaLifecycleTemplateRepository implements LifecycleTemplateRepos
       relatedRegulationIds: step.relatedRegulationIds,
       pmdaResourceUrls: step.pmdaResourceUrls,
       notes: step.notes,
-      sourceRefs: step.sourceRefs,
+      sourceRefs: step.sourceRefs as unknown as Prisma.InputJsonValue,
     };
   }
 
