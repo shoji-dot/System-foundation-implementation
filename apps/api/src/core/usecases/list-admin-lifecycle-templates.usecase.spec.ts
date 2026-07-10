@@ -1,15 +1,15 @@
 import type { LifecycleTemplate } from "../domain/lifecycle-template.entity";
 import type { LifecycleTemplateRepository } from "../domain/lifecycle-template.repository";
 
-import { ListLifecycleTemplatesUsecase } from "./list-lifecycle-templates.usecase";
+import { ListAdminLifecycleTemplatesUsecase } from "./list-admin-lifecycle-templates.usecase";
 
-describe("ListLifecycleTemplatesUsecase", () => {
+describe("ListAdminLifecycleTemplatesUsecase", () => {
   const template: LifecycleTemplate = {
     id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
     jurisdiction: { code: "JP", name: "日本" },
     deviceCategory: "CLASS_II",
     procedureType: "認証",
-    status: "PUBLISHED",
+    status: "DRAFT",
     version: 1,
     createdAt: new Date("2026-07-10T00:00:00.000Z"),
   };
@@ -26,13 +26,13 @@ describe("ListLifecycleTemplatesUsecase", () => {
       delete: jest.fn(),
       publish: jest.fn(),
     };
-    const usecase = new ListLifecycleTemplatesUsecase(lifecycleTemplateRepository);
+    const usecase = new ListAdminLifecycleTemplatesUsecase(lifecycleTemplateRepository);
     return { usecase, lifecycleTemplateRepository };
   }
 
-  it("delegates filters to the repository and returns the paginated result", async () => {
+  it("delegates filters (including status) to the repository, covering all statuses", async () => {
     const { usecase, lifecycleTemplateRepository } = setup();
-    lifecycleTemplateRepository.findManyPublished.mockResolvedValue({
+    lifecycleTemplateRepository.findManyForAdmin.mockResolvedValue({
       items: [template],
       nextCursor: null,
     });
@@ -41,14 +41,16 @@ describe("ListLifecycleTemplatesUsecase", () => {
       jurisdiction: "JP",
       deviceCategory: "CLASS_II",
       procedureType: "認証",
+      status: "DRAFT",
       cursor: undefined,
       limit: 20,
     });
 
-    expect(lifecycleTemplateRepository.findManyPublished).toHaveBeenCalledWith({
+    expect(lifecycleTemplateRepository.findManyForAdmin).toHaveBeenCalledWith({
       jurisdictionCode: "JP",
       deviceCategory: "CLASS_II",
       procedureType: "認証",
+      status: "DRAFT",
       cursor: undefined,
       limit: 20,
     });

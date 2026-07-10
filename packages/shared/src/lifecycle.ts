@@ -141,3 +141,55 @@ export const lifecycleTemplateDetailResponseSchema = lifecycleTemplateSummaryRes
   steps: z.array(lifecycleTemplateStepResponseSchema),
 });
 export type LifecycleTemplateDetailResponse = z.infer<typeof lifecycleTemplateDetailResponseSchema>;
+
+/**
+ * 工程マスタ・個別工程の作成/更新入力（設計変更書③ CRUD /api/v1/admin/lifecycle-templates、admin/editor限定）。
+ * phaseCodeで大工程を指定する（DBの内部UUIDをクライアントに意識させないため、公開APIのphase.codeと同じ値）。
+ * sourceRefsは「根拠必須」（設計変更書④AI設計）のため1件以上を必須とする。
+ */
+export const adminLifecycleTemplateStepInputSchema = z.object({
+  phaseCode: lifecyclePhaseCodeSchema,
+  name: z.string().trim().min(1),
+  order: z.number().int().min(0),
+  durationMinDays: z.number().int().min(0).nullable(),
+  durationMaxDays: z.number().int().min(0).nullable(),
+  costMinJpy: z.number().int().min(0).nullable(),
+  costMaxJpy: z.number().int().min(0).nullable(),
+  requiredDocuments: z.array(z.string().trim().min(1)),
+  requiredTests: z.array(z.string().trim().min(1)),
+  relatedRegulationIds: z.array(z.string().uuid()),
+  pmdaResourceUrls: z.array(z.string().trim().min(1)),
+  notes: z.string().trim().max(2000).nullable(),
+  sourceRefs: z.array(lifecycleTemplateSourceRefResponseSchema).min(1),
+});
+export type AdminLifecycleTemplateStepInput = z.infer<typeof adminLifecycleTemplateStepInputSchema>;
+
+/**
+ * POST /api/v1/admin/lifecycle-templates リクエストボディ。テンプレート本体+工程一覧を一括で作成する
+ * （regulation_versionsのfullText同様、工程マスタも1ドキュメントとして丸ごと扱う設計）。
+ */
+export const createLifecycleTemplateRequestSchema = z.object({
+  jurisdiction: jurisdictionCodeSchema,
+  deviceCategory: lifecycleDeviceCategorySchema,
+  procedureType: z.string().trim().min(1),
+  steps: z.array(adminLifecycleTemplateStepInputSchema).min(1),
+});
+export type CreateLifecycleTemplateRequest = z.infer<typeof createLifecycleTemplateRequestSchema>;
+
+/**
+ * PATCH /api/v1/admin/lifecycle-templates/:id リクエストボディ。DRAFTのみ許可、工程一覧は丸ごと置き換え
+ * （個別工程の差分更新はサポートしない。createと同一形状）。
+ */
+export const updateLifecycleTemplateRequestSchema = createLifecycleTemplateRequestSchema;
+export type UpdateLifecycleTemplateRequest = CreateLifecycleTemplateRequest;
+
+/** GET /api/v1/admin/lifecycle-templates クエリ（全ステータス対象、公開用GETと異なりstatus絞り込み可）。 */
+export const listAdminLifecycleTemplatesQuerySchema = cursorPaginationQuerySchema.extend({
+  jurisdiction: jurisdictionCodeSchema.optional(),
+  deviceCategory: lifecycleDeviceCategorySchema.optional(),
+  procedureType: z.string().trim().min(1).optional(),
+  status: lifecycleTemplateStatusSchema.optional(),
+});
+export type ListAdminLifecycleTemplatesQuery = z.infer<
+  typeof listAdminLifecycleTemplatesQuerySchema
+>;
