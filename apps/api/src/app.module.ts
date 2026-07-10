@@ -13,6 +13,7 @@ import { BillingModule } from "./modules/billing/billing.module";
 import { ClassificationsModule } from "./modules/classifications/classifications.module";
 import { HealthModule } from "./modules/health/health.module";
 import { LearningModule } from "./modules/learning/learning.module";
+import { LifecycleModule } from "./modules/lifecycle/lifecycle.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { ProjectsModule } from "./modules/projects/projects.module";
 import { RegulationsModule } from "./modules/regulations/regulations.module";
@@ -43,6 +44,7 @@ import { WorkflowModule } from "./modules/workflow/workflow.module";
     RegulationsModule,
     ClassificationsModule,
     LearningModule,
+    LifecycleModule,
     SearchModule,
     WorkflowModule,
     NotificationsModule,
