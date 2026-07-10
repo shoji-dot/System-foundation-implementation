@@ -41,6 +41,11 @@
 //          （admin による手動付与、設計変更書⑥「社内利用（無償フル機能）」準拠）。
 //          既存の PLAN_PROJECT_LIMITS/PLAN_SUBSCRIPTION_LIMITS の BUSINESS 値は PRO と同一（20件、ユーザー承認済み。
 //          設計変更書に明記が無かったため個別確認した）。
+// Phase 7 (⑦-2 工程マスタ): 設計変更書_ライフサイクル管理_SaaS化.md ② DB変更 のうち工程マスタ3テーブル
+//          （lifecycle_phases / lifecycle_templates / lifecycle_template_steps）を追加。
+//          ProjectRoadmap/ProjectRoadmapStep（プロジェクトへの適用・進捗管理）は7-3着手時に追加する
+//          （ユーザー承認済み、未使用テーブルを先行して作らない方針）。本コミットはスキーマ追加のみ
+//          （API/管理画面/初期マスタデータ投入は別コミット）。
 // 他ドメインテーブル は各モジュール実装時に追加する（本ファイルへの無断追加はしない）。
 
 generator client {
@@ -212,6 +217,7 @@ model Jurisdiction {
   regulations           Regulation[]
   deviceClassifications DeviceClassification[]
   updateSubscriptions   UpdateSubscription[]
+  lifecycleTemplates    LifecycleTemplate[]
 
   @@map("jurisdictions")
 }
@@ -727,4 +733,121 @@ model Subscription {
   @@index([userId])
   @@index([organizationId])
   @@map("subscriptions")
+}
+
+/// 大工程（設計変更書_ライフサイクル管理_SaaS化.md ② DB変更 LifecyclePhase 準拠、Phase7 7-2）。
+/// 企画〜販売終了までの18工程を固定の閉じた集合として列挙する（design docに列挙された全18コード）。
+enum LifecyclePhaseCode {
+  PLANNING
+  MARKET_RESEARCH
+  DESIGN
+  RISK_ISO14971
+  QMS
+  TESTING
+  REG_STRATEGY
+  SUBMISSION
+  PMDA_CONSULT
+  APPROVAL
+  REIMBURSEMENT
+  LAUNCH
+  SALES
+  CHANGE_CONTROL
+  COMPLAINT
+  CAPA
+  RECALL
+  DISCONTINUATION
+}
+
+/// 工程マスタ・ロードマップウィザード(S23)で選択する機器種別（設計変更書① S23「クラスI–IV/SaMD/IVD/
+/// 能動/その他」、② DB変更 deviceCategory 準拠）。既存の device_classifications（JMDN等の詳細分類、
+/// S08/S09）とは別軸の簡易カテゴリで、テンプレート選定のみに用いる（分類サブシステム自体の拡張ではない）。
+enum LifecycleDeviceCategory {
+  CLASS_I
+  CLASS_II
+  CLASS_III
+  CLASS_IV
+  SAMD
+  IVD
+  ACTIVE
+  OTHER
+}
+
+/// 工程マスタの公開状態（設計変更書② DB変更「status(draft/published)」準拠）。regulation_versionsの
+/// DRAFT/REVIEW/PUBLISHEDと異なり2状態のみ（design docの記載通り）。校閲ワークフロー自体はS20と同様
+/// editor/adminのCRUD+publish操作で行う（③API追加「CRUD /admin/lifecycle-templates、S20と同じ
+/// draft→publishフロー」準拠、状態遷移の粒度は本enumの2状態に対応させる）。
+enum LifecycleTemplateStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// 大工程マスタ（設計変更書② DB変更 LifecyclePhase 準拠、Phase7 7-2）。18工程の固定リスト。
+/// nameは表示用日本語ラベル、orderは表示順（企画=1〜販売終了=18を想定、実データ投入は別コミット）。
+model LifecyclePhase {
+  id        String             @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  code      LifecyclePhaseCode @unique
+  name      String
+  order     Int
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @updatedAt @map("updated_at")
+
+  steps LifecycleTemplateStep[]
+
+  @@map("lifecycle_phases")
+}
+
+/// 工程マスタ・テンプレート本体（設計変更書② DB変更 LifecycleTemplate 準拠、Phase7 7-2）。
+/// regulationと同じ「不変版管理+status」原則（design doc記載）をこの1テーブルで表現する
+/// （regulation/regulation_versionsのような親子分割はせず、versionを直接列として持つ）。
+/// procedureTypeはJP(届出/認証/承認)/US(510k)/EU(CE)等、国により語彙が大きく異なり設計書も
+/// 「届出/認証/承認/510k/CE…」と非網羅的に記載しているため、regulation.subtypeと同様に自由文字列とする
+/// （enum化して将来の国追加のたびにスキーマ変更が必要になる事態を避ける）。
+model LifecycleTemplate {
+  id             String                  @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  jurisdictionId String                  @map("jurisdiction_id") @db.Uuid
+  deviceCategory LifecycleDeviceCategory @map("device_category")
+  procedureType  String                  @map("procedure_type")
+  status         LifecycleTemplateStatus @default(DRAFT)
+  version        Int                     @default(1)
+  createdAt      DateTime                @default(now()) @map("created_at")
+  updatedAt      DateTime                @updatedAt @map("updated_at")
+
+  jurisdiction Jurisdiction            @relation(fields: [jurisdictionId], references: [id], onDelete: Restrict)
+  steps        LifecycleTemplateStep[]
+
+  @@index([jurisdictionId, deviceCategory, procedureType, status], name: "lifecycle_templates_filter_idx")
+  @@map("lifecycle_templates")
+}
+
+/// 工程マスタの個別工程（設計変更書② DB変更 LifecycleTemplateStep 準拠、Phase7 7-2）。
+/// durationMin/MaxDays・costMin/MaxJpyは「概算レンジ」（設計変更書④AI設計「免責: 費用・期間は概算
+/// レンジ・参考値」準拠）。relatedRegulationIdsはregulationsへのFK配列だが、Postgresの配列列には外部キー
+/// 制約を張れないためアプリケーション層で整合性を担保する（既存のuser_projects.target_jurisdictions等と
+/// 同じ設計判断）。sourceRefsは設計書④AI設計の「根拠必須」原則に基づき必須列とする（空配列は許容、
+/// 実データ投入時のバリデーションはAPI実装時に追加）。
+model LifecycleTemplateStep {
+  id                   String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  templateId           String   @map("template_id") @db.Uuid
+  phaseId              String   @map("phase_id") @db.Uuid
+  name                 String
+  order                Int
+  durationMinDays      Int?     @map("duration_min_days")
+  durationMaxDays      Int?     @map("duration_max_days")
+  costMinJpy           Int?     @map("cost_min_jpy")
+  costMaxJpy           Int?     @map("cost_max_jpy")
+  requiredDocuments    Json     @map("required_documents")
+  requiredTests        Json     @map("required_tests")
+  relatedRegulationIds String[] @map("related_regulation_ids")
+  pmdaResourceUrls     Json     @map("pmda_resource_urls")
+  notes                String?
+  sourceRefs           Json     @map("source_refs")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  template LifecycleTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  phase    LifecyclePhase    @relation(fields: [phaseId], references: [id], onDelete: Restrict)
+
+  @@index([templateId])
+  @@index([phaseId])
+  @@map("lifecycle_template_steps")
 }
