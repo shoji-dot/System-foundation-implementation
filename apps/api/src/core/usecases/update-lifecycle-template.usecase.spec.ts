@@ -48,10 +48,15 @@ describe("UpdateLifecycleTemplateUsecase", () => {
     return {
       id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
       jurisdiction: { code: "JP", name: "日本" },
-      deviceCategory: "CLASS_II",
-      procedureType: "認証",
+      framework: "MEDICAL_DEVICE",
+      deviceClass: "CLASS_II",
+      productNovelty: null,
+      approvalRoute: "認証",
+      characteristics: [],
       status,
       version: 1,
+      effectiveFrom: new Date("2026-07-01T00:00:00.000Z"),
+      effectiveTo: null,
       createdAt: new Date("2026-07-10T00:00:00.000Z"),
       steps: [],
     };
@@ -85,23 +90,33 @@ describe("UpdateLifecycleTemplateUsecase", () => {
     lifecycleTemplateRepository.findDetailByIdForAdmin.mockResolvedValue(draft);
     jurisdictionRepository.findAll.mockResolvedValue([jpJurisdiction]);
     lifecycleTemplateRepository.findAllPhases.mockResolvedValue([submissionPhase]);
-    lifecycleTemplateRepository.update.mockResolvedValue({ ...draft, procedureType: "承認" });
+    lifecycleTemplateRepository.update.mockResolvedValue({ ...draft, approvalRoute: "承認" });
 
     const result = await usecase.execute({
       id: draft.id,
       jurisdictionCode: "JP",
-      deviceCategory: "CLASS_II",
-      procedureType: "  承認  ",
+      framework: "MEDICAL_DEVICE",
+      deviceClass: "CLASS_II",
+      productNovelty: null,
+      approvalRoute: "  承認  ",
+      characteristics: ["SAMD"],
+      effectiveFrom: new Date("2026-07-01T00:00:00.000Z"),
+      effectiveTo: null,
       steps: [step],
     });
 
     expect(lifecycleTemplateRepository.update).toHaveBeenCalledWith(draft.id, {
       jurisdictionCode: "JP",
-      deviceCategory: "CLASS_II",
-      procedureType: "承認",
+      framework: "MEDICAL_DEVICE",
+      deviceClass: "CLASS_II",
+      productNovelty: null,
+      approvalRoute: "承認",
+      characteristics: ["SAMD"],
+      effectiveFrom: new Date("2026-07-01T00:00:00.000Z"),
+      effectiveTo: null,
       steps: [step],
     });
-    expect(result.procedureType).toBe("承認");
+    expect(result.approvalRoute).toBe("承認");
   });
 
   it("throws NotFoundException when the template does not exist", async () => {
@@ -112,8 +127,13 @@ describe("UpdateLifecycleTemplateUsecase", () => {
       usecase.execute({
         id: "missing",
         jurisdictionCode: "JP",
-        deviceCategory: "CLASS_II",
-        procedureType: "認証",
+        framework: "MEDICAL_DEVICE",
+        deviceClass: "CLASS_II",
+        productNovelty: null,
+        approvalRoute: "認証",
+        characteristics: [],
+        effectiveFrom: new Date("2026-07-01T00:00:00.000Z"),
+        effectiveTo: null,
         steps: [step],
       }),
     ).rejects.toBeInstanceOf(NotFoundException);
@@ -128,8 +148,13 @@ describe("UpdateLifecycleTemplateUsecase", () => {
       usecase.execute({
         id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
         jurisdictionCode: "JP",
-        deviceCategory: "CLASS_II",
-        procedureType: "認証",
+        framework: "MEDICAL_DEVICE",
+        deviceClass: "CLASS_II",
+        productNovelty: null,
+        approvalRoute: "認証",
+        characteristics: [],
+        effectiveFrom: new Date("2026-07-01T00:00:00.000Z"),
+        effectiveTo: null,
         steps: [step],
       }),
     ).rejects.toBeInstanceOf(ConflictException);
@@ -146,8 +171,13 @@ describe("UpdateLifecycleTemplateUsecase", () => {
       usecase.execute({
         id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
         jurisdictionCode: "JP",
-        deviceCategory: "CLASS_II",
-        procedureType: "認証",
+        framework: "MEDICAL_DEVICE",
+        deviceClass: "CLASS_II",
+        productNovelty: null,
+        approvalRoute: "認証",
+        characteristics: [],
+        effectiveFrom: new Date("2026-07-01T00:00:00.000Z"),
+        effectiveTo: null,
         steps: [step],
       }),
     ).rejects.toBeInstanceOf(BadRequestException);
@@ -164,8 +194,13 @@ describe("UpdateLifecycleTemplateUsecase", () => {
       usecase.execute({
         id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
         jurisdictionCode: "JP",
-        deviceCategory: "CLASS_II",
-        procedureType: "認証",
+        framework: "MEDICAL_DEVICE",
+        deviceClass: "CLASS_II",
+        productNovelty: null,
+        approvalRoute: "認証",
+        characteristics: [],
+        effectiveFrom: new Date("2026-07-01T00:00:00.000Z"),
+        effectiveTo: null,
         steps: [step],
       }),
     ).rejects.toBeInstanceOf(ConflictException);

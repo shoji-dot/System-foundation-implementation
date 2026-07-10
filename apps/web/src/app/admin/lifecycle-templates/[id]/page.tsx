@@ -1,5 +1,10 @@
 import type { SystemRole } from "@yakuji/shared";
-import { LIFECYCLE_DEVICE_CATEGORY_LABELS, LIFECYCLE_TEMPLATE_STATUS_LABELS } from "@yakuji/shared";
+import {
+  LIFECYCLE_DEVICE_CLASS_LABELS,
+  LIFECYCLE_FRAMEWORK_LABELS,
+  LIFECYCLE_PRODUCT_NOVELTY_LABELS,
+  LIFECYCLE_TEMPLATE_STATUS_LABELS,
+} from "@yakuji/shared";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -53,7 +58,19 @@ export default async function LifecycleTemplateDetailPage({
 
   const { id } = await params;
   const detail = await loadDetail(session.accessToken, id);
-  const templateLabel = `${detail.jurisdiction.name} / ${LIFECYCLE_DEVICE_CATEGORY_LABELS[detail.deviceCategory]} / ${detail.procedureType}`;
+  const classLabel = detail.deviceClass ? LIFECYCLE_DEVICE_CLASS_LABELS[detail.deviceClass] : null;
+  const noveltyLabel = detail.productNovelty
+    ? LIFECYCLE_PRODUCT_NOVELTY_LABELS[detail.productNovelty]
+    : null;
+  const templateLabel = [
+    detail.jurisdiction.name,
+    LIFECYCLE_FRAMEWORK_LABELS[detail.framework],
+    classLabel,
+    noveltyLabel,
+    detail.approvalRoute,
+  ]
+    .filter((part): part is string => Boolean(part))
+    .join(" / ");
 
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-6 p-8">

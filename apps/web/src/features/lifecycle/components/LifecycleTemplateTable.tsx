@@ -1,7 +1,12 @@
 "use client";
 
 import type { LifecycleTemplateSummaryResponse } from "@yakuji/shared";
-import { LIFECYCLE_DEVICE_CATEGORY_LABELS, LIFECYCLE_TEMPLATE_STATUS_LABELS } from "@yakuji/shared";
+import {
+  LIFECYCLE_DEVICE_CLASS_LABELS,
+  LIFECYCLE_FRAMEWORK_LABELS,
+  LIFECYCLE_PRODUCT_NOVELTY_LABELS,
+  LIFECYCLE_TEMPLATE_STATUS_LABELS,
+} from "@yakuji/shared";
 import { Button } from "@yakuji/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -62,10 +67,13 @@ export function LifecycleTemplateTable({ items }: LifecycleTemplateTableProps) {
               法域
             </th>
             <th scope="col" className="py-2 pr-4 font-medium">
-              機器種別
+              法体系/クラス/新規性
             </th>
             <th scope="col" className="py-2 pr-4 font-medium">
-              手続き種別
+              手続き区分
+            </th>
+            <th scope="col" className="py-2 pr-4 font-medium">
+              特性
             </th>
             <th scope="col" className="py-2 pr-4 font-medium">
               状態
@@ -85,9 +93,18 @@ export function LifecycleTemplateTable({ items }: LifecycleTemplateTableProps) {
               <tr key={template.id} className="border-b border-border">
                 <td className="py-3 pr-4 text-text">{template.jurisdiction.name}</td>
                 <td className="py-3 pr-4 text-text">
-                  {LIFECYCLE_DEVICE_CATEGORY_LABELS[template.deviceCategory]}
+                  {LIFECYCLE_FRAMEWORK_LABELS[template.framework]}
+                  {template.deviceClass
+                    ? ` / ${LIFECYCLE_DEVICE_CLASS_LABELS[template.deviceClass]}`
+                    : ""}
+                  {template.productNovelty
+                    ? ` / ${LIFECYCLE_PRODUCT_NOVELTY_LABELS[template.productNovelty]}`
+                    : ""}
                 </td>
-                <td className="py-3 pr-4 text-text">{template.procedureType}</td>
+                <td className="py-3 pr-4 text-text">{template.approvalRoute}</td>
+                <td className="py-3 pr-4 text-text">
+                  {template.characteristics.length > 0 ? template.characteristics.join("、") : "—"}
+                </td>
                 <td className="py-3 pr-4 text-text">
                   {LIFECYCLE_TEMPLATE_STATUS_LABELS[template.status]}
                 </td>

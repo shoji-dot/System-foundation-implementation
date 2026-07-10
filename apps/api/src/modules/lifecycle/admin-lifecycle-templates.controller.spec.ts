@@ -26,10 +26,15 @@ describe("AdminLifecycleTemplatesController", () => {
   const detail: LifecycleTemplateDetail = {
     id: templateId,
     jurisdiction: { code: "JP", name: "日本" },
-    deviceCategory: "CLASS_II",
-    procedureType: "認証",
+    framework: "MEDICAL_DEVICE",
+    deviceClass: "CLASS_II",
+    productNovelty: null,
+    approvalRoute: "認証",
+    characteristics: ["SAMD"],
     status: "DRAFT",
     version: 1,
+    effectiveFrom: new Date("2026-07-01T00:00:00.000Z"),
+    effectiveTo: null,
     createdAt: new Date("2026-07-10T00:00:00.000Z"),
     steps: [
       {
@@ -108,15 +113,25 @@ describe("AdminLifecycleTemplatesController", () => {
 
     const result = await controller.create({
       jurisdiction: "JP",
-      deviceCategory: "CLASS_II",
-      procedureType: "認証",
+      framework: "MEDICAL_DEVICE",
+      deviceClass: "CLASS_II",
+      productNovelty: null,
+      approvalRoute: "認証",
+      characteristics: ["SAMD"],
+      effectiveFrom: "2026-07-01",
+      effectiveTo: null,
       steps: [stepRequest],
     });
 
     expect(createExecute).toHaveBeenCalledWith({
       jurisdictionCode: "JP",
-      deviceCategory: "CLASS_II",
-      procedureType: "認証",
+      framework: "MEDICAL_DEVICE",
+      deviceClass: "CLASS_II",
+      productNovelty: null,
+      approvalRoute: "認証",
+      characteristics: ["SAMD"],
+      effectiveFrom: new Date("2026-07-01"),
+      effectiveTo: null,
       steps: [stepRequest],
     });
     expect(result.id).toBe(templateId);
@@ -124,14 +139,19 @@ describe("AdminLifecycleTemplatesController", () => {
   });
 
   it("update: delegates to the usecase with the param id and body fields", async () => {
-    updateExecute.mockResolvedValue({ ...detail, procedureType: "承認" });
+    updateExecute.mockResolvedValue({ ...detail, approvalRoute: "承認" });
 
     const result = await controller.update(
       { id: templateId },
       {
         jurisdiction: "JP",
-        deviceCategory: "CLASS_II",
-        procedureType: "承認",
+        framework: "MEDICAL_DEVICE",
+        deviceClass: "CLASS_II",
+        productNovelty: null,
+        approvalRoute: "承認",
+        characteristics: ["SAMD"],
+        effectiveFrom: "2026-07-01",
+        effectiveTo: null,
         steps: [stepRequest],
       },
     );
@@ -139,11 +159,16 @@ describe("AdminLifecycleTemplatesController", () => {
     expect(updateExecute).toHaveBeenCalledWith({
       id: templateId,
       jurisdictionCode: "JP",
-      deviceCategory: "CLASS_II",
-      procedureType: "承認",
+      framework: "MEDICAL_DEVICE",
+      deviceClass: "CLASS_II",
+      productNovelty: null,
+      approvalRoute: "承認",
+      characteristics: ["SAMD"],
+      effectiveFrom: new Date("2026-07-01"),
+      effectiveTo: null,
       steps: [stepRequest],
     });
-    expect(result.procedureType).toBe("承認");
+    expect(result.approvalRoute).toBe("承認");
   });
 
   it("remove: delegates to the usecase with the param id", async () => {
@@ -169,10 +194,15 @@ describe("AdminLifecycleTemplatesController", () => {
         {
           id: templateId,
           jurisdiction: { code: "JP", name: "日本" },
-          deviceCategory: "CLASS_II",
-          procedureType: "認証",
+          framework: "MEDICAL_DEVICE",
+          deviceClass: "CLASS_II",
+          productNovelty: null,
+          approvalRoute: "認証",
+          characteristics: [],
           status: "DRAFT",
           version: 1,
+          effectiveFrom: new Date("2026-07-01T00:00:00.000Z"),
+          effectiveTo: null,
           createdAt: new Date("2026-07-10T00:00:00.000Z"),
         },
       ],
@@ -181,16 +211,18 @@ describe("AdminLifecycleTemplatesController", () => {
 
     const result = await controller.list({
       jurisdiction: "JP",
-      deviceCategory: "CLASS_II",
-      procedureType: "認証",
+      framework: "MEDICAL_DEVICE",
+      deviceClass: "CLASS_II",
+      approvalRoute: "認証",
       status: "DRAFT",
       limit: 20,
     });
 
     expect(listExecute).toHaveBeenCalledWith({
       jurisdiction: "JP",
-      deviceCategory: "CLASS_II",
-      procedureType: "認証",
+      framework: "MEDICAL_DEVICE",
+      deviceClass: "CLASS_II",
+      approvalRoute: "認証",
       status: "DRAFT",
       cursor: undefined,
       limit: 20,

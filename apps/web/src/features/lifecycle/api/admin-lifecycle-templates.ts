@@ -1,7 +1,8 @@
 import type {
   CreateLifecycleTemplateRequest,
   JurisdictionCode,
-  LifecycleDeviceCategory,
+  LifecycleDeviceClass,
+  LifecycleFramework,
   LifecycleTemplateDetailResponse,
   LifecycleTemplateListResponse,
   LifecycleTemplateStatus,
@@ -39,8 +40,9 @@ async function parseProblemOrThrow(response: Response, fallbackMessage: string):
 
 export interface ListAdminLifecycleTemplatesParams {
   jurisdiction?: JurisdictionCode;
-  deviceCategory?: LifecycleDeviceCategory;
-  procedureType?: string;
+  framework?: LifecycleFramework;
+  deviceClass?: LifecycleDeviceClass;
+  approvalRoute?: string;
   status?: LifecycleTemplateStatus;
   cursor?: string;
   limit?: number;
@@ -55,11 +57,14 @@ export async function listAdminLifecycleTemplates(
   if (params.jurisdiction) {
     query.set("jurisdiction", params.jurisdiction);
   }
-  if (params.deviceCategory) {
-    query.set("deviceCategory", params.deviceCategory);
+  if (params.framework) {
+    query.set("framework", params.framework);
   }
-  if (params.procedureType) {
-    query.set("procedureType", params.procedureType);
+  if (params.deviceClass) {
+    query.set("deviceClass", params.deviceClass);
+  }
+  if (params.approvalRoute) {
+    query.set("approvalRoute", params.approvalRoute);
   }
   if (params.status) {
     query.set("status", params.status);

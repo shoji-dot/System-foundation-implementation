@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 
 import type { JurisdictionCode } from "../domain/jurisdiction.entity";
-import type { LifecycleDeviceCategory } from "../domain/lifecycle-template.entity";
+import type { LifecycleDeviceClass, LifecycleFramework } from "../domain/lifecycle-template.entity";
 import type {
   LifecycleTemplateListResult,
   LifecycleTemplateRepository,
@@ -10,8 +10,9 @@ import { LIFECYCLE_TEMPLATE_REPOSITORY } from "../domain/lifecycle-template.repo
 
 export interface ListLifecycleTemplatesInput {
   jurisdiction?: JurisdictionCode;
-  deviceCategory?: LifecycleDeviceCategory;
-  procedureType?: string;
+  framework?: LifecycleFramework;
+  deviceClass?: LifecycleDeviceClass;
+  approvalRoute?: string;
   cursor?: string;
   limit: number;
 }
@@ -30,8 +31,9 @@ export class ListLifecycleTemplatesUsecase {
   async execute(input: ListLifecycleTemplatesInput): Promise<LifecycleTemplateListResult> {
     return this.lifecycleTemplateRepository.findManyPublished({
       jurisdictionCode: input.jurisdiction,
-      deviceCategory: input.deviceCategory,
-      procedureType: input.procedureType,
+      framework: input.framework,
+      deviceClass: input.deviceClass,
+      approvalRoute: input.approvalRoute,
       cursor: input.cursor,
       limit: input.limit,
     });
