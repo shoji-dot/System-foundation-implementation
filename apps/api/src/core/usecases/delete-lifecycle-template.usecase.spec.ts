@@ -10,10 +10,15 @@ describe("DeleteLifecycleTemplateUsecase", () => {
     return {
       id: "018f2c3a-70d1-7c9a-8b1e-5f2a1c9d3e5a",
       jurisdiction: { code: "JP", name: "日本" },
-      deviceCategory: "CLASS_II",
-      procedureType: "認証",
+      framework: "MEDICAL_DEVICE",
+      deviceClass: "CLASS_II",
+      productNovelty: null,
+      approvalRoute: "認証",
+      characteristics: [],
       status,
       version: 1,
+      effectiveFrom: new Date("2026-07-01T00:00:00.000Z"),
+      effectiveTo: null,
       createdAt: new Date("2026-07-10T00:00:00.000Z"),
       steps: [],
     };

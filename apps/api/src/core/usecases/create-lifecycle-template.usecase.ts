@@ -4,7 +4,9 @@ import type { JurisdictionCode } from "../domain/jurisdiction.entity";
 import type { JurisdictionRepository } from "../domain/jurisdiction.repository";
 import { JURISDICTION_REPOSITORY } from "../domain/jurisdiction.repository";
 import type {
-  LifecycleDeviceCategory,
+  LifecycleDeviceClass,
+  LifecycleFramework,
+  LifecycleProductNovelty,
   LifecycleTemplateDetail,
 } from "../domain/lifecycle-template.entity";
 import type {
@@ -15,8 +17,13 @@ import { LIFECYCLE_TEMPLATE_REPOSITORY } from "../domain/lifecycle-template.repo
 
 export interface CreateLifecycleTemplateInput {
   jurisdictionCode: JurisdictionCode;
-  deviceCategory: LifecycleDeviceCategory;
-  procedureType: string;
+  framework: LifecycleFramework;
+  deviceClass: LifecycleDeviceClass | null;
+  productNovelty: LifecycleProductNovelty | null;
+  approvalRoute: string;
+  characteristics: string[];
+  effectiveFrom: Date;
+  effectiveTo: Date | null;
   steps: LifecycleTemplateStepWriteInput[];
 }
 
@@ -41,8 +48,13 @@ export class CreateLifecycleTemplateUsecase {
 
     return this.lifecycleTemplateRepository.create({
       jurisdictionCode: input.jurisdictionCode,
-      deviceCategory: input.deviceCategory,
-      procedureType: input.procedureType.trim(),
+      framework: input.framework,
+      deviceClass: input.deviceClass,
+      productNovelty: input.productNovelty,
+      approvalRoute: input.approvalRoute.trim(),
+      characteristics: input.characteristics,
+      effectiveFrom: input.effectiveFrom,
+      effectiveTo: input.effectiveTo,
       steps: input.steps,
     });
   }

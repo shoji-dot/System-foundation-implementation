@@ -60,33 +60,58 @@ export const LIFECYCLE_PHASE_LABELS: Record<LifecyclePhaseCode, string> = {
 };
 
 /**
- * 機器種別（設計変更書① S23「クラスI–IV/SaMD/IVD/能動/その他」、② DB変更 deviceCategory 準拠）。
- * 既存の device_classifications（JMDN等、S08/S09）とは別軸の簡易カテゴリで、工程マスタ・
- * ロードマップウィザードのテンプレート選定のみに用いる。
+ * 規制の法体系区分（Phase7 7-2再設計、2026-07-10ユーザー承認）。医療機器・体外診断用医薬品・
+ * コンビネーションプロダクトは薬機法上そもそも根拠条文・分類体系が異なるため、Classとは独立した
+ * 最上位の軸として持つ。COMBINATION_PRODUCTは将来拡張用（初期マスタデータの投入対象外）。
  */
-export const LIFECYCLE_DEVICE_CATEGORIES = [
+export const LIFECYCLE_FRAMEWORKS = ["MEDICAL_DEVICE", "IVD", "COMBINATION_PRODUCT"] as const;
+export type LifecycleFramework = (typeof LIFECYCLE_FRAMEWORKS)[number];
+export const lifecycleFrameworkSchema = z.enum(LIFECYCLE_FRAMEWORKS);
+
+/** 規制の法体系区分の日本語表示名（S22管理画面で使用）。 */
+export const LIFECYCLE_FRAMEWORK_LABELS: Record<LifecycleFramework, string> = {
+  MEDICAL_DEVICE: "医療機器",
+  IVD: "体外診断用医薬品",
+  COMBINATION_PRODUCT: "コンビネーションプロダクト",
+};
+
+/**
+ * 医療機器のクラス分類（Phase7 7-2再設計）。旧LifecycleDeviceCategoryからSaMD/IVD/ACTIVEを除去し、
+ * Class本来の4区分+OTHERのみに単純化。SaMD/能動植込み等は「特性」でありcharacteristics（タグ）で表現する
+ * （本フィールドには含めない）。framework=MEDICAL_DEVICE以外では意味を持たないためoptional。
+ */
+export const LIFECYCLE_DEVICE_CLASSES = [
   "CLASS_I",
   "CLASS_II",
   "CLASS_III",
   "CLASS_IV",
-  "SAMD",
-  "IVD",
-  "ACTIVE",
   "OTHER",
 ] as const;
-export type LifecycleDeviceCategory = (typeof LIFECYCLE_DEVICE_CATEGORIES)[number];
-export const lifecycleDeviceCategorySchema = z.enum(LIFECYCLE_DEVICE_CATEGORIES);
+export type LifecycleDeviceClass = (typeof LIFECYCLE_DEVICE_CLASSES)[number];
+export const lifecycleDeviceClassSchema = z.enum(LIFECYCLE_DEVICE_CLASSES);
 
-/** 機器種別の日本語表示名（設計変更書① S23「クラスI–IV/SaMD/IVD/能動/その他」準拠、S22管理画面で使用）。 */
-export const LIFECYCLE_DEVICE_CATEGORY_LABELS: Record<LifecycleDeviceCategory, string> = {
+/** クラス分類の日本語表示名（S22管理画面で使用）。 */
+export const LIFECYCLE_DEVICE_CLASS_LABELS: Record<LifecycleDeviceClass, string> = {
   CLASS_I: "クラスI",
   CLASS_II: "クラスII",
   CLASS_III: "クラスIII",
   CLASS_IV: "クラスIV",
-  SAMD: "SaMD",
-  IVD: "IVD",
-  ACTIVE: "能動機器",
   OTHER: "その他",
+};
+
+/**
+ * 新規性区分（Phase7 7-2再設計）。新医療機器/改良医療機器/後発医療機器はPMDAの審査期間・手数料が
+ * 大きく異なる別軸のため独立させた。届出等、概念自体が当てはまらない手続きではoptional。
+ */
+export const LIFECYCLE_PRODUCT_NOVELTIES = ["NEW", "MODIFIED", "GENERIC"] as const;
+export type LifecycleProductNovelty = (typeof LIFECYCLE_PRODUCT_NOVELTIES)[number];
+export const lifecycleProductNoveltySchema = z.enum(LIFECYCLE_PRODUCT_NOVELTIES);
+
+/** 新規性区分の日本語表示名（S22管理画面で使用）。 */
+export const LIFECYCLE_PRODUCT_NOVELTY_LABELS: Record<LifecycleProductNovelty, string> = {
+  NEW: "新医療機器",
+  MODIFIED: "改良医療機器",
+  GENERIC: "後発医療機器",
 };
 
 /** 工程マスタの公開状態（設計変更書②「status(draft/published)」準拠、2状態のみ）。 */
@@ -101,13 +126,16 @@ export const LIFECYCLE_TEMPLATE_STATUS_LABELS: Record<LifecycleTemplateStatus, s
 };
 
 /**
- * GET /api/v1/lifecycle/templates クエリ（設計変更書③「?jurisdiction=&deviceCategory=&procedureType=」準拠）。
- * procedureTypeはJP/US/EU等で語彙が大きく異なるため自由文字列（apps/api側と同方針）。
+ * GET /api/v1/lifecycle/templates クエリ（Phase7 7-2再設計）。
+ * approvalRoute（旧procedureType）はJP/US/EU等で語彙が大きく異なるため自由文字列（apps/api側と同方針）。
+ * characteristicsはSaMD/能動植込み等のタグ名による絞り込み（tags/taggings経由）で、現時点ではAPI側の
+ * 絞り込みは未実装（一覧・詳細応答への表示のみ先行実装。フィルタは将来のroadmap wizard実装時に追加、YAGNI）。
  */
 export const listLifecycleTemplatesQuerySchema = cursorPaginationQuerySchema.extend({
   jurisdiction: jurisdictionCodeSchema.optional(),
-  deviceCategory: lifecycleDeviceCategorySchema.optional(),
-  procedureType: z.string().trim().min(1).optional(),
+  framework: lifecycleFrameworkSchema.optional(),
+  deviceClass: lifecycleDeviceClassSchema.optional(),
+  approvalRoute: z.string().trim().min(1).optional(),
 });
 export type ListLifecycleTemplatesQuery = z.infer<typeof listLifecycleTemplatesQuerySchema>;
 
@@ -159,14 +187,24 @@ export const lifecycleTemplateStepResponseSchema = z.object({
 });
 export type LifecycleTemplateStepResponse = z.infer<typeof lifecycleTemplateStepResponseSchema>;
 
-/** 工程マスタ・テンプレート一覧項目応答（GET /lifecycle/templates）。 */
+/**
+ * 工程マスタ・テンプレート一覧項目応答（GET /lifecycle/templates、Phase7 7-2再設計）。
+ * deviceClass/productNoveltyはframework=MEDICAL_DEVICE以外や届出等一部手続きでnull。
+ * characteristicsはtags/taggings（TaggableType.LIFECYCLE_TEMPLATE）経由のタグ名一覧（例: ["SAMD"]）。
+ * effectiveFrom/effectiveToは「この期間・費用データが妥当と確認できた実世界の期間」（監査用）。
+ */
 export const lifecycleTemplateSummaryResponseSchema = z.object({
   id: z.string().uuid(),
   jurisdiction: jurisdictionSummaryResponseSchema,
-  deviceCategory: lifecycleDeviceCategorySchema,
-  procedureType: z.string(),
+  framework: lifecycleFrameworkSchema,
+  deviceClass: lifecycleDeviceClassSchema.nullable(),
+  productNovelty: lifecycleProductNoveltySchema.nullable(),
+  approvalRoute: z.string(),
+  characteristics: z.array(z.string()),
   status: lifecycleTemplateStatusSchema,
   version: z.number().int(),
+  effectiveFrom: z.string(),
+  effectiveTo: z.string().nullable(),
   createdAt: z.string().datetime(),
 });
 export type LifecycleTemplateSummaryResponse = z.infer<
@@ -209,13 +247,21 @@ export const adminLifecycleTemplateStepInputSchema = z.object({
 export type AdminLifecycleTemplateStepInput = z.infer<typeof adminLifecycleTemplateStepInputSchema>;
 
 /**
- * POST /api/v1/admin/lifecycle-templates リクエストボディ。テンプレート本体+工程一覧を一括で作成する
- * （regulation_versionsのfullText同様、工程マスタも1ドキュメントとして丸ごと扱う設計）。
+ * POST /api/v1/admin/lifecycle-templates リクエストボディ（Phase7 7-2再設計）。テンプレート本体+工程一覧を
+ * 一括で作成する（regulation_versionsのfullText同様、工程マスタも1ドキュメントとして丸ごと扱う設計）。
+ * deviceClass/productNoveltyはnullable（framework=MEDICAL_DEVICE以外や届出等では概念が無いため）。
+ * characteristicsは自由文字列タグ名の配列（例: ["SAMD","ACTIVE_IMPLANTABLE"]、admin入力時に
+ * find-or-createでtagsへ登録する。空配列許容）。effectiveToはnullable（現在も有効な場合）。
  */
 export const createLifecycleTemplateRequestSchema = z.object({
   jurisdiction: jurisdictionCodeSchema,
-  deviceCategory: lifecycleDeviceCategorySchema,
-  procedureType: z.string().trim().min(1),
+  framework: lifecycleFrameworkSchema,
+  deviceClass: lifecycleDeviceClassSchema.nullable(),
+  productNovelty: lifecycleProductNoveltySchema.nullable(),
+  approvalRoute: z.string().trim().min(1),
+  characteristics: z.array(z.string().trim().min(1)).default([]),
+  effectiveFrom: z.string(),
+  effectiveTo: z.string().nullable(),
   steps: z.array(adminLifecycleTemplateStepInputSchema).min(1),
 });
 export type CreateLifecycleTemplateRequest = z.infer<typeof createLifecycleTemplateRequestSchema>;
@@ -230,8 +276,9 @@ export type UpdateLifecycleTemplateRequest = CreateLifecycleTemplateRequest;
 /** GET /api/v1/admin/lifecycle-templates クエリ（全ステータス対象、公開用GETと異なりstatus絞り込み可）。 */
 export const listAdminLifecycleTemplatesQuerySchema = cursorPaginationQuerySchema.extend({
   jurisdiction: jurisdictionCodeSchema.optional(),
-  deviceCategory: lifecycleDeviceCategorySchema.optional(),
-  procedureType: z.string().trim().min(1).optional(),
+  framework: lifecycleFrameworkSchema.optional(),
+  deviceClass: lifecycleDeviceClassSchema.optional(),
+  approvalRoute: z.string().trim().min(1).optional(),
   status: lifecycleTemplateStatusSchema.optional(),
 });
 export type ListAdminLifecycleTemplatesQuery = z.infer<

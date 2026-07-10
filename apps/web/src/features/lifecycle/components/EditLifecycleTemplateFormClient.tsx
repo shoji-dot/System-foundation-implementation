@@ -23,8 +23,13 @@ export function EditLifecycleTemplateFormClient({ detail }: EditLifecycleTemplat
       submitLabel="保存する"
       initialValues={{
         jurisdiction: detail.jurisdiction.code,
-        deviceCategory: detail.deviceCategory,
-        procedureType: detail.procedureType,
+        framework: detail.framework,
+        deviceClass: detail.deviceClass,
+        productNovelty: detail.productNovelty,
+        approvalRoute: detail.approvalRoute,
+        characteristics: detail.characteristics,
+        effectiveFrom: detail.effectiveFrom,
+        effectiveTo: detail.effectiveTo,
         steps: [...detail.steps]
           .sort((a, b) => a.order - b.order)
           .map((step) => stepFromResponse(step)),

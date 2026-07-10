@@ -1,7 +1,9 @@
 import type { JurisdictionCode } from "./jurisdiction.entity";
 import type { LifecyclePhase, LifecyclePhaseCode } from "./lifecycle-phase.entity";
 import type {
-  LifecycleDeviceCategory,
+  LifecycleDeviceClass,
+  LifecycleFramework,
+  LifecycleProductNovelty,
   LifecycleTemplate,
   LifecycleTemplateDetail,
   LifecycleTemplateSourceRef,
@@ -16,8 +18,9 @@ export const LIFECYCLE_TEMPLATE_REPOSITORY = Symbol("LIFECYCLE_TEMPLATE_REPOSITO
 
 export interface LifecycleTemplateListFilters {
   jurisdictionCode?: JurisdictionCode;
-  deviceCategory?: LifecycleDeviceCategory;
-  procedureType?: string;
+  framework?: LifecycleFramework;
+  deviceClass?: LifecycleDeviceClass;
+  approvalRoute?: string;
   /** カーソルページネーション（設計変更書③）: 前回応答の nextCursor をそのまま渡す。 */
   cursor?: string;
   limit: number;
@@ -50,11 +53,20 @@ export interface LifecycleTemplateStepWriteInput {
   sourceRefs: LifecycleTemplateSourceRef[];
 }
 
-/** 工程マスタ・テンプレート本体の作成/更新入力（admin CRUD向け）。 */
+/**
+ * 工程マスタ・テンプレート本体の作成/更新入力（admin CRUD向け、Phase7 7-2再設計）。
+ * characteristicsはタグ名の配列（find-or-createでtagsへ登録し、taggableType=LIFECYCLE_TEMPLATEで
+ * 紐付ける。既存tags/taggingsの再利用、enum固定化を避けるための設計）。
+ */
 export interface LifecycleTemplateWriteInput {
   jurisdictionCode: JurisdictionCode;
-  deviceCategory: LifecycleDeviceCategory;
-  procedureType: string;
+  framework: LifecycleFramework;
+  deviceClass: LifecycleDeviceClass | null;
+  productNovelty: LifecycleProductNovelty | null;
+  approvalRoute: string;
+  characteristics: string[];
+  effectiveFrom: Date;
+  effectiveTo: Date | null;
   steps: LifecycleTemplateStepWriteInput[];
 }
 

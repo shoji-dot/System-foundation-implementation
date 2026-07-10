@@ -60,8 +60,9 @@ export class AdminLifecycleTemplatesController {
   ): Promise<LifecycleTemplateListResponse> {
     const result = await this.listAdminLifecycleTemplatesUsecase.execute({
       jurisdiction: query.jurisdiction,
-      deviceCategory: query.deviceCategory,
-      procedureType: query.procedureType,
+      framework: query.framework,
+      deviceClass: query.deviceClass,
+      approvalRoute: query.approvalRoute,
       status: query.status,
       cursor: query.cursor,
       limit: query.limit,
@@ -71,10 +72,15 @@ export class AdminLifecycleTemplatesController {
       items: result.items.map((template) => ({
         id: template.id,
         jurisdiction: template.jurisdiction,
-        deviceCategory: template.deviceCategory,
-        procedureType: template.procedureType,
+        framework: template.framework,
+        deviceClass: template.deviceClass,
+        productNovelty: template.productNovelty,
+        approvalRoute: template.approvalRoute,
+        characteristics: template.characteristics,
         status: template.status,
         version: template.version,
+        effectiveFrom: template.effectiveFrom.toISOString().slice(0, 10),
+        effectiveTo: template.effectiveTo ? template.effectiveTo.toISOString().slice(0, 10) : null,
         createdAt: template.createdAt.toISOString(),
       })),
       nextCursor: result.nextCursor,
@@ -95,8 +101,13 @@ export class AdminLifecycleTemplatesController {
   ): Promise<LifecycleTemplateDetailResponse> {
     const created = await this.createLifecycleTemplateUsecase.execute({
       jurisdictionCode: body.jurisdiction,
-      deviceCategory: body.deviceCategory,
-      procedureType: body.procedureType,
+      framework: body.framework,
+      deviceClass: body.deviceClass,
+      productNovelty: body.productNovelty,
+      approvalRoute: body.approvalRoute,
+      characteristics: body.characteristics,
+      effectiveFrom: new Date(body.effectiveFrom),
+      effectiveTo: body.effectiveTo ? new Date(body.effectiveTo) : null,
       steps: body.steps,
     });
 
@@ -111,8 +122,13 @@ export class AdminLifecycleTemplatesController {
     const updated = await this.updateLifecycleTemplateUsecase.execute({
       id: params.id,
       jurisdictionCode: body.jurisdiction,
-      deviceCategory: body.deviceCategory,
-      procedureType: body.procedureType,
+      framework: body.framework,
+      deviceClass: body.deviceClass,
+      productNovelty: body.productNovelty,
+      approvalRoute: body.approvalRoute,
+      characteristics: body.characteristics,
+      effectiveFrom: new Date(body.effectiveFrom),
+      effectiveTo: body.effectiveTo ? new Date(body.effectiveTo) : null,
       steps: body.steps,
     });
 
@@ -139,10 +155,15 @@ function toDetailResponse(detail: LifecycleTemplateDetail) {
   return {
     id: detail.id,
     jurisdiction: detail.jurisdiction,
-    deviceCategory: detail.deviceCategory,
-    procedureType: detail.procedureType,
+    framework: detail.framework,
+    deviceClass: detail.deviceClass,
+    productNovelty: detail.productNovelty,
+    approvalRoute: detail.approvalRoute,
+    characteristics: detail.characteristics,
     status: detail.status,
     version: detail.version,
+    effectiveFrom: detail.effectiveFrom.toISOString().slice(0, 10),
+    effectiveTo: detail.effectiveTo ? detail.effectiveTo.toISOString().slice(0, 10) : null,
     createdAt: detail.createdAt.toISOString(),
     steps: detail.steps.map((step) => ({
       id: step.id,

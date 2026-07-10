@@ -36,8 +36,9 @@ export class LifecycleController {
   ): Promise<LifecycleTemplateListResponse> {
     const result = await this.listLifecycleTemplatesUsecase.execute({
       jurisdiction: query.jurisdiction,
-      deviceCategory: query.deviceCategory,
-      procedureType: query.procedureType,
+      framework: query.framework,
+      deviceClass: query.deviceClass,
+      approvalRoute: query.approvalRoute,
       cursor: query.cursor,
       limit: query.limit,
     });
@@ -46,10 +47,15 @@ export class LifecycleController {
       items: result.items.map((template) => ({
         id: template.id,
         jurisdiction: template.jurisdiction,
-        deviceCategory: template.deviceCategory,
-        procedureType: template.procedureType,
+        framework: template.framework,
+        deviceClass: template.deviceClass,
+        productNovelty: template.productNovelty,
+        approvalRoute: template.approvalRoute,
+        characteristics: template.characteristics,
         status: template.status,
         version: template.version,
+        effectiveFrom: template.effectiveFrom.toISOString().slice(0, 10),
+        effectiveTo: template.effectiveTo ? template.effectiveTo.toISOString().slice(0, 10) : null,
         createdAt: template.createdAt.toISOString(),
       })),
       nextCursor: result.nextCursor,
@@ -69,10 +75,15 @@ export class LifecycleController {
     return lifecycleTemplateDetailResponseSchema.parse({
       id: detail.id,
       jurisdiction: detail.jurisdiction,
-      deviceCategory: detail.deviceCategory,
-      procedureType: detail.procedureType,
+      framework: detail.framework,
+      deviceClass: detail.deviceClass,
+      productNovelty: detail.productNovelty,
+      approvalRoute: detail.approvalRoute,
+      characteristics: detail.characteristics,
       status: detail.status,
       version: detail.version,
+      effectiveFrom: detail.effectiveFrom.toISOString().slice(0, 10),
+      effectiveTo: detail.effectiveTo ? detail.effectiveTo.toISOString().slice(0, 10) : null,
       createdAt: detail.createdAt.toISOString(),
       steps: detail.steps.map((step) => this.toStepResponse(step)),
     });

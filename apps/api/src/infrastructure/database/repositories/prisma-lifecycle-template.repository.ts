@@ -5,13 +5,16 @@ import type {
   LifecycleTemplate as PrismaLifecycleTemplate,
   LifecycleTemplateStep as PrismaLifecycleTemplateStep,
   Prisma,
+  PrismaClient,
 } from "@prisma/client";
 import { z } from "zod";
 
 import type { JurisdictionCode } from "../../../core/domain/jurisdiction.entity";
 import type { LifecyclePhase } from "../../../core/domain/lifecycle-phase.entity";
 import type {
-  LifecycleDeviceCategory,
+  LifecycleDeviceClass,
+  LifecycleFramework,
+  LifecycleProductNovelty,
   LifecycleTemplate,
   LifecycleTemplateDetail,
   LifecycleTemplateSourceRef,
@@ -38,6 +41,14 @@ type LifecycleTemplateWithJurisdictionAndSteps = LifecycleTemplateWithJurisdicti
 /** lifecycle_template_steps のjsonb列の実行時検証（DBには型保証が無いため、prisma-quiz.repositoryと同方針）。 */
 const stringArraySchema = z.array(z.string());
 const sourceRefsSchema = z.array(z.object({ title: z.string(), url: z.string() }));
+
+/**
+ * 特性タグの対象種別（Phase7 7-2再設計）。tags/taggings（設計書④共通、S21）を再利用し、
+ * SaMD/能動植込み等の「特性」をenum固定化せずタグとして表現する。tags.moduleへのDI依存を避けるため
+ * （lifecycle→tags のモジュール間依存を発生させないため）、本リポジトリから直接Prismaで読み書きする
+ * （TagRepository/TaggingRepositoryと同じテーブルを扱うが、実装は独立させるユーザー承認済みの判断）。
+ */
+const LIFECYCLE_TEMPLATE_TAGGABLE_TYPE = "LIFECYCLE_TEMPLATE" as const;
 
 const DETAIL_INCLUDE = {
   jurisdiction: true,
@@ -68,8 +79,12 @@ export class PrismaLifecycleTemplateRepository implements LifecycleTemplateRepos
       where: { id, status: "PUBLISHED" },
       include: DETAIL_INCLUDE,
     });
+    if (!record) {
+      return null;
+    }
 
-    return record ? this.toDetailDomain(record) : null;
+    const characteristics = await this.listCharacteristics(record.id);
+    return this.toDetailDomain(record, characteristics);
   }
 
   async findManyForAdmin(
@@ -88,8 +103,12 @@ export class PrismaLifecycleTemplateRepository implements LifecycleTemplateRepos
       where: { id },
       include: DETAIL_INCLUDE,
     });
+    if (!record) {
+      return null;
+    }
 
-    return record ? this.toDetailDomain(record) : null;
+    const characteristics = await this.listCharacteristics(record.id);
+    return this.toDetailDomain(record, characteristics);
   }
 
   async findAllPhases(): Promise<LifecyclePhase[]> {
@@ -98,17 +117,24 @@ export class PrismaLifecycleTemplateRepository implements LifecycleTemplateRepos
   }
 
   async create(input: LifecycleTemplateWriteInput): Promise<LifecycleTemplateDetail> {
-    const record = await this.prisma.lifecycleTemplate.create({
-      data: {
-        jurisdiction: { connect: { code: input.jurisdictionCode } },
-        deviceCategory: input.deviceCategory,
-        procedureType: input.procedureType,
-        steps: { create: input.steps.map((step) => this.toStepCreateData(step)) },
-      },
-      include: DETAIL_INCLUDE,
-    });
+    return this.prisma.$transaction(async (tx) => {
+      const record = await tx.lifecycleTemplate.create({
+        data: {
+          jurisdiction: { connect: { code: input.jurisdictionCode } },
+          framework: input.framework,
+          deviceClass: input.deviceClass,
+          productNovelty: input.productNovelty,
+          approvalRoute: input.approvalRoute,
+          effectiveFrom: input.effectiveFrom,
+          effectiveTo: input.effectiveTo,
+          steps: { create: input.steps.map((step) => this.toStepCreateData(step)) },
+        },
+        include: DETAIL_INCLUDE,
+      });
 
-    return this.toDetailDomain(record);
+      await this.replaceCharacteristics(tx, record.id, input.characteristics);
+      return this.toDetailDomain(record, input.characteristics);
+    });
   }
 
   async update(
@@ -128,14 +154,19 @@ export class PrismaLifecycleTemplateRepository implements LifecycleTemplateRepos
         where: { id },
         data: {
           jurisdiction: { connect: { code: input.jurisdictionCode } },
-          deviceCategory: input.deviceCategory,
-          procedureType: input.procedureType,
+          framework: input.framework,
+          deviceClass: input.deviceClass,
+          productNovelty: input.productNovelty,
+          approvalRoute: input.approvalRoute,
+          effectiveFrom: input.effectiveFrom,
+          effectiveTo: input.effectiveTo,
           steps: { create: input.steps.map((step) => this.toStepCreateData(step)) },
         },
         include: DETAIL_INCLUDE,
       });
 
-      return this.toDetailDomain(record);
+      await this.replaceCharacteristics(tx, record.id, input.characteristics);
+      return this.toDetailDomain(record, input.characteristics);
     });
   }
 
@@ -147,6 +178,10 @@ export class PrismaLifecycleTemplateRepository implements LifecycleTemplateRepos
       }
 
       // lifecycle_template_steps は template_id に onDelete: Cascade のためstepsは自動削除される。
+      // taggingsはtaggableIdへの外部キー制約が無い（polymorphic設計）ため明示的に削除する。
+      await tx.tagging.deleteMany({
+        where: { taggableType: LIFECYCLE_TEMPLATE_TAGGABLE_TYPE, taggableId: id },
+      });
       await tx.lifecycleTemplate.delete({ where: { id } });
       return true;
     });
@@ -165,7 +200,8 @@ export class PrismaLifecycleTemplateRepository implements LifecycleTemplateRepos
         include: DETAIL_INCLUDE,
       });
 
-      return this.toDetailDomain(record);
+      const characteristics = await this.listCharacteristics(id, tx);
+      return this.toDetailDomain(record, characteristics);
     });
   }
 
@@ -185,30 +221,102 @@ export class PrismaLifecycleTemplateRepository implements LifecycleTemplateRepos
     const page = hasMore ? records.slice(0, filters.limit) : records;
     const nextCursor = hasMore ? (page[page.length - 1]?.id ?? null) : null;
 
+    // characteristicsはpolymorphicなtaggingsのため一括バッチ取得する（1クエリでN+1を回避）。
+    const characteristicsByTemplateId = await this.batchListCharacteristics(
+      page.map((record: LifecycleTemplateWithJurisdiction) => record.id),
+    );
+
     return {
-      items: page.map((record: LifecycleTemplateWithJurisdiction) => this.toDomain(record)),
+      items: page.map((record: LifecycleTemplateWithJurisdiction) =>
+        this.toDomain(record, characteristicsByTemplateId.get(record.id) ?? []),
+      ),
       nextCursor,
     };
   }
 
   private buildFilterWhere(filters: {
     jurisdictionCode?: JurisdictionCode;
-    deviceCategory?: LifecycleDeviceCategory;
-    procedureType?: string;
+    framework?: LifecycleFramework;
+    deviceClass?: LifecycleDeviceClass;
+    approvalRoute?: string;
   }): Prisma.LifecycleTemplateWhereInput {
     const where: Prisma.LifecycleTemplateWhereInput = {};
 
     if (filters.jurisdictionCode) {
       where.jurisdiction = { code: filters.jurisdictionCode };
     }
-    if (filters.deviceCategory) {
-      where.deviceCategory = filters.deviceCategory;
+    if (filters.framework) {
+      where.framework = filters.framework;
     }
-    if (filters.procedureType) {
-      where.procedureType = filters.procedureType;
+    if (filters.deviceClass) {
+      where.deviceClass = filters.deviceClass;
+    }
+    if (filters.approvalRoute) {
+      where.approvalRoute = filters.approvalRoute;
     }
 
     return where;
+  }
+
+  /**
+   * 特性タグの find-or-create + 一括置換（Phase7 7-2再設計）。tags/taggings（S21と共通のテーブル）を
+   * 直接扱う。update時は既存taggingsを一旦全削除してから作り直す（steps同様「丸ごと置換」方式）。
+   */
+  private async replaceCharacteristics(
+    tx: Prisma.TransactionClient,
+    templateId: string,
+    characteristics: string[],
+  ): Promise<void> {
+    await tx.tagging.deleteMany({
+      where: { taggableType: LIFECYCLE_TEMPLATE_TAGGABLE_TYPE, taggableId: templateId },
+    });
+
+    for (const name of characteristics) {
+      const tag = await tx.tag.upsert({
+        where: { name },
+        update: {},
+        create: { name },
+      });
+      await tx.tagging.create({
+        data: { tagId: tag.id, taggableType: LIFECYCLE_TEMPLATE_TAGGABLE_TYPE, taggableId: templateId },
+      });
+    }
+  }
+
+  private async listCharacteristics(
+    templateId: string,
+    client: Prisma.TransactionClient | PrismaClient = this.prisma,
+  ): Promise<string[]> {
+    const taggings = await client.tagging.findMany({
+      where: { taggableType: LIFECYCLE_TEMPLATE_TAGGABLE_TYPE, taggableId: templateId },
+      include: { tag: true },
+      orderBy: { createdAt: "asc" },
+    });
+
+    return taggings.map((tagging) => tagging.tag.name);
+  }
+
+  private async batchListCharacteristics(
+    templateIds: string[],
+  ): Promise<Map<string, string[]>> {
+    if (templateIds.length === 0) {
+      return new Map();
+    }
+
+    const taggings = await this.prisma.tagging.findMany({
+      where: { taggableType: LIFECYCLE_TEMPLATE_TAGGABLE_TYPE, taggableId: { in: templateIds } },
+      include: { tag: true },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const result = new Map<string, string[]>();
+    for (const tagging of taggings) {
+      const current = result.get(tagging.taggableId) ?? [];
+      current.push(tagging.tag.name);
+      result.set(tagging.taggableId, current);
+    }
+
+    return result;
   }
 
   private toStepCreateData(
@@ -231,26 +339,35 @@ export class PrismaLifecycleTemplateRepository implements LifecycleTemplateRepos
     };
   }
 
-  private toDomain(record: LifecycleTemplateWithJurisdiction): LifecycleTemplate {
+  private toDomain(
+    record: LifecycleTemplateWithJurisdiction,
+    characteristics: string[],
+  ): LifecycleTemplate {
     return {
       id: record.id,
       jurisdiction: {
         code: record.jurisdiction.code as JurisdictionCode,
         name: record.jurisdiction.name,
       },
-      deviceCategory: record.deviceCategory as LifecycleDeviceCategory,
-      procedureType: record.procedureType,
+      framework: record.framework as LifecycleFramework,
+      deviceClass: record.deviceClass as LifecycleDeviceClass | null,
+      productNovelty: record.productNovelty as LifecycleProductNovelty | null,
+      approvalRoute: record.approvalRoute,
+      characteristics,
       status: record.status as LifecycleTemplateStatus,
       version: record.version,
+      effectiveFrom: record.effectiveFrom,
+      effectiveTo: record.effectiveTo,
       createdAt: record.createdAt,
     };
   }
 
   private toDetailDomain(
     record: LifecycleTemplateWithJurisdictionAndSteps,
+    characteristics: string[],
   ): LifecycleTemplateDetail {
     return {
-      ...this.toDomain(record),
+      ...this.toDomain(record, characteristics),
       steps: record.steps.map((step: LifecycleTemplateStepWithPhase) => this.toStepDomain(step)),
     };
   }

@@ -60,11 +60,15 @@ export function createEmptyStep(order: number): StepFormValue {
   };
 }
 
-function arrayToLines(items: readonly string[] | null): string {
+/**
+ * 配列⇔改行区切りテキストの相互変換（Phase7 7-2再設計でLifecycleTemplateForm.tsxの
+ * characteristics入力からも再利用するためexportする）。
+ */
+export function arrayToLines(items: readonly string[] | null): string {
   return (items ?? []).join("\n");
 }
 
-function linesToArray(value: string): string[] {
+export function linesToArray(value: string): string[] {
   return value
     .split("\n")
     .map((line) => line.trim())
