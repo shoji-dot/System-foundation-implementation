@@ -41,6 +41,13 @@ describe("GetLifecycleTemplateDetailUsecase", () => {
     const lifecycleTemplateRepository: jest.Mocked<LifecycleTemplateRepository> = {
       findManyPublished: jest.fn(),
       findPublishedDetailById: jest.fn(),
+      findManyForAdmin: jest.fn(),
+      findDetailByIdForAdmin: jest.fn(),
+      findAllPhases: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      publish: jest.fn(),
     };
     const usecase = new GetLifecycleTemplateDetailUsecase(lifecycleTemplateRepository);
     return { usecase, lifecycleTemplateRepository };
