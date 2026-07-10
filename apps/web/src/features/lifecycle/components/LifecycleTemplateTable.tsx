@@ -94,7 +94,9 @@ export function LifecycleTemplateTable({ items }: LifecycleTemplateTableProps) {
                 <td className="py-3 pr-4 text-text">{template.jurisdiction.name}</td>
                 <td className="py-3 pr-4 text-text">
                   {LIFECYCLE_FRAMEWORK_LABELS[template.framework]}
-                  {template.deviceClass ? ` / ${LIFECYCLE_DEVICE_CLASS_LABELS[template.deviceClass]}` : ""}
+                  {template.deviceClass
+                    ? ` / ${LIFECYCLE_DEVICE_CLASS_LABELS[template.deviceClass]}`
+                    : ""}
                   {template.productNovelty
                     ? ` / ${LIFECYCLE_PRODUCT_NOVELTY_LABELS[template.productNovelty]}`
                     : ""}

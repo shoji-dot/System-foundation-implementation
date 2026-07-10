@@ -278,7 +278,11 @@ export class PrismaLifecycleTemplateRepository implements LifecycleTemplateRepos
         create: { name },
       });
       await tx.tagging.create({
-        data: { tagId: tag.id, taggableType: LIFECYCLE_TEMPLATE_TAGGABLE_TYPE, taggableId: templateId },
+        data: {
+          tagId: tag.id,
+          taggableType: LIFECYCLE_TEMPLATE_TAGGABLE_TYPE,
+          taggableId: templateId,
+        },
       });
     }
   }
@@ -296,9 +300,7 @@ export class PrismaLifecycleTemplateRepository implements LifecycleTemplateRepos
     return taggings.map((tagging) => tagging.tag.name);
   }
 
-  private async batchListCharacteristics(
-    templateIds: string[],
-  ): Promise<Map<string, string[]>> {
+  private async batchListCharacteristics(templateIds: string[]): Promise<Map<string, string[]>> {
     if (templateIds.length === 0) {
       return new Map();
     }

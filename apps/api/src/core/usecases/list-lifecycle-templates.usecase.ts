@@ -1,10 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 
 import type { JurisdictionCode } from "../domain/jurisdiction.entity";
-import type {
-  LifecycleDeviceClass,
-  LifecycleFramework,
-} from "../domain/lifecycle-template.entity";
+import type { LifecycleDeviceClass, LifecycleFramework } from "../domain/lifecycle-template.entity";
 import type {
   LifecycleTemplateListResult,
   LifecycleTemplateRepository,
