@@ -1,0 +1,3559 @@
+{
+  "templates": [
+    {
+      "jurisdiction": "JP",
+      "framework": "MEDICAL_DEVICE",
+      "deviceClass": "CLASS_I",
+      "productNovelty": null,
+      "approvalRoute": "届出",
+      "characteristics": [],
+      "effectiveFrom": "2022-05-20",
+      "effectiveTo": null,
+      "steps": [
+        {
+          "phaseCode": "PLANNING",
+          "name": "企画",
+          "order": 1,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["事業計画書", "ターゲット製品プロファイル(TPP)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "MARKET_RESEARCH",
+          "name": "市場調査",
+          "order": 2,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["競合製品調査資料", "市場規模調査資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "DESIGN",
+          "name": "設計",
+          "order": 3,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["設計開発計画書", "設計仕様書", "設計検証・妥当性確認記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令（厚労省令第169号）第30条〜第36条（設計開発）に基づく文書体系。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第30条〜第36条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RISK_ISO14971",
+          "name": "リスクマネジメント",
+          "order": 4,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "リスクマネジメント計画書",
+            "リスク分析・評価・対応記録",
+            "リスクマネジメントファイル"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "JIS T 14971:2020 (ISO 14971:2019)。QMS省令第26条にも要求あり。",
+          "sourceRefs": [
+            {
+              "title": "JIS T 14971:2020 (ISO 14971:2019) / QMS省令第169号 第26条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "QMS",
+          "name": "QMS構築",
+          "order": 5,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["品質マニュアル", "QMS体制図", "内部監査記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "医療機器はQMS省令（第169号）準拠必須。認証取得の場合はISO13485登録が前提となることが多い。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "TESTING",
+          "name": "試験",
+          "order": 6,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "試験計画書",
+            "生物学的安全性試験(ISO10993等)報告書",
+            "電気的安全性試験(IEC60601等)報告書"
+          ],
+          "requiredTests": ["ISO10993（生物学的安全性）", "IEC60601（電気的安全性）"],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+          "sourceRefs": [
+            {
+              "title": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "LAUNCH",
+          "name": "上市",
+          "order": 12,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "製造販売業許可証",
+            "製造業登録証",
+            "添付文書",
+            "GVP/GQP体制に関する文書"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5（製造販売業許可）等。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5（製造販売業許可）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SALES",
+          "name": "販売",
+          "order": 13,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["販売実績管理記録", "安全管理情報収集記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+          "sourceRefs": [
+            {
+              "title": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CHANGE_CONTROL",
+          "name": "変更管理",
+          "order": 14,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["変更管理記録", "一部変更承認申請書または軽微変更届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第36条（設計変更管理）。変更の程度により分岐（別途要判断）。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第169号 第36条（設計変更管理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "COMPLAINT",
+          "name": "苦情処理",
+          "order": 15,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["苦情処理記録", "苦情対応手順書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第60条（苦情処理）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第60条（苦情処理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CAPA",
+          "name": "CAPA",
+          "order": 16,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["是正処置・予防処置記録(CAPA記録)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第64条（是正措置及び予防措置）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第64条（是正措置及び予防措置）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RECALL",
+          "name": "回収",
+          "order": 17,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["回収着手報告書", "回収状況定期報告書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/safety/info-services/devices/0054.html"],
+          "notes": "薬機法第68条の11、施行規則第228条の22。回収クラス（クラスI〜III、健康被害リスク順）に応じ報告頻度が変わる。",
+          "sourceRefs": [
+            {
+              "title": "厚労省 回収に関する通知（薬食発1121第10号）",
+              "url": "https://www.mhlw.go.jp/file/06-Seisakujouhou-11120000-Iyakushokuhinkyoku/0000130618.pdf"
+            },
+            {
+              "title": "PMDA 回収情報（医療機器）",
+              "url": "https://www.pmda.go.jp/safety/info-services/devices/0054.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "DISCONTINUATION",
+          "name": "販売終了",
+          "order": 18,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["製造販売中止届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法施行規則に基づく中止届出。",
+          "sourceRefs": [
+            {
+              "title": "薬機法施行規則に基づく製造販売中止届書",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REG_STRATEGY",
+          "name": "薬事戦略",
+          "order": 7,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["該当法域・分類の該当性確認資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "クラスI＝一般医療機器（薬機法上、届出のみで審査なし）。",
+          "sourceRefs": [
+            {
+              "title": "クラスI＝一般医療機器（薬機法上、届出のみで審査なし）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SUBMISSION",
+          "name": "承認申請",
+          "order": 8,
+          "durationMinDays": 1,
+          "durationMaxDays": 5,
+          "costMinJpy": 0,
+          "costMaxJpy": 0,
+          "requiredDocuments": ["医療機器製造販売届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の12。届出は審査を伴わず受理のみのため他区分と性質が異なる。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の12",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "PMDA_CONSULT",
+          "name": "PMDA相談",
+          "order": 9,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "届出品目はPMDA審査対象外のため通常不要（対象外）。",
+          "sourceRefs": [
+            {
+              "title": "届出品目はPMDA審査対象外のため通常不要。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "APPROVAL",
+          "name": "承認・認証",
+          "order": 10,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["届出受理通知（発行される場合）"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "届出受理をもって完了。",
+          "sourceRefs": [
+            {
+              "title": "届出受理をもって完了",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REIMBURSEMENT",
+          "name": "保険償還",
+          "order": 11,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "一般医療機器は保険適用外（自費/特定保険医療材料に該当しない）ケースが大半。該当なしが多い。",
+          "sourceRefs": [
+            {
+              "title": "一般医療機器は保険適用外（自費/特定保険医療材料に該当しない）ケースが大半。",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JP",
+      "framework": "MEDICAL_DEVICE",
+      "deviceClass": "CLASS_II",
+      "productNovelty": null,
+      "approvalRoute": "認証",
+      "characteristics": [],
+      "effectiveFrom": "2022-05-20",
+      "effectiveTo": null,
+      "steps": [
+        {
+          "phaseCode": "PLANNING",
+          "name": "企画",
+          "order": 1,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["事業計画書", "ターゲット製品プロファイル(TPP)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "MARKET_RESEARCH",
+          "name": "市場調査",
+          "order": 2,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["競合製品調査資料", "市場規模調査資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "DESIGN",
+          "name": "設計",
+          "order": 3,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["設計開発計画書", "設計仕様書", "設計検証・妥当性確認記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令（厚労省令第169号）第30条〜第36条（設計開発）に基づく文書体系。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第30条〜第36条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RISK_ISO14971",
+          "name": "リスクマネジメント",
+          "order": 4,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "リスクマネジメント計画書",
+            "リスク分析・評価・対応記録",
+            "リスクマネジメントファイル"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "JIS T 14971:2020 (ISO 14971:2019)。QMS省令第26条にも要求あり。",
+          "sourceRefs": [
+            {
+              "title": "JIS T 14971:2020 (ISO 14971:2019) / QMS省令第169号 第26条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "QMS",
+          "name": "QMS構築",
+          "order": 5,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["品質マニュアル", "QMS体制図", "内部監査記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "医療機器はQMS省令（第169号）準拠必須。認証取得の場合はISO13485登録が前提となることが多い。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "TESTING",
+          "name": "試験",
+          "order": 6,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "試験計画書",
+            "生物学的安全性試験(ISO10993等)報告書",
+            "電気的安全性試験(IEC60601等)報告書"
+          ],
+          "requiredTests": ["ISO10993（生物学的安全性）", "IEC60601（電気的安全性）"],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+          "sourceRefs": [
+            {
+              "title": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "LAUNCH",
+          "name": "上市",
+          "order": 12,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "製造販売業許可証",
+            "製造業登録証",
+            "添付文書",
+            "GVP/GQP体制に関する文書"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5（製造販売業許可）等。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5（製造販売業許可）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SALES",
+          "name": "販売",
+          "order": 13,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["販売実績管理記録", "安全管理情報収集記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+          "sourceRefs": [
+            {
+              "title": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CHANGE_CONTROL",
+          "name": "変更管理",
+          "order": 14,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["変更管理記録", "一部変更承認申請書または軽微変更届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第36条（設計変更管理）。変更の程度により分岐（別途要判断）。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第169号 第36条（設計変更管理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "COMPLAINT",
+          "name": "苦情処理",
+          "order": 15,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["苦情処理記録", "苦情対応手順書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第60条（苦情処理）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第60条（苦情処理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CAPA",
+          "name": "CAPA",
+          "order": 16,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["是正処置・予防処置記録(CAPA記録)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第64条（是正措置及び予防措置）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第64条（是正措置及び予防措置）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RECALL",
+          "name": "回収",
+          "order": 17,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["回収着手報告書", "回収状況定期報告書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/safety/info-services/devices/0054.html"],
+          "notes": "薬機法第68条の11、施行規則第228条の22。回収クラス（クラスI〜III、健康被害リスク順）に応じ報告頻度が変わる。",
+          "sourceRefs": [
+            {
+              "title": "厚労省 回収に関する通知（薬食発1121第10号）",
+              "url": "https://www.mhlw.go.jp/file/06-Seisakujouhou-11120000-Iyakushokuhinkyoku/0000130618.pdf"
+            },
+            {
+              "title": "PMDA 回収情報（医療機器）",
+              "url": "https://www.pmda.go.jp/safety/info-services/devices/0054.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "DISCONTINUATION",
+          "name": "販売終了",
+          "order": 18,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["製造販売中止届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法施行規則に基づく中止届出。",
+          "sourceRefs": [
+            {
+              "title": "薬機法施行規則に基づく製造販売中止届書",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REG_STRATEGY",
+          "name": "薬事戦略",
+          "order": 7,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["認証基準への該当性確認資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "厚労大臣が定める認証基準への適合が前提。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の23",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SUBMISSION",
+          "name": "承認申請",
+          "order": 8,
+          "durationMinDays": 60,
+          "durationMaxDays": 90,
+          "costMinJpy": 400000,
+          "costMaxJpy": 900000,
+          "requiredDocuments": [
+            "認証申請書",
+            "基本要件基準適合性チェックリスト",
+            "認証基準適合性チェックリスト",
+            "ISO13485登録証"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "⚠️一次資料非公開（PMDAではなく登録認証機関＝民間の設定のため）。実際の投入時は代表的な登録認証機関へ個別確認し置換を推奨。",
+          "sourceRefs": [
+            {
+              "title": "医療機器センター 認証制度",
+              "url": "https://www.jaame.or.jp/cert/system/"
+            },
+            {
+              "title": "せたがや行政法務事務所 FAQ（参考、非一次資料）",
+              "url": "https://faq.rso.or.jp/faq/q5/"
+            }
+          ]
+        },
+        {
+          "phaseCode": "PMDA_CONSULT",
+          "name": "PMDA相談",
+          "order": 9,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "認証は登録認証機関が審査主体でありPMDA対面助言の対象外。",
+          "sourceRefs": [
+            {
+              "title": "認証は登録認証機関が審査主体でありPMDA対面助言の対象外。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "APPROVAL",
+          "name": "承認・認証",
+          "order": 10,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["認証書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "認証書交付をもって完了（費用は上記SUBMISSIONに含む）。",
+          "sourceRefs": [
+            {
+              "title": "認証書交付をもって完了",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REIMBURSEMENT",
+          "name": "保険償還",
+          "order": 11,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["保険適用希望書（該当する場合）"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "品目依存。該当する場合は年4回収載サイクルに準ずる。",
+          "sourceRefs": [
+            {
+              "title": "令和6年度 医療機器・体外診断用医薬品の保険適用に関するガイドブック（厚労省）",
+              "url": "https://www.mhlw.go.jp/content/10800000/001073851.pdf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JP",
+      "framework": "MEDICAL_DEVICE",
+      "deviceClass": "CLASS_II",
+      "productNovelty": "MODIFIED",
+      "approvalRoute": "承認",
+      "characteristics": [],
+      "effectiveFrom": "2022-05-20",
+      "effectiveTo": null,
+      "steps": [
+        {
+          "phaseCode": "PLANNING",
+          "name": "企画",
+          "order": 1,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["事業計画書", "ターゲット製品プロファイル(TPP)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "MARKET_RESEARCH",
+          "name": "市場調査",
+          "order": 2,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["競合製品調査資料", "市場規模調査資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "DESIGN",
+          "name": "設計",
+          "order": 3,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["設計開発計画書", "設計仕様書", "設計検証・妥当性確認記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令（厚労省令第169号）第30条〜第36条（設計開発）に基づく文書体系。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第30条〜第36条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RISK_ISO14971",
+          "name": "リスクマネジメント",
+          "order": 4,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "リスクマネジメント計画書",
+            "リスク分析・評価・対応記録",
+            "リスクマネジメントファイル"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "JIS T 14971:2020 (ISO 14971:2019)。QMS省令第26条にも要求あり。",
+          "sourceRefs": [
+            {
+              "title": "JIS T 14971:2020 (ISO 14971:2019) / QMS省令第169号 第26条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "QMS",
+          "name": "QMS構築",
+          "order": 5,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["品質マニュアル", "QMS体制図", "内部監査記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "医療機器はQMS省令（第169号）準拠必須。認証取得の場合はISO13485登録が前提となることが多い。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "TESTING",
+          "name": "試験",
+          "order": 6,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "試験計画書",
+            "生物学的安全性試験(ISO10993等)報告書",
+            "電気的安全性試験(IEC60601等)報告書"
+          ],
+          "requiredTests": ["ISO10993（生物学的安全性）", "IEC60601（電気的安全性）"],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+          "sourceRefs": [
+            {
+              "title": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "LAUNCH",
+          "name": "上市",
+          "order": 12,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "製造販売業許可証",
+            "製造業登録証",
+            "添付文書",
+            "GVP/GQP体制に関する文書"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5（製造販売業許可）等。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5（製造販売業許可）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SALES",
+          "name": "販売",
+          "order": 13,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["販売実績管理記録", "安全管理情報収集記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+          "sourceRefs": [
+            {
+              "title": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CHANGE_CONTROL",
+          "name": "変更管理",
+          "order": 14,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["変更管理記録", "一部変更承認申請書または軽微変更届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第36条（設計変更管理）。変更の程度により分岐（別途要判断）。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第169号 第36条（設計変更管理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "COMPLAINT",
+          "name": "苦情処理",
+          "order": 15,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["苦情処理記録", "苦情対応手順書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第60条（苦情処理）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第60条（苦情処理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CAPA",
+          "name": "CAPA",
+          "order": 16,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["是正処置・予防処置記録(CAPA記録)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第64条（是正措置及び予防措置）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第64条（是正措置及び予防措置）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RECALL",
+          "name": "回収",
+          "order": 17,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["回収着手報告書", "回収状況定期報告書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/safety/info-services/devices/0054.html"],
+          "notes": "薬機法第68条の11、施行規則第228条の22。回収クラス（クラスI〜III、健康被害リスク順）に応じ報告頻度が変わる。",
+          "sourceRefs": [
+            {
+              "title": "厚労省 回収に関する通知（薬食発1121第10号）",
+              "url": "https://www.mhlw.go.jp/file/06-Seisakujouhou-11120000-Iyakushokuhinkyoku/0000130618.pdf"
+            },
+            {
+              "title": "PMDA 回収情報（医療機器）",
+              "url": "https://www.pmda.go.jp/safety/info-services/devices/0054.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "DISCONTINUATION",
+          "name": "販売終了",
+          "order": 18,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["製造販売中止届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法施行規則に基づく中止届出。",
+          "sourceRefs": [
+            {
+              "title": "薬機法施行規則に基づく製造販売中止届書",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REG_STRATEGY",
+          "name": "薬事戦略",
+          "order": 7,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["該非判断資料", "対面助言記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "認証基準の無い管理医療機器は大臣承認が必要。",
+          "sourceRefs": [
+            {
+              "title": "認証基準の無い管理医療機器は大臣承認が必要。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SUBMISSION",
+          "name": "承認申請",
+          "order": 8,
+          "durationMinDays": 174,
+          "durationMaxDays": 180,
+          "costMinJpy": 1879900,
+          "costMaxJpy": 1879900,
+          "requiredDocuments": [
+            "添付資料（GHTF区分イ〜ト）",
+            "基本要件基準適合性チェックリスト",
+            "QMS適合性調査資料"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "R4-R6実績レンジ、目標値6ヶ月。費用は改良・臨床なし・基準なし・クラスII・IIIの手数料。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 令和6年度業務実績報告書（審査期間実績）",
+              "url": "https://www.pmda.go.jp/about-pmda/annual-reports/0001.html"
+            },
+            {
+              "title": "PMDA 審査等手数料・対面助言等の手数料について",
+              "url": "https://www.pmda.go.jp/review-services/drug-reviews/user-fees/0001.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "PMDA_CONSULT",
+          "name": "PMDA相談",
+          "order": 9,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["相談資料一式"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/files/000272392.pdf"],
+          "notes": "相談種別により数週間〜数ヶ月。金額は相談区分ごとに大きく異なるため数値化せず。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 対面助言・安全性試験調査等の手数料表PDF",
+              "url": "https://www.pmda.go.jp/files/000272392.pdf"
+            }
+          ]
+        },
+        {
+          "phaseCode": "APPROVAL",
+          "name": "承認・認証",
+          "order": 10,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["承認書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "上記SUBMISSION期間・費用に含む。",
+          "sourceRefs": [
+            {
+              "title": "上記SUBMISSION期間・費用に含む。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REIMBURSEMENT",
+          "name": "保険償還",
+          "order": 11,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["保険適用希望書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "品目依存、収載は年4回サイクル。",
+          "sourceRefs": [
+            {
+              "title": "令和6年度 医療機器・体外診断用医薬品の保険適用に関するガイドブック（厚労省）",
+              "url": "https://www.mhlw.go.jp/content/10800000/001073851.pdf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JP",
+      "framework": "MEDICAL_DEVICE",
+      "deviceClass": "CLASS_III",
+      "productNovelty": "MODIFIED",
+      "approvalRoute": "承認",
+      "characteristics": [],
+      "effectiveFrom": "2022-05-20",
+      "effectiveTo": null,
+      "steps": [
+        {
+          "phaseCode": "PLANNING",
+          "name": "企画",
+          "order": 1,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["事業計画書", "ターゲット製品プロファイル(TPP)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "MARKET_RESEARCH",
+          "name": "市場調査",
+          "order": 2,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["競合製品調査資料", "市場規模調査資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "DESIGN",
+          "name": "設計",
+          "order": 3,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["設計開発計画書", "設計仕様書", "設計検証・妥当性確認記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令（厚労省令第169号）第30条〜第36条（設計開発）に基づく文書体系。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第30条〜第36条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RISK_ISO14971",
+          "name": "リスクマネジメント",
+          "order": 4,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "リスクマネジメント計画書",
+            "リスク分析・評価・対応記録",
+            "リスクマネジメントファイル"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "JIS T 14971:2020 (ISO 14971:2019)。QMS省令第26条にも要求あり。",
+          "sourceRefs": [
+            {
+              "title": "JIS T 14971:2020 (ISO 14971:2019) / QMS省令第169号 第26条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "QMS",
+          "name": "QMS構築",
+          "order": 5,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["品質マニュアル", "QMS体制図", "内部監査記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "医療機器はQMS省令（第169号）準拠必須。認証取得の場合はISO13485登録が前提となることが多い。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "TESTING",
+          "name": "試験",
+          "order": 6,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "試験計画書",
+            "生物学的安全性試験(ISO10993等)報告書",
+            "電気的安全性試験(IEC60601等)報告書"
+          ],
+          "requiredTests": ["ISO10993（生物学的安全性）", "IEC60601（電気的安全性）"],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+          "sourceRefs": [
+            {
+              "title": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "LAUNCH",
+          "name": "上市",
+          "order": 12,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "製造販売業許可証",
+            "製造業登録証",
+            "添付文書",
+            "GVP/GQP体制に関する文書"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5（製造販売業許可）等。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5（製造販売業許可）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SALES",
+          "name": "販売",
+          "order": 13,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["販売実績管理記録", "安全管理情報収集記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+          "sourceRefs": [
+            {
+              "title": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CHANGE_CONTROL",
+          "name": "変更管理",
+          "order": 14,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["変更管理記録", "一部変更承認申請書または軽微変更届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第36条（設計変更管理）。変更の程度により分岐（別途要判断）。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第169号 第36条（設計変更管理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "COMPLAINT",
+          "name": "苦情処理",
+          "order": 15,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["苦情処理記録", "苦情対応手順書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第60条（苦情処理）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第60条（苦情処理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CAPA",
+          "name": "CAPA",
+          "order": 16,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["是正処置・予防処置記録(CAPA記録)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第64条（是正措置及び予防措置）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第64条（是正措置及び予防措置）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RECALL",
+          "name": "回収",
+          "order": 17,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["回収着手報告書", "回収状況定期報告書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/safety/info-services/devices/0054.html"],
+          "notes": "薬機法第68条の11、施行規則第228条の22。回収クラス（クラスI〜III、健康被害リスク順）に応じ報告頻度が変わる。",
+          "sourceRefs": [
+            {
+              "title": "厚労省 回収に関する通知（薬食発1121第10号）",
+              "url": "https://www.mhlw.go.jp/file/06-Seisakujouhou-11120000-Iyakushokuhinkyoku/0000130618.pdf"
+            },
+            {
+              "title": "PMDA 回収情報（医療機器）",
+              "url": "https://www.pmda.go.jp/safety/info-services/devices/0054.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "DISCONTINUATION",
+          "name": "販売終了",
+          "order": 18,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["製造販売中止届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法施行規則に基づく中止届出。",
+          "sourceRefs": [
+            {
+              "title": "薬機法施行規則に基づく製造販売中止届書",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REG_STRATEGY",
+          "name": "薬事戦略",
+          "order": 7,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["該非判断資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "クラスIII・改良医療機器の該非判断。",
+          "sourceRefs": [
+            {
+              "title": "クラスIII・改良医療機器の該非判断。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SUBMISSION",
+          "name": "承認申請",
+          "order": 8,
+          "durationMinDays": 267,
+          "durationMaxDays": 270,
+          "costMinJpy": 6650800,
+          "costMaxJpy": 6650800,
+          "requiredDocuments": ["添付資料一式", "臨床評価/治験成績", "QMS適合性調査資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "R4-R6実績、目標10ヶ月。費用は改良・臨床あり・クラスII・IIIの手数料。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 令和6年度業務実績報告書（審査期間実績）",
+              "url": "https://www.pmda.go.jp/about-pmda/annual-reports/0001.html"
+            },
+            {
+              "title": "PMDA 審査等手数料・対面助言等の手数料について",
+              "url": "https://www.pmda.go.jp/review-services/drug-reviews/user-fees/0001.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "PMDA_CONSULT",
+          "name": "PMDA相談",
+          "order": 9,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["相談資料一式"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/files/000272392.pdf"],
+          "notes": "要個別確認。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 対面助言・安全性試験調査等の手数料表PDF",
+              "url": "https://www.pmda.go.jp/files/000272392.pdf"
+            }
+          ]
+        },
+        {
+          "phaseCode": "APPROVAL",
+          "name": "承認・認証",
+          "order": 10,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["承認書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "上記SUBMISSION期間・費用に含む。",
+          "sourceRefs": [
+            {
+              "title": "上記SUBMISSION期間・費用に含む。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REIMBURSEMENT",
+          "name": "保険償還",
+          "order": 11,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["保険適用希望書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "品目依存。",
+          "sourceRefs": [
+            {
+              "title": "令和6年度 医療機器・体外診断用医薬品の保険適用に関するガイドブック（厚労省）",
+              "url": "https://www.mhlw.go.jp/content/10800000/001073851.pdf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JP",
+      "framework": "MEDICAL_DEVICE",
+      "deviceClass": "CLASS_III",
+      "productNovelty": "NEW",
+      "approvalRoute": "承認",
+      "characteristics": [],
+      "effectiveFrom": "2022-05-20",
+      "effectiveTo": null,
+      "steps": [
+        {
+          "phaseCode": "PLANNING",
+          "name": "企画",
+          "order": 1,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["事業計画書", "ターゲット製品プロファイル(TPP)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "MARKET_RESEARCH",
+          "name": "市場調査",
+          "order": 2,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["競合製品調査資料", "市場規模調査資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "DESIGN",
+          "name": "設計",
+          "order": 3,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["設計開発計画書", "設計仕様書", "設計検証・妥当性確認記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令（厚労省令第169号）第30条〜第36条（設計開発）に基づく文書体系。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第30条〜第36条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RISK_ISO14971",
+          "name": "リスクマネジメント",
+          "order": 4,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "リスクマネジメント計画書",
+            "リスク分析・評価・対応記録",
+            "リスクマネジメントファイル"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "JIS T 14971:2020 (ISO 14971:2019)。QMS省令第26条にも要求あり。",
+          "sourceRefs": [
+            {
+              "title": "JIS T 14971:2020 (ISO 14971:2019) / QMS省令第169号 第26条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "QMS",
+          "name": "QMS構築",
+          "order": 5,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["品質マニュアル", "QMS体制図", "内部監査記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "医療機器はQMS省令（第169号）準拠必須。認証取得の場合はISO13485登録が前提となることが多い。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "TESTING",
+          "name": "試験",
+          "order": 6,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "試験計画書",
+            "生物学的安全性試験(ISO10993等)報告書",
+            "電気的安全性試験(IEC60601等)報告書"
+          ],
+          "requiredTests": ["ISO10993（生物学的安全性）", "IEC60601（電気的安全性）"],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+          "sourceRefs": [
+            {
+              "title": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "LAUNCH",
+          "name": "上市",
+          "order": 12,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "製造販売業許可証",
+            "製造業登録証",
+            "添付文書",
+            "GVP/GQP体制に関する文書"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5（製造販売業許可）等。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5（製造販売業許可）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SALES",
+          "name": "販売",
+          "order": 13,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["販売実績管理記録", "安全管理情報収集記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+          "sourceRefs": [
+            {
+              "title": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CHANGE_CONTROL",
+          "name": "変更管理",
+          "order": 14,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["変更管理記録", "一部変更承認申請書または軽微変更届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第36条（設計変更管理）。変更の程度により分岐（別途要判断）。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第169号 第36条（設計変更管理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "COMPLAINT",
+          "name": "苦情処理",
+          "order": 15,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["苦情処理記録", "苦情対応手順書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第60条（苦情処理）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第60条（苦情処理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CAPA",
+          "name": "CAPA",
+          "order": 16,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["是正処置・予防処置記録(CAPA記録)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第64条（是正措置及び予防措置）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第64条（是正措置及び予防措置）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RECALL",
+          "name": "回収",
+          "order": 17,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["回収着手報告書", "回収状況定期報告書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/safety/info-services/devices/0054.html"],
+          "notes": "薬機法第68条の11、施行規則第228条の22。回収クラス（クラスI〜III、健康被害リスク順）に応じ報告頻度が変わる。",
+          "sourceRefs": [
+            {
+              "title": "厚労省 回収に関する通知（薬食発1121第10号）",
+              "url": "https://www.mhlw.go.jp/file/06-Seisakujouhou-11120000-Iyakushokuhinkyoku/0000130618.pdf"
+            },
+            {
+              "title": "PMDA 回収情報（医療機器）",
+              "url": "https://www.pmda.go.jp/safety/info-services/devices/0054.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "DISCONTINUATION",
+          "name": "販売終了",
+          "order": 18,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["製造販売中止届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法施行規則に基づく中止届出。",
+          "sourceRefs": [
+            {
+              "title": "薬機法施行規則に基づく製造販売中止届書",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REG_STRATEGY",
+          "name": "薬事戦略",
+          "order": 7,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["該非判断資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "クラスIII・新医療機器の該非判断。v0.1では④に両論併記していたケースを新規性区分の分離により独立テンプレート化。",
+          "sourceRefs": [
+            {
+              "title": "クラスIII・新医療機器の該非判断。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SUBMISSION",
+          "name": "承認申請",
+          "order": 8,
+          "durationMinDays": 342,
+          "durationMaxDays": 360,
+          "costMinJpy": 13016900,
+          "costMaxJpy": 13016900,
+          "requiredDocuments": ["添付資料一式", "臨床評価/治験成績", "QMS適合性調査資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "R4-R6実績、目標14ヶ月。費用は新医療機器・通常・クラスII・IIIの手数料。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 令和6年度業務実績報告書（審査期間実績）",
+              "url": "https://www.pmda.go.jp/about-pmda/annual-reports/0001.html"
+            },
+            {
+              "title": "PMDA 審査等手数料・対面助言等の手数料について",
+              "url": "https://www.pmda.go.jp/review-services/drug-reviews/user-fees/0001.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "PMDA_CONSULT",
+          "name": "PMDA相談",
+          "order": 9,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["相談資料一式"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/files/000272392.pdf"],
+          "notes": "要個別確認。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 対面助言・安全性試験調査等の手数料表PDF",
+              "url": "https://www.pmda.go.jp/files/000272392.pdf"
+            }
+          ]
+        },
+        {
+          "phaseCode": "APPROVAL",
+          "name": "承認・認証",
+          "order": 10,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["承認書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "上記SUBMISSION期間・費用に含む。",
+          "sourceRefs": [
+            {
+              "title": "上記SUBMISSION期間・費用に含む。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REIMBURSEMENT",
+          "name": "保険償還",
+          "order": 11,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["保険適用希望書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "品目依存。",
+          "sourceRefs": [
+            {
+              "title": "令和6年度 医療機器・体外診断用医薬品の保険適用に関するガイドブック（厚労省）",
+              "url": "https://www.mhlw.go.jp/content/10800000/001073851.pdf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JP",
+      "framework": "MEDICAL_DEVICE",
+      "deviceClass": "CLASS_IV",
+      "productNovelty": "NEW",
+      "approvalRoute": "承認",
+      "characteristics": [],
+      "effectiveFrom": "2022-05-20",
+      "effectiveTo": null,
+      "steps": [
+        {
+          "phaseCode": "PLANNING",
+          "name": "企画",
+          "order": 1,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["事業計画書", "ターゲット製品プロファイル(TPP)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "MARKET_RESEARCH",
+          "name": "市場調査",
+          "order": 2,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["競合製品調査資料", "市場規模調査資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "DESIGN",
+          "name": "設計",
+          "order": 3,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["設計開発計画書", "設計仕様書", "設計検証・妥当性確認記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令（厚労省令第169号）第30条〜第36条（設計開発）に基づく文書体系。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第30条〜第36条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RISK_ISO14971",
+          "name": "リスクマネジメント",
+          "order": 4,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "リスクマネジメント計画書",
+            "リスク分析・評価・対応記録",
+            "リスクマネジメントファイル"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "JIS T 14971:2020 (ISO 14971:2019)。QMS省令第26条にも要求あり。",
+          "sourceRefs": [
+            {
+              "title": "JIS T 14971:2020 (ISO 14971:2019) / QMS省令第169号 第26条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "QMS",
+          "name": "QMS構築",
+          "order": 5,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["品質マニュアル", "QMS体制図", "内部監査記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "医療機器はQMS省令（第169号）準拠必須。認証取得の場合はISO13485登録が前提となることが多い。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "TESTING",
+          "name": "試験",
+          "order": 6,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "試験計画書",
+            "生物学的安全性試験(ISO10993等)報告書",
+            "電気的安全性試験(IEC60601等)報告書"
+          ],
+          "requiredTests": ["ISO10993（生物学的安全性）", "IEC60601（電気的安全性）"],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+          "sourceRefs": [
+            {
+              "title": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "LAUNCH",
+          "name": "上市",
+          "order": 12,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "製造販売業許可証",
+            "製造業登録証",
+            "添付文書",
+            "GVP/GQP体制に関する文書"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5（製造販売業許可）等。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5（製造販売業許可）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SALES",
+          "name": "販売",
+          "order": 13,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["販売実績管理記録", "安全管理情報収集記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+          "sourceRefs": [
+            {
+              "title": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CHANGE_CONTROL",
+          "name": "変更管理",
+          "order": 14,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["変更管理記録", "一部変更承認申請書または軽微変更届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第36条（設計変更管理）。変更の程度により分岐（別途要判断）。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第169号 第36条（設計変更管理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "COMPLAINT",
+          "name": "苦情処理",
+          "order": 15,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["苦情処理記録", "苦情対応手順書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第60条（苦情処理）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第60条（苦情処理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CAPA",
+          "name": "CAPA",
+          "order": 16,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["是正処置・予防処置記録(CAPA記録)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第64条（是正措置及び予防措置）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第64条（是正措置及び予防措置）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RECALL",
+          "name": "回収",
+          "order": 17,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["回収着手報告書", "回収状況定期報告書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/safety/info-services/devices/0054.html"],
+          "notes": "薬機法第68条の11、施行規則第228条の22。回収クラス（クラスI〜III、健康被害リスク順）に応じ報告頻度が変わる。",
+          "sourceRefs": [
+            {
+              "title": "厚労省 回収に関する通知（薬食発1121第10号）",
+              "url": "https://www.mhlw.go.jp/file/06-Seisakujouhou-11120000-Iyakushokuhinkyoku/0000130618.pdf"
+            },
+            {
+              "title": "PMDA 回収情報（医療機器）",
+              "url": "https://www.pmda.go.jp/safety/info-services/devices/0054.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "DISCONTINUATION",
+          "name": "販売終了",
+          "order": 18,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["製造販売中止届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法施行規則に基づく中止届出。",
+          "sourceRefs": [
+            {
+              "title": "薬機法施行規則に基づく製造販売中止届書",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REG_STRATEGY",
+          "name": "薬事戦略",
+          "order": 7,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["該非判断資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "クラスIV・新医療機器の該非判断。",
+          "sourceRefs": [
+            {
+              "title": "クラスIV・新医療機器の該非判断。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SUBMISSION",
+          "name": "承認申請",
+          "order": 8,
+          "durationMinDays": 342,
+          "durationMaxDays": 360,
+          "costMinJpy": 17721200,
+          "costMaxJpy": 17721200,
+          "requiredDocuments": ["添付資料一式", "臨床評価/治験成績", "QMS適合性調査資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "R4-R6実績、目標14ヶ月。費用は新医療機器・クラスIVの手数料。改良品の場合はproductNovelty=MODIFIEDの別テンプレート（10,413,400円/267〜270日）を今後追加。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 令和6年度業務実績報告書（審査期間実績）",
+              "url": "https://www.pmda.go.jp/about-pmda/annual-reports/0001.html"
+            },
+            {
+              "title": "PMDA 審査等手数料・対面助言等の手数料について",
+              "url": "https://www.pmda.go.jp/review-services/drug-reviews/user-fees/0001.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "PMDA_CONSULT",
+          "name": "PMDA相談",
+          "order": 9,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["相談資料一式"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/files/000272392.pdf"],
+          "notes": "要個別確認。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 対面助言・安全性試験調査等の手数料表PDF",
+              "url": "https://www.pmda.go.jp/files/000272392.pdf"
+            }
+          ]
+        },
+        {
+          "phaseCode": "APPROVAL",
+          "name": "承認・認証",
+          "order": 10,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["承認書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "上記SUBMISSION期間・費用に含む。",
+          "sourceRefs": [
+            {
+              "title": "上記SUBMISSION期間・費用に含む。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REIMBURSEMENT",
+          "name": "保険償還",
+          "order": 11,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["保険適用希望書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "品目依存。",
+          "sourceRefs": [
+            {
+              "title": "令和6年度 医療機器・体外診断用医薬品の保険適用に関するガイドブック（厚労省）",
+              "url": "https://www.mhlw.go.jp/content/10800000/001073851.pdf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JP",
+      "framework": "MEDICAL_DEVICE",
+      "deviceClass": "CLASS_II",
+      "productNovelty": "MODIFIED",
+      "approvalRoute": "承認",
+      "characteristics": ["SAMD"],
+      "effectiveFrom": "2022-05-20",
+      "effectiveTo": null,
+      "steps": [
+        {
+          "phaseCode": "PLANNING",
+          "name": "企画",
+          "order": 1,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["事業計画書", "ターゲット製品プロファイル(TPP)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "MARKET_RESEARCH",
+          "name": "市場調査",
+          "order": 2,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["競合製品調査資料", "市場規模調査資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "DESIGN",
+          "name": "設計",
+          "order": 3,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["設計開発計画書", "設計仕様書", "設計検証・妥当性確認記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令（厚労省令第169号）第30条〜第36条（設計開発）に基づく文書体系。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第30条〜第36条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RISK_ISO14971",
+          "name": "リスクマネジメント",
+          "order": 4,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "リスクマネジメント計画書",
+            "リスク分析・評価・対応記録",
+            "リスクマネジメントファイル"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "JIS T 14971:2020 (ISO 14971:2019)。QMS省令第26条にも要求あり。",
+          "sourceRefs": [
+            {
+              "title": "JIS T 14971:2020 (ISO 14971:2019) / QMS省令第169号 第26条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "QMS",
+          "name": "QMS構築",
+          "order": 5,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["品質マニュアル", "QMS体制図", "内部監査記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "医療機器はQMS省令（第169号）準拠必須。認証取得の場合はISO13485登録が前提となることが多い。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "TESTING",
+          "name": "試験",
+          "order": 6,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "試験計画書",
+            "生物学的安全性試験(ISO10993等)報告書",
+            "電気的安全性試験(IEC60601等)報告書"
+          ],
+          "requiredTests": ["ISO10993（生物学的安全性）", "IEC60601（電気的安全性）"],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+          "sourceRefs": [
+            {
+              "title": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "LAUNCH",
+          "name": "上市",
+          "order": 12,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "製造販売業許可証",
+            "製造業登録証",
+            "添付文書",
+            "GVP/GQP体制に関する文書"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5（製造販売業許可）等。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5（製造販売業許可）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SALES",
+          "name": "販売",
+          "order": 13,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["販売実績管理記録", "安全管理情報収集記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+          "sourceRefs": [
+            {
+              "title": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CHANGE_CONTROL",
+          "name": "変更管理",
+          "order": 14,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["変更管理記録", "一部変更承認申請書または軽微変更届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第36条（設計変更管理）。変更の程度により分岐（別途要判断）。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第169号 第36条（設計変更管理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "COMPLAINT",
+          "name": "苦情処理",
+          "order": 15,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["苦情処理記録", "苦情対応手順書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第60条（苦情処理）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第60条（苦情処理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CAPA",
+          "name": "CAPA",
+          "order": 16,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["是正処置・予防処置記録(CAPA記録)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第64条（是正措置及び予防措置）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第64条（是正措置及び予防措置）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RECALL",
+          "name": "回収",
+          "order": 17,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["回収着手報告書", "回収状況定期報告書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/safety/info-services/devices/0054.html"],
+          "notes": "薬機法第68条の11、施行規則第228条の22。回収クラス（クラスI〜III、健康被害リスク順）に応じ報告頻度が変わる。",
+          "sourceRefs": [
+            {
+              "title": "厚労省 回収に関する通知（薬食発1121第10号）",
+              "url": "https://www.mhlw.go.jp/file/06-Seisakujouhou-11120000-Iyakushokuhinkyoku/0000130618.pdf"
+            },
+            {
+              "title": "PMDA 回収情報（医療機器）",
+              "url": "https://www.pmda.go.jp/safety/info-services/devices/0054.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "DISCONTINUATION",
+          "name": "販売終了",
+          "order": 18,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["製造販売中止届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法施行規則に基づく中止届出。",
+          "sourceRefs": [
+            {
+              "title": "薬機法施行規則に基づく製造販売中止届書",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REG_STRATEGY",
+          "name": "薬事戦略",
+          "order": 7,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["医療機器該当性判断資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [
+            "https://www.pmda.go.jp/review-services/f2f-pre/strategies/0011.html",
+            "https://www.pmda.go.jp/files/000274829.pdf"
+          ],
+          "notes": "「プログラムの医療機器該当性に関するガイドライン」。DASH for SaMD施策あり。",
+          "sourceRefs": [
+            {
+              "title": "PMDA SaMD一元的相談窓口",
+              "url": "https://www.pmda.go.jp/review-services/f2f-pre/strategies/0011.html"
+            },
+            {
+              "title": "プログラム医療機器の薬事開発・承認申請に関する手引き（令和7年4月1日）",
+              "url": "https://www.pmda.go.jp/files/000274829.pdf"
+            }
+          ]
+        },
+        {
+          "phaseCode": "SUBMISSION",
+          "name": "承認申請",
+          "order": 8,
+          "durationMinDays": 174,
+          "durationMaxDays": 180,
+          "costMinJpy": 1879900,
+          "costMaxJpy": 1879900,
+          "requiredDocuments": [
+            "添付資料",
+            "ソフトウェアライフサイクルプロセス資料(IEC62304)",
+            "サイバーセキュリティ資料"
+          ],
+          "requiredTests": ["IEC62304"],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "⚠️SaMDはクラス自体が品目のリスクにより大きく変動するため代表ケース（クラスII相当・改良/臨床なし）。実際の品目クラスに応じ他テンプレートの数値に読み替える運用。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 令和6年度業務実績報告書（審査期間実績）",
+              "url": "https://www.pmda.go.jp/about-pmda/annual-reports/0001.html"
+            },
+            {
+              "title": "PMDA 審査等手数料・対面助言等の手数料について",
+              "url": "https://www.pmda.go.jp/review-services/drug-reviews/user-fees/0001.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "PMDA_CONSULT",
+          "name": "PMDA相談",
+          "order": 9,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["相談資料一式"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [
+            "https://www.pmda.go.jp/review-services/f2f-pre/strategies/0011.html"
+          ],
+          "notes": "SaMD一元的相談窓口あり、要個別確認。",
+          "sourceRefs": [
+            {
+              "title": "PMDA SaMD一元的相談窓口",
+              "url": "https://www.pmda.go.jp/review-services/f2f-pre/strategies/0011.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "APPROVAL",
+          "name": "承認・認証",
+          "order": 10,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["承認書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "上記SUBMISSION期間・費用に含む。",
+          "sourceRefs": [
+            {
+              "title": "上記SUBMISSION期間・費用に含む。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REIMBURSEMENT",
+          "name": "保険償還",
+          "order": 11,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["保険適用希望書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "品目依存（プログラム医療機器は保険適用の考え方が発展途上）。",
+          "sourceRefs": [
+            {
+              "title": "品目依存（プログラム医療機器は保険適用の考え方が発展途上）。",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JP",
+      "framework": "IVD",
+      "deviceClass": null,
+      "productNovelty": null,
+      "approvalRoute": "承認",
+      "characteristics": [],
+      "effectiveFrom": "2022-05-20",
+      "effectiveTo": null,
+      "steps": [
+        {
+          "phaseCode": "PLANNING",
+          "name": "企画",
+          "order": 1,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["事業計画書", "ターゲット製品プロファイル(TPP)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "MARKET_RESEARCH",
+          "name": "市場調査",
+          "order": 2,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["競合製品調査資料", "市場規模調査資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "DESIGN",
+          "name": "設計",
+          "order": 3,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["設計開発計画書", "設計仕様書", "設計検証・妥当性確認記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令（厚労省令第169号）第30条〜第36条（設計開発）に基づく文書体系。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第30条〜第36条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RISK_ISO14971",
+          "name": "リスクマネジメント",
+          "order": 4,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "リスクマネジメント計画書",
+            "リスク分析・評価・対応記録",
+            "リスクマネジメントファイル"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "JIS T 14971:2020 (ISO 14971:2019)。QMS省令第26条にも要求あり。",
+          "sourceRefs": [
+            {
+              "title": "JIS T 14971:2020 (ISO 14971:2019) / QMS省令第169号 第26条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "QMS",
+          "name": "QMS構築",
+          "order": 5,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["品質マニュアル", "QMS体制図", "内部監査記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "医療機器はQMS省令（第169号）準拠必須。認証取得の場合はISO13485登録が前提となることが多い。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "TESTING",
+          "name": "試験",
+          "order": 6,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "試験計画書",
+            "生物学的安全性試験(ISO10993等)報告書",
+            "電気的安全性試験(IEC60601等)報告書"
+          ],
+          "requiredTests": ["ISO10993（生物学的安全性）", "IEC60601（電気的安全性）"],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+          "sourceRefs": [
+            {
+              "title": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "LAUNCH",
+          "name": "上市",
+          "order": 12,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "製造販売業許可証",
+            "製造業登録証",
+            "添付文書",
+            "GVP/GQP体制に関する文書"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5（製造販売業許可）等。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5（製造販売業許可）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SALES",
+          "name": "販売",
+          "order": 13,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["販売実績管理記録", "安全管理情報収集記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+          "sourceRefs": [
+            {
+              "title": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CHANGE_CONTROL",
+          "name": "変更管理",
+          "order": 14,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["変更管理記録", "一部変更承認申請書または軽微変更届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第36条（設計変更管理）。変更の程度により分岐（別途要判断）。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第169号 第36条（設計変更管理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "COMPLAINT",
+          "name": "苦情処理",
+          "order": 15,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["苦情処理記録", "苦情対応手順書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第60条（苦情処理）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第60条（苦情処理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CAPA",
+          "name": "CAPA",
+          "order": 16,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["是正処置・予防処置記録(CAPA記録)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第64条（是正措置及び予防措置）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第64条（是正措置及び予防措置）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RECALL",
+          "name": "回収",
+          "order": 17,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["回収着手報告書", "回収状況定期報告書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/safety/info-services/devices/0054.html"],
+          "notes": "薬機法第68条の11、施行規則第228条の22。回収クラス（クラスI〜III、健康被害リスク順）に応じ報告頻度が変わる。",
+          "sourceRefs": [
+            {
+              "title": "厚労省 回収に関する通知（薬食発1121第10号）",
+              "url": "https://www.mhlw.go.jp/file/06-Seisakujouhou-11120000-Iyakushokuhinkyoku/0000130618.pdf"
+            },
+            {
+              "title": "PMDA 回収情報（医療機器）",
+              "url": "https://www.pmda.go.jp/safety/info-services/devices/0054.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "DISCONTINUATION",
+          "name": "販売終了",
+          "order": 18,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["製造販売中止届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法施行規則に基づく中止届出。",
+          "sourceRefs": [
+            {
+              "title": "薬機法施行規則に基づく製造販売中止届書",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REG_STRATEGY",
+          "name": "薬事戦略",
+          "order": 7,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["該非判断資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "体外診断用医薬品は薬機法上「医薬品」区分だが実務上医療機器類似の審査体系。deviceClass（医療機器のClass I-IV）は適用されないためnull。",
+          "sourceRefs": [
+            {
+              "title": "体外診断用医薬品は薬機法上「医薬品」区分だが実務上医療機器類似の審査体系。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SUBMISSION",
+          "name": "承認申請",
+          "order": 8,
+          "durationMinDays": 198,
+          "durationMaxDays": 204,
+          "costMinJpy": 2534000,
+          "costMaxJpy": 2534000,
+          "requiredDocuments": ["添付資料", "分析性能評価資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "通常品目、R4-R6実績。新規品目・コンパニオン診断薬除く。コンパニオン診断薬の場合は別途派生テンプレート（characteristics=[\"COMPANION_DIAGNOSTIC\"]、期間327〜351日/費用4,295,000円）を将来追加予定（今回スコープ外）。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 令和6年度業務実績報告書（審査期間実績）",
+              "url": "https://www.pmda.go.jp/about-pmda/annual-reports/0001.html"
+            },
+            {
+              "title": "PMDA 審査等手数料・対面助言等の手数料について",
+              "url": "https://www.pmda.go.jp/review-services/drug-reviews/user-fees/0001.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "PMDA_CONSULT",
+          "name": "PMDA相談",
+          "order": 9,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["相談資料一式"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/files/000272392.pdf"],
+          "notes": "体外診断用医薬品治験相談等、要個別確認。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 対面助言・安全性試験調査等の手数料表PDF",
+              "url": "https://www.pmda.go.jp/files/000272392.pdf"
+            }
+          ]
+        },
+        {
+          "phaseCode": "APPROVAL",
+          "name": "承認・認証",
+          "order": 10,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["承認書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "上記SUBMISSION期間・費用に含む。",
+          "sourceRefs": [
+            {
+              "title": "上記SUBMISSION期間・費用に含む。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REIMBURSEMENT",
+          "name": "保険償還",
+          "order": 11,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["保険適用希望書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "品目依存（多くは検査料の点数評価）。",
+          "sourceRefs": [
+            {
+              "title": "令和6年度 医療機器・体外診断用医薬品の保険適用に関するガイドブック（厚労省）",
+              "url": "https://www.mhlw.go.jp/content/10800000/001073851.pdf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "jurisdiction": "JP",
+      "framework": "MEDICAL_DEVICE",
+      "deviceClass": "CLASS_IV",
+      "productNovelty": "NEW",
+      "approvalRoute": "承認",
+      "characteristics": ["ACTIVE_IMPLANTABLE"],
+      "effectiveFrom": "2022-05-20",
+      "effectiveTo": null,
+      "steps": [
+        {
+          "phaseCode": "PLANNING",
+          "name": "企画",
+          "order": 1,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["事業計画書", "ターゲット製品プロファイル(TPP)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "MARKET_RESEARCH",
+          "name": "市場調査",
+          "order": 2,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["競合製品調査資料", "市場規模調査資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "期間・費用は事業規模依存のため非公表。",
+          "sourceRefs": [
+            {
+              "title": "期間・費用は事業規模依存のため非公表（法的根拠なし、個別企業体制に依存）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "DESIGN",
+          "name": "設計",
+          "order": 3,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["設計開発計画書", "設計仕様書", "設計検証・妥当性確認記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令（厚労省令第169号）第30条〜第36条（設計開発）に基づく文書体系。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第30条〜第36条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RISK_ISO14971",
+          "name": "リスクマネジメント",
+          "order": 4,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "リスクマネジメント計画書",
+            "リスク分析・評価・対応記録",
+            "リスクマネジメントファイル"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "JIS T 14971:2020 (ISO 14971:2019)。QMS省令第26条にも要求あり。",
+          "sourceRefs": [
+            {
+              "title": "JIS T 14971:2020 (ISO 14971:2019) / QMS省令第169号 第26条",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "QMS",
+          "name": "QMS構築",
+          "order": 5,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["品質マニュアル", "QMS体制図", "内部監査記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "医療機器はQMS省令（第169号）準拠必須。認証取得の場合はISO13485登録が前提となることが多い。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "TESTING",
+          "name": "試験",
+          "order": 6,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "試験計画書",
+            "生物学的安全性試験(ISO10993等)報告書",
+            "電気的安全性試験(IEC60601等)報告書"
+          ],
+          "requiredTests": ["ISO10993（生物学的安全性）", "IEC60601（電気的安全性）"],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+          "sourceRefs": [
+            {
+              "title": "適用規格は品目の技術分野により大きく異なるため個別判断（基本要件基準への適合性確認の一部）。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "LAUNCH",
+          "name": "上市",
+          "order": 12,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": [
+            "製造販売業許可証",
+            "製造業登録証",
+            "添付文書",
+            "GVP/GQP体制に関する文書"
+          ],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5（製造販売業許可）等。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5（製造販売業許可）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SALES",
+          "name": "販売",
+          "order": 13,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["販売実績管理記録", "安全管理情報収集記録"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+          "sourceRefs": [
+            {
+              "title": "薬機法・QMS省令に基づく市販後の体制維持が前提。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CHANGE_CONTROL",
+          "name": "変更管理",
+          "order": 14,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["変更管理記録", "一部変更承認申請書または軽微変更届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第36条（設計変更管理）。変更の程度により分岐（別途要判断）。",
+          "sourceRefs": [
+            {
+              "title": "薬機法第23条の2の5第11項（一部変更承認）／QMS省令第169号 第36条（設計変更管理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "COMPLAINT",
+          "name": "苦情処理",
+          "order": 15,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["苦情処理記録", "苦情対応手順書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第60条（苦情処理）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第60条（苦情処理）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "CAPA",
+          "name": "CAPA",
+          "order": 16,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["是正処置・予防処置記録(CAPA記録)"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "QMS省令第64条（是正措置及び予防措置）。",
+          "sourceRefs": [
+            {
+              "title": "QMS省令（厚生労働省令第169号）第64条（是正措置及び予防措置）",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "RECALL",
+          "name": "回収",
+          "order": 17,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["回収着手報告書", "回収状況定期報告書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/safety/info-services/devices/0054.html"],
+          "notes": "薬機法第68条の11、施行規則第228条の22。回収クラス（クラスI〜III、健康被害リスク順）に応じ報告頻度が変わる。",
+          "sourceRefs": [
+            {
+              "title": "厚労省 回収に関する通知（薬食発1121第10号）",
+              "url": "https://www.mhlw.go.jp/file/06-Seisakujouhou-11120000-Iyakushokuhinkyoku/0000130618.pdf"
+            },
+            {
+              "title": "PMDA 回収情報（医療機器）",
+              "url": "https://www.pmda.go.jp/safety/info-services/devices/0054.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "DISCONTINUATION",
+          "name": "販売終了",
+          "order": 18,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["製造販売中止届書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "薬機法施行規則に基づく中止届出。",
+          "sourceRefs": [
+            {
+              "title": "薬機法施行規則に基づく製造販売中止届書",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REG_STRATEGY",
+          "name": "薬事戦略",
+          "order": 7,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["該非判断資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "能動植込み医療機器（ペースメーカー等）は原則クラスIV。",
+          "sourceRefs": [
+            {
+              "title": "能動植込み医療機器（ペースメーカー等）は原則クラスIV。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "SUBMISSION",
+          "name": "承認申請",
+          "order": 8,
+          "durationMinDays": 342,
+          "durationMaxDays": 360,
+          "costMinJpy": 17721200,
+          "costMaxJpy": 17721200,
+          "requiredDocuments": ["添付資料一式", "長期植込み安全性評価資料", "臨床評価/治験成績"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "新医療機器・クラスIV想定。⑥と同一の出典・数値。改良品の場合はproductNovelty=MODIFIEDの派生を将来追加。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 令和6年度業務実績報告書（審査期間実績）",
+              "url": "https://www.pmda.go.jp/about-pmda/annual-reports/0001.html"
+            },
+            {
+              "title": "PMDA 審査等手数料・対面助言等の手数料について",
+              "url": "https://www.pmda.go.jp/review-services/drug-reviews/user-fees/0001.html"
+            }
+          ]
+        },
+        {
+          "phaseCode": "PMDA_CONSULT",
+          "name": "PMDA相談",
+          "order": 9,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["相談資料一式"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": ["https://www.pmda.go.jp/files/000272392.pdf"],
+          "notes": "要個別確認。",
+          "sourceRefs": [
+            {
+              "title": "PMDA 対面助言・安全性試験調査等の手数料表PDF",
+              "url": "https://www.pmda.go.jp/files/000272392.pdf"
+            }
+          ]
+        },
+        {
+          "phaseCode": "APPROVAL",
+          "name": "承認・認証",
+          "order": 10,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["承認書"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "上記SUBMISSION期間・費用に含む。",
+          "sourceRefs": [
+            {
+              "title": "上記SUBMISSION期間・費用に含む。",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "phaseCode": "REIMBURSEMENT",
+          "name": "保険償還",
+          "order": 11,
+          "durationMinDays": null,
+          "durationMaxDays": null,
+          "costMinJpy": null,
+          "costMaxJpy": null,
+          "requiredDocuments": ["保険適用希望書", "機能区分該当性資料"],
+          "requiredTests": [],
+          "relatedRegulationIds": [],
+          "pmdaResourceUrls": [],
+          "notes": "品目依存、特定保険医療材料としての機能区分決定が必要な場合あり。",
+          "sourceRefs": [
+            {
+              "title": "令和6年度 医療機器・体外診断用医薬品の保険適用に関するガイドブック（厚労省）",
+              "url": "https://www.mhlw.go.jp/content/10800000/001073851.pdf"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
