@@ -7,14 +7,7 @@ import type { LifecyclePhase } from "./lifecycle-phase.entity";
  * テンプレート選定のみに用いる（分類サブシステム自体の拡張ではない）。
  */
 export type LifecycleDeviceCategory =
-  | "CLASS_I"
-  | "CLASS_II"
-  | "CLASS_III"
-  | "CLASS_IV"
-  | "SAMD"
-  | "IVD"
-  | "ACTIVE"
-  | "OTHER";
+  "CLASS_I" | "CLASS_II" | "CLASS_III" | "CLASS_IV" | "SAMD" | "IVD" | "ACTIVE" | "OTHER";
 
 /** 工程マスタの公開状態（設計変更書②「status(draft/published)」準拠、2状態のみ）。 */
 export type LifecycleTemplateStatus = "DRAFT" | "PUBLISHED";
