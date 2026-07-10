@@ -137,9 +137,7 @@ export const lifecycleTemplateListResponseSchema = z.object({
 export type LifecycleTemplateListResponse = z.infer<typeof lifecycleTemplateListResponseSchema>;
 
 /** GET /api/v1/lifecycle/templates/:id 応答（工程一覧込み）。 */
-export const lifecycleTemplateDetailResponseSchema = lifecycleTemplateSummaryResponseSchema.extend(
-  {
-    steps: z.array(lifecycleTemplateStepResponseSchema),
-  },
-);
+export const lifecycleTemplateDetailResponseSchema = lifecycleTemplateSummaryResponseSchema.extend({
+  steps: z.array(lifecycleTemplateStepResponseSchema),
+});
 export type LifecycleTemplateDetailResponse = z.infer<typeof lifecycleTemplateDetailResponseSchema>;
