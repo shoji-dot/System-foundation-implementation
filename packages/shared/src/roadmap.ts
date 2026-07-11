@@ -83,9 +83,7 @@ export const updateProjectRoadmapStepRequestSchema = z.object({
   actualEndDate: z.string().date().nullable().optional(),
   assigneeId: z.string().uuid().nullable().optional(),
 });
-export type UpdateProjectRoadmapStepRequest = z.infer<
-  typeof updateProjectRoadmapStepRequestSchema
->;
+export type UpdateProjectRoadmapStepRequest = z.infer<typeof updateProjectRoadmapStepRequestSchema>;
 
 /** ロードマップ工程パラメータ（PATCH /projects/:id/roadmap/steps/:stepId、UUID検証）。 */
 export const projectRoadmapStepIdParamSchema = z.object({
