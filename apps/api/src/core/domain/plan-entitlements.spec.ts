@@ -1,4 +1,8 @@
-import { hasReachedProjectLimit, hasReachedSubscriptionLimit } from "./plan-entitlements";
+import {
+  hasReachedProjectLimit,
+  hasReachedRoadmapLimit,
+  hasReachedSubscriptionLimit,
+} from "./plan-entitlements";
 
 describe("hasReachedProjectLimit", () => {
   it("returns false while the FREE plan count is below the limit (3)", () => {
@@ -51,5 +55,27 @@ describe("hasReachedSubscriptionLimit", () => {
   it("always returns false for the unlimited ENTERPRISE plan", () => {
     expect(hasReachedSubscriptionLimit("ENTERPRISE", 0)).toBe(false);
     expect(hasReachedSubscriptionLimit("ENTERPRISE", 10_000)).toBe(false);
+  });
+});
+
+describe("hasReachedRoadmapLimit", () => {
+  it("always returns true for the FREE plan (view-only, limit=0)", () => {
+    expect(hasReachedRoadmapLimit("FREE", 0)).toBe(true);
+    expect(hasReachedRoadmapLimit("FREE", 1)).toBe(true);
+  });
+
+  it("returns true once the PRO plan count reaches the limit (3)", () => {
+    expect(hasReachedRoadmapLimit("PRO", 2)).toBe(false);
+    expect(hasReachedRoadmapLimit("PRO", 3)).toBe(true);
+  });
+
+  it("always returns false for the unlimited BUSINESS plan", () => {
+    expect(hasReachedRoadmapLimit("BUSINESS", 0)).toBe(false);
+    expect(hasReachedRoadmapLimit("BUSINESS", 10_000)).toBe(false);
+  });
+
+  it("always returns false for the unlimited ENTERPRISE plan", () => {
+    expect(hasReachedRoadmapLimit("ENTERPRISE", 0)).toBe(false);
+    expect(hasReachedRoadmapLimit("ENTERPRISE", 10_000)).toBe(false);
   });
 });
