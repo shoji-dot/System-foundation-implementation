@@ -2,12 +2,16 @@ import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from
 import type {
   ProjectListResponse,
   ProjectResponse,
+  ProjectRoadmapResponse,
+  ProjectRoadmapStepResponse,
   ProjectTaskListResponse,
   ProjectTaskResponse,
 } from "@yakuji/shared";
 import {
   projectListResponseSchema,
   projectResponseSchema,
+  projectRoadmapResponseSchema,
+  projectRoadmapStepResponseSchema,
   projectTaskListResponseSchema,
   projectTaskResponseSchema,
 } from "@yakuji/shared";
@@ -15,18 +19,25 @@ import {
 import type { AuthenticatedRequest } from "../../common/guards/authenticated-request";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { toDateOnlyString } from "../../common/utils/date-only";
+import type { ProjectRoadmapStepDetail } from "../../core/domain/project-roadmap.entity";
 import { CreateProjectTaskUsecase } from "../../core/usecases/create-project-task.usecase";
 import { CreateProjectUsecase } from "../../core/usecases/create-project.usecase";
+import { GenerateProjectRoadmapUsecase } from "../../core/usecases/generate-project-roadmap.usecase";
 import { GetProjectDetailUsecase } from "../../core/usecases/get-project-detail.usecase";
+import { GetProjectRoadmapUsecase } from "../../core/usecases/get-project-roadmap.usecase";
 import { ListProjectTasksUsecase } from "../../core/usecases/list-project-tasks.usecase";
 import { ListProjectsUsecase } from "../../core/usecases/list-projects.usecase";
+import { UpdateProjectRoadmapStepUsecase } from "../../core/usecases/update-project-roadmap-step.usecase";
 import { UpdateProjectTaskStatusUsecase } from "../../core/usecases/update-project-task-status.usecase";
 
 import { CreateProjectRequestDto } from "./dto/create-project-request.dto";
 import { CreateProjectTaskRequestDto } from "./dto/create-project-task-request.dto";
+import { GenerateProjectRoadmapRequestDto } from "./dto/generate-project-roadmap-request.dto";
 import { ListProjectsQueryDto } from "./dto/list-projects-query.dto";
 import { ProjectIdParamDto } from "./dto/project-id-param.dto";
+import { ProjectRoadmapStepIdParamDto } from "./dto/project-roadmap-step-id-param.dto";
 import { ProjectTaskIdParamDto } from "./dto/project-task-id-param.dto";
+import { UpdateProjectRoadmapStepRequestDto } from "./dto/update-project-roadmap-step-request.dto";
 import { UpdateProjectTaskStatusRequestDto } from "./dto/update-project-task-status-request.dto";
 
 /**
@@ -45,6 +56,9 @@ export class ProjectsController {
     private readonly listProjectTasksUsecase: ListProjectTasksUsecase,
     private readonly createProjectTaskUsecase: CreateProjectTaskUsecase,
     private readonly updateProjectTaskStatusUsecase: UpdateProjectTaskStatusUsecase,
+    private readonly generateProjectRoadmapUsecase: GenerateProjectRoadmapUsecase,
+    private readonly getProjectRoadmapUsecase: GetProjectRoadmapUsecase,
+    private readonly updateProjectRoadmapStepUsecase: UpdateProjectRoadmapStepUsecase,
   ) {}
 
   @Get()
@@ -182,4 +196,119 @@ export class ProjectsController {
       createdAt: task.createdAt.toISOString(),
     });
   }
+
+  @Post(":id/roadmap")
+  async generateRoadmap(
+    @Req() request: AuthenticatedRequest,
+    @Param() params: ProjectIdParamDto,
+    @Body() body: GenerateProjectRoadmapRequestDto,
+  ): Promise<ProjectRoadmapResponse> {
+    const roadmap = await this.generateProjectRoadmapUsecase.execute({
+      userId: request.user.userId,
+      plan: request.user.plan,
+      projectId: params.id,
+      templateId: body.templateId,
+    });
+
+    return projectRoadmapResponseSchema.parse({
+      id: roadmap.id,
+      projectId: roadmap.projectId,
+      templateId: roadmap.templateId,
+      generatedAt: roadmap.generatedAt.toISOString(),
+      aiAdjustments: roadmap.aiAdjustments,
+      status: roadmap.status,
+      steps: roadmap.steps.map((step) => toRoadmapStepResponse(step)),
+      createdAt: roadmap.createdAt.toISOString(),
+      updatedAt: roadmap.updatedAt.toISOString(),
+    });
+  }
+
+  @Get(":id/roadmap")
+  async getRoadmap(
+    @Req() request: AuthenticatedRequest,
+    @Param() params: ProjectIdParamDto,
+  ): Promise<ProjectRoadmapResponse> {
+    const roadmap = await this.getProjectRoadmapUsecase.execute({
+      userId: request.user.userId,
+      projectId: params.id,
+    });
+
+    return projectRoadmapResponseSchema.parse({
+      id: roadmap.id,
+      projectId: roadmap.projectId,
+      templateId: roadmap.templateId,
+      generatedAt: roadmap.generatedAt.toISOString(),
+      aiAdjustments: roadmap.aiAdjustments,
+      status: roadmap.status,
+      steps: roadmap.steps.map((step) => toRoadmapStepResponse(step)),
+      createdAt: roadmap.createdAt.toISOString(),
+      updatedAt: roadmap.updatedAt.toISOString(),
+    });
+  }
+
+  @Patch(":id/roadmap/steps/:stepId")
+  async updateRoadmapStep(
+    @Req() request: AuthenticatedRequest,
+    @Param() params: ProjectRoadmapStepIdParamDto,
+    @Body() body: UpdateProjectRoadmapStepRequestDto,
+  ): Promise<ProjectRoadmapStepResponse> {
+    const step = await this.updateProjectRoadmapStepUsecase.execute({
+      userId: request.user.userId,
+      projectId: params.id,
+      stepId: params.stepId,
+      status: body.status,
+      plannedStartDate: parseDateOnlyField(body.plannedStartDate),
+      plannedEndDate: parseDateOnlyField(body.plannedEndDate),
+      actualStartDate: parseDateOnlyField(body.actualStartDate),
+      actualEndDate: parseDateOnlyField(body.actualEndDate),
+      assigneeId: body.assigneeId,
+    });
+
+    return toRoadmapStepResponse(step);
+  }
+}
+
+/**
+ * PATCHの部分更新セマンティクス（undefined=変更なし、null=クリア、値=更新）をそのままusecase入力へ渡す。
+ * body側はstring | null | undefined、usecase/repository側はDate | null | undefinedのため日付のみ変換する。
+ */
+function parseDateOnlyField(value: string | null | undefined): Date | null | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  return value === null ? null : new Date(value);
+}
+
+function toRoadmapStepResponse(step: ProjectRoadmapStepDetail): ProjectRoadmapStepResponse {
+  return projectRoadmapStepResponseSchema.parse({
+    id: step.id,
+    templateStep: {
+      id: step.templateStep.id,
+      phase: {
+        code: step.templateStep.phase.code,
+        name: step.templateStep.phase.name,
+        order: step.templateStep.phase.order,
+      },
+      name: step.templateStep.name,
+      order: step.templateStep.order,
+      durationMinDays: step.templateStep.durationMinDays,
+      durationMaxDays: step.templateStep.durationMaxDays,
+      costMinJpy: step.templateStep.costMinJpy,
+      costMaxJpy: step.templateStep.costMaxJpy,
+      requiredDocuments: step.templateStep.requiredDocuments,
+      requiredTests: step.templateStep.requiredTests,
+      relatedRegulationIds: step.templateStep.relatedRegulationIds,
+      pmdaResourceUrls: step.templateStep.pmdaResourceUrls,
+      notes: step.templateStep.notes,
+      sourceRefs: step.templateStep.sourceRefs,
+    },
+    status: step.status,
+    plannedStartDate: toDateOnlyString(step.plannedStartDate),
+    plannedEndDate: toDateOnlyString(step.plannedEndDate),
+    actualStartDate: toDateOnlyString(step.actualStartDate),
+    actualEndDate: toDateOnlyString(step.actualEndDate),
+    assigneeId: step.assigneeId,
+    createdAt: step.createdAt.toISOString(),
+    updatedAt: step.updatedAt.toISOString(),
+  });
 }
