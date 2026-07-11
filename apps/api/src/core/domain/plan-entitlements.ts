@@ -38,3 +38,19 @@ export function hasReachedProjectLimit(plan: Plan, currentCount: number): boolea
 export function hasReachedSubscriptionLimit(plan: Plan, currentCount: number): boolean {
   return hasReachedLimit(PLAN_SUBSCRIPTION_LIMITS[plan], currentCount);
 }
+
+/**
+ * ロードマップ生成・保存数の上限（設計変更書⑥「ロードマップ: Free=テンプレ閲覧のみ／Pro=生成・保存3件／
+ * Business・Enterprise=無制限」準拠、Phase7 7-3）。FREE=0とすることで、hasReachedLimit
+ * （currentCount>=limit）が常にtrueを返し、他プランと同じ仕組みで「生成不可（閲覧のみ）」を表現する。
+ */
+export const PLAN_ROADMAP_LIMITS: Record<Plan, number | null> = {
+  FREE: 0,
+  PRO: 3,
+  BUSINESS: null,
+  ENTERPRISE: null,
+};
+
+export function hasReachedRoadmapLimit(plan: Plan, currentCount: number): boolean {
+  return hasReachedLimit(PLAN_ROADMAP_LIMITS[plan], currentCount);
+}
