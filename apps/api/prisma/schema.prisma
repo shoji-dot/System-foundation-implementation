@@ -58,6 +58,15 @@
 //            ため、taggableId FK制約なしの既存パターンをそのまま踏襲）。
 //          - procedureType（届出/認証/承認、自由文字列の設計は維持）を approvalRoute へ改称し、「新医療機器/改良/
 //            後発」という意味との混同を避ける。
+// Phase 7 (⑦-3 ロードマップ, 2026-07-11): 設計変更書_ライフサイクル管理_SaaS化.md ② DB変更のうち
+//          ProjectRoadmap/ProjectRoadmapStep（7-2時点で先送りしたプロジェクトへのテンプレート適用・進捗管理）
+//          を追加する。本コミットはスキーマ追加のみ（生成/進捗API・S23-S25画面・S16統合は別コミット）。
+//          RoadmapStatusは設計書に値の明記が無いため、現時点で確実に必要なACTIVEのみを定義する
+//          （将来、生成usecase実装時に必要が生じた場合はPostgresのALTER TYPE ADD VALUEで追加可能なため、
+//          使途未確定の状態を先行して増やさない方針。実装時の判断のため要ユーザー確認）。
+//          assigneeIdはproject_tasks.assignee（自由文字列）とは異なりUser直接参照のFKとする
+//          （設計書がassigneeではなくassigneeIdと明記していること、7-4のS26組織横断ビューでメンバー単位の
+//          集計が必要になることを踏まえた判断）。
 //          - effectiveFrom/effectiveTo（regulation_versionsと同型）を追加。これはアプリ内のpublish/versionの
 //            ライフサイクル管理（既存のversion+statusで完結、変更なし）とは別に、「この期間・費用データが妥当と
 //            確認できた実世界の期間」を監査目的で保持するための列（PMDA手数料改定等の追跡に必須とユーザー判断）。
@@ -146,6 +155,8 @@ model User {
   /// 課金サブスクリプション（Phase7 ⑦-1）。既存の`subscriptions`（更新通知購読, UpdateSubscription）と
   /// 名称が衝突するため billingSubscriptions とする。
   billingSubscriptions Subscription[]
+  /// ロードマップ工程の担当者として割り当てられた場合の逆参照（Phase7 7-3、S26組織横断ビュー用）。
+  assignedRoadmapSteps ProjectRoadmapStep[]
 
   @@map("users")
 }
@@ -569,6 +580,7 @@ model Project {
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   tasks        ProjectTask[]
+  roadmap      ProjectRoadmap?
 
   @@index([userId])
   @@map("user_projects")
@@ -859,6 +871,7 @@ model LifecycleTemplate {
 
   jurisdiction Jurisdiction            @relation(fields: [jurisdictionId], references: [id], onDelete: Restrict)
   steps        LifecycleTemplateStep[]
+  roadmaps     ProjectRoadmap[]
 
   @@index([jurisdictionId, framework, deviceClass, approvalRoute, status], name: "lifecycle_templates_filter_idx")
   @@map("lifecycle_templates")
@@ -891,8 +904,82 @@ model LifecycleTemplateStep {
 
   template LifecycleTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
   phase    LifecyclePhase    @relation(fields: [phaseId], references: [id], onDelete: Restrict)
+  roadmapSteps ProjectRoadmapStep[]
 
   @@index([templateId])
   @@index([phaseId])
   @@map("lifecycle_template_steps")
+}
+
+/// ロードマップの状態（Phase7 7-3、設計変更書②「ProjectRoadmap...status」準拠）。
+/// 値はACTIVEのみを先行定義する（生成usecase未実装のためGENERATING/FAILED等の要否が確定していない。
+/// Postgres enumは`ALTER TYPE ... ADD VALUE`で後方互換に値を追加できるため、必要が生じた時点で追加する
+/// 方針とし、使途未確定の値を先行して増やさない。実装時の判断のため要ユーザー確認）。
+enum RoadmapStatus {
+  ACTIVE
+}
+
+/// ロードマップ工程の進捗状態（Phase7 7-3）。既存 TaskStatus（project_tasks、S16）と同じ3値だが、
+/// テンプレートから生成される別エンティティのため専用enumとする（regulation_versions/lifecycle_templates
+/// 等、本スキーマの既存方針＝概念ごとに専用statusを持つ、に合わせた）。
+enum RoadmapStepStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+/// プロジェクトへ適用されたロードマップ（設計変更書② DB変更 ProjectRoadmap 準拠、Phase7 7-3）。
+/// projectIdはunique制約により「1プロジェクトに最大1ロードマップ」を表現する（design doc「projectId(1:1拡張)」
+/// 準拠の最も素直な解釈。再生成時の履歴保持（旧ロードマップのアーカイブ）は設計書に記載が無いため
+/// 今回は対象外とし、再生成usecase実装時に必要であれば別途ユーザー確認のうえ検討する）。
+/// templateIdはPUBLISHED版のLifecycleTemplateを想定するが、DB制約としてはstatusを問わず参照可能とする
+/// （生成usecase側でPUBLISHEDのみ許可する業務ルールを担保する、既存のlifecycle公開APIと同じ層分担）。
+/// aiAdjustmentsはAI補完提案の保存先（設計書④AI設計「マスタ値は改変しない」準拠、マスタ値のコピーである
+/// ProjectRoadmapStep本体とは独立）。nullableとし、AI呼び出し失敗時も基本の工程複製自体は成功させる
+/// （既存のAIチャット/分類支援と同じOpenAI依存の失敗可能性を考慮した設計、生成usecase実装時に確定）。
+model ProjectRoadmap {
+  id            String        @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  projectId     String        @unique @map("project_id") @db.Uuid
+  templateId    String        @map("template_id") @db.Uuid
+  generatedAt   DateTime      @map("generated_at")
+  aiAdjustments Json?         @map("ai_adjustments")
+  status        RoadmapStatus @default(ACTIVE)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  project  Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  template LifecycleTemplate    @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  steps    ProjectRoadmapStep[]
+
+  @@map("project_roadmaps")
+}
+
+/// ロードマップの個別工程（設計変更書② DB変更 ProjectRoadmapStep 準拠、Phase7 7-3）。
+/// LifecycleTemplateStepの内容をプロジェクトへ複製したもの（マスタ値はtemplateStep経由で参照可能なため
+/// 本モデルには複製しない。progress専用の列のみ持つ）。
+/// assigneeIdはproject_tasks.assignee（自由文字列）と異なりUserへのFK（onDelete: SetNull）とする。
+/// 理由: 設計書がassigneeではなくassigneeIdと明記していること、7-4 S26「組織内全プロジェクトの工程進捗・
+/// 期限・担当の横断ビュー」でメンバー単位の集計が必要になることを踏まえた判断（実装時の判断のため
+/// 要ユーザー確認）。
+model ProjectRoadmapStep {
+  id               String            @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  roadmapId        String            @map("roadmap_id") @db.Uuid
+  templateStepId   String            @map("template_step_id") @db.Uuid
+  status           RoadmapStepStatus @default(TODO)
+  plannedStartDate DateTime?         @map("planned_start_date") @db.Date
+  plannedEndDate   DateTime?         @map("planned_end_date") @db.Date
+  actualStartDate  DateTime?         @map("actual_start_date") @db.Date
+  actualEndDate    DateTime?         @map("actual_end_date") @db.Date
+  assigneeId       String?           @map("assignee_id") @db.Uuid
+  customFields     Json?             @map("custom_fields")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  roadmap      ProjectRoadmap        @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  templateStep LifecycleTemplateStep @relation(fields: [templateStepId], references: [id], onDelete: Restrict)
+  assignee     User?                 @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  @@index([roadmapId])
+  @@index([assigneeId])
+  @@map("project_roadmap_steps")
 }
